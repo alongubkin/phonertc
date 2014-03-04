@@ -64,6 +64,7 @@ To start the TURN server, run the following command:
 
 To start a call, you can do something like:
 
+```javascript
     phonertc.call({ 
         isInitator: true, 
         turn: {
@@ -91,4 +92,5 @@ To start a call, you can do something like:
             phonertc.receiveMessage(message.data);
         }
     };
+```
     
