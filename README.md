@@ -72,9 +72,7 @@ Add the plugin:
 
     cordova plugin add https://github.com/alongubkin/phonertc.git
     
-### Usage 
-
-To start a call, you can do something like:
+### Usage Example 
 
 ```javascript
 phonertc.call({ 
