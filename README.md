@@ -134,3 +134,10 @@ This command will result in an error. Open the project in Xcode and change the f
 In the target choose a real iOS device, not the simulator, otherwise it won't build.
 
 To create an IPA, go to Product > Archive.
+
+### Note on native libraries
+
+The libs directory contains compiled libraries from the [official webrtc project](https://code.google.com/p/webrtc/). If you want to build them yourself, use the following tutorials:
+
+Android: https://code.google.com/p/webrtc/source/browse/trunk/talk/examples/android/README
+iOS: https://code.google.com/p/webrtc/source/browse/trunk/talk/app/webrtc/objc/README
