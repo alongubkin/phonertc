@@ -3,7 +3,7 @@ PhoneRTC
 
 PhoneRTC is a standalone video/voice chat solution for PhoneGap based on WebRTC.
 
-### How does PhoneRTC differ from OpenTok, Weemo, etc?
+### How does PhoneRTC differ from OpenTok, Weemo and other solutions?
 
 WebRTC is mostly a peer-to-peer protocol, but it still needs servers: a signaling server for initializing the call, and a proxy server if the peer-to-peer connection fails.
 
