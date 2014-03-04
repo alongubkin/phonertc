@@ -62,9 +62,12 @@ To start the TURN server, run the following command:
 
 ### Plugin Installation
 
-Create a new cordova project:
+Install Cordova:
 
     npm install -g cordova ios-deploy
+    
+Create a new cordova project:
+
     cordova create <name>
     cordova platform add ios android
 
