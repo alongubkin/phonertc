@@ -1,4 +1,4 @@
-var webrtc = { 
+var phonertc = { 
 	call: function (options) {
 		cordova.exec(
 			function (data) { 
