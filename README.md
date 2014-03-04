@@ -65,32 +65,32 @@ To start the TURN server, run the following command:
 To start a call, you can do something like:
 
 ```javascript
-    phonertc.call({ 
-        isInitator: true, 
-        turn: {
-            host: 'turn:turn.example.com:3478',
-            username: 'user',
-            password: 'pass
-        },
-        sendMessageCallback: function (data) {
-            // send a message to the target with the signaling server
-            signaling.sendMessage(target, { 
-                type: 'webrtc_handshake',
-                data: data
-            });
-        },
-        answerCallback: function () {
-            alert('Callee answered!');
-        },
-        disconnectCallback: function () {
-            alert('Call disconnected!');
-        }
-    });
-    
-    signaling.onMessage = function (message) {
-        if (message.type === 'webrtc_handshake') {
-            phonertc.receiveMessage(message.data);
-        }
-    };
+phonertc.call({ 
+    isInitator: true, 
+    turn: {
+        host: 'turn:turn.example.com:3478',
+        username: 'user',
+        password: 'pass
+    },
+    sendMessageCallback: function (data) {
+        // send a message to the target with the signaling server
+        signaling.sendMessage(target, { 
+            type: 'webrtc_handshake',
+            data: data
+        });
+    },
+    answerCallback: function () {
+        alert('Callee answered!');
+    },
+    disconnectCallback: function () {
+        alert('Call disconnected!');
+    }
+});
+
+signaling.onMessage = function (message) {
+    if (message.type === 'webrtc_handshake') {
+        phonertc.receiveMessage(message.data);
+    }
+};
 ```
     
