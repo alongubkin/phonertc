@@ -52,7 +52,9 @@ Also uncomment the following options:
     lt-cred-mech
     fingerprint 
 
-Next, open `/etc/turnuserdb.conf` and add a new user at the end of the file (the format is `username:password`).
+Next, open `/etc/turnuserdb.conf` and add a new user at the end of the file. The format is: 
+
+    username:password
 
 To start the TURN server, run the following command:
 
