@@ -116,11 +116,15 @@ Building for Android is easy. You can just:
     cordova build android
     cordova run android
 
-In iOS, it's slightly more complicated. Open the project in Xcode and change the following options in the project settings:
+In iOS, it's slightly more complicated. Run:
+
+    cordova build ios
+    
+This command will result in an error, it's fine. Open the project in Xcode and change the following options in the project settings:
 
     Valid Architectures => armv7
     Build Active Architecture Only => No
 
-In the target choose a real iOS device, not a simulator, otherwise it won't build.
+In the target choose a real iOS device, not the simulator, otherwise it won't build.
 
 To create an IPA, go to Product > Archive.
