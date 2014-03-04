@@ -123,4 +123,4 @@ In iOS, it's slightly more complicated. Open the project in Xcode and change the
 
 In the target choose a real iOS device, not a simulator, otherwise it won't build.
 
-To create an IPA, go to Product -> Archive.
+To create an IPA, go to Product > Archive.
