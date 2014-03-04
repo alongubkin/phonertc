@@ -70,7 +70,7 @@ phonertc.call({
     turn: {
         host: 'turn:turn.example.com:3478',
         username: 'user',
-        password: 'pass
+        password: 'pass'
     },
     sendMessageCallback: function (data) {
         // send a message to the target with the signaling server
