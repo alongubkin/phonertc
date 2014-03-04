@@ -30,11 +30,11 @@ PhoneRTC allows you to use your own servers, without relying on anyone.
 
 To set up a TURN server, create an Amazon EC2 instance with the latest Ubuntu. Open the following port in the instance security group:
 
-TCP 443
-TCP 3478-3479
-TCP 32355-65535
-UDP 3478-3479
-UDP 32355-65535
+    TCP 443
+    TCP 3478-3479
+    TCP 32355-65535
+    UDP 3478-3479
+    UDP 32355-65535
 
 Open SSH and run:
 
