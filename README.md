@@ -66,14 +66,15 @@ To start a call, you can do something like:
 
 ```javascript
 phonertc.call({ 
-    isInitator: true, 
+    isInitator: true, // Caller or callee?
     turn: {
         host: 'turn:turn.example.com:3478',
         username: 'user',
         password: 'pass'
     },
     sendMessageCallback: function (data) {
-        // send a message to the target with the signaling server
+        // PhoneRTC wants to send a message to your target, use
+        // your signaling server here to send the message.
         signaling.sendMessage(target, { 
             type: 'webrtc_handshake',
             data: data
@@ -89,6 +90,8 @@ phonertc.call({
 
 signaling.onMessage = function (message) {
     if (message.type === 'webrtc_handshake') {
+        // when a message is received from the signaling server, 
+        // notify the PhoneRTC plugin.
         phonertc.receiveMessage(message.data);
     }
 };
