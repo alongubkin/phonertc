@@ -1,5 +1,4 @@
-PhoneRTC
-========
+## PhoneRTC
 
 PhoneRTC is a standalone video/voice chat solution for PhoneGap based on WebRTC.
 
