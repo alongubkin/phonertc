@@ -60,7 +60,19 @@ To start the TURN server, run the following command:
 
     sudo /etc/init.d/rfc5766-turn-server start
 
-## Usage 
+### Plugin Installation
+
+Create a new cordova project:
+
+    npm install -g cordova ios-deploy
+    cordova create <name>
+    cordova platform add ios android
+
+Add the plugin:
+
+    cordova plugin add https://github.com/alongubkin/phonertc.git
+    
+### Usage 
 
 To start a call, you can do something like:
 
