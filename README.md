@@ -24,7 +24,7 @@ Other solutions, such as OpenTok and Weemo, require you to use their own third-p
 
 PhoneRTC allows you to use your own servers, without relying on anyone. 
 
-## Setting up a TURN server
+### Setting up a TURN server
 
 To set up a TURN server, create an Amazon EC2 instance with the latest Ubuntu. Open the following ports in the instance security group:
 
