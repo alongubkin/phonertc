@@ -140,4 +140,5 @@ To create an IPA, go to Product > Archive.
 The libs directory contains compiled libraries from the [official webrtc project](https://code.google.com/p/webrtc/). If you want to build them yourself, use the following tutorials:
 
 Android: https://code.google.com/p/webrtc/source/browse/trunk/talk/examples/android/README
+
 iOS: https://code.google.com/p/webrtc/source/browse/trunk/talk/app/webrtc/objc/README
