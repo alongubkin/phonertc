@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?><plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.dooble.phonertc"
+    version="1.0.0">
+
+    <name>PhoneRTC</name>
+    <description></description>
+    <license></license>
+
+    <engines>
+        <engine name="cordova" version=">=3.0.0" />
+    </engines>    
+
+    <js-module src="www/phonertc.js" name="PhoneRTC">
+        <clobbers target="cordova.plugins.phonertc" />
+    </js-module>
+
+    <asset src="www/phonertc.js" target="phonertc.js" />
+
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+			<feature name="PhoneRTCPlugin">
+				<param name="ios-package" value="PhoneRTCPlugin" />
+			</feature>
+        </config-file>
+
+        <header-file src="src/ios/PhoneRTCPlugin.h" />
+		<header-file src="src/ios/RTCAudioSource.h" />
+		<header-file src="src/ios/RTCAudioTrack.h" />	
+		<header-file src="src/ios/RTCI420Frame.h" />
+		<header-file src="src/ios/RTCICECandidate.h" />
+		<header-file src="src/ios/RTCICEServer.h" />
+		<header-file src="src/ios/RTCMediaConstraints.h" />
+		<header-file src="src/ios/RTCMediaSource.h" />
+		<header-file src="src/ios/RTCMediaStream.h" />
+		<header-file src="src/ios/RTCMediaStreamTrack.h" />
+		<header-file src="src/ios/RTCPair.h" />
+		<header-file src="src/ios/RTCPeerConnection.h" />
+		<header-file src="src/ios/RTCPeerConnectionDelegate.h" />
+		<header-file src="src/ios/RTCPeerConnectionFactory.h" />
+		<header-file src="src/ios/RTCSessionDescription.h" />
+		<header-file src="src/ios/RTCSessionDescriptonDelegate.h" />
+		<header-file src="src/ios/RTCTypes.h" />
+		<header-file src="src/ios/RTCVideoCapturer.h" />
+		<header-file src="src/ios/RTCVideoRenderer.h" />
+		<header-file src="src/ios/RTCVideoRendererDelegate.h" />
+		<header-file src="src/ios/RTCVideoSource.h" />
+		<header-file src="src/ios/RTCVideoTrack.h" />
+		<header-file src="src/ios/PhoneRTCDelegate.h" />
+		
+        <source-file src="src/ios/PhoneRTCDelegate.m" />
+		<source-file src="src/ios/PhoneRTCPlugin.m" />
+
+        <framework src="libstdc++.dylib" />
+		<framework src="libsqlite3.0.dylib" />	
+        <framework src="OpenGLES.framework" />
+        <framework src="CoreVideo.framework" />
+        <framework src="CoreMedia.framework" />
+        <framework src="CoreAudio.framework" />
+        <framework src="AVFoundation.framework" />
+        <framework src="QuartzCore.framework" />		
+        <framework src="AssetsLibrary.framework" />
+        <framework src="CoreGraphics.framework" />			
+        <framework src="MobileCoreServices.framework" />
+		<framework src="CoreLocation.framework" />
+		<framework src="AudioToolbox.framework" />
+		<source-file src="libs/ios/lib_core_neon_offsets.a" framework="true" />
+		<source-file src="libs/ios/libacm2.a" framework="true" />
+		<source-file src="libs/ios/libaudio_coding_module.a" framework="true" />
+		<source-file src="libs/ios/libaudio_conference_mixer.a" framework="true" />
+		<source-file src="libs/ios/libaudio_device.a" framework="true" />
+		<source-file src="libs/ios/libaudio_processing.a" framework="true" />
+		<source-file src="libs/ios/libaudio_processing_neon.a" framework="true" />
+		<source-file src="libs/ios/libbitrate_controller.a" framework="true" />
+		<source-file src="libs/ios/libCNG.a" framework="true" />
+		<source-file src="libs/ios/libcommon_audio.a" framework="true" />
+		<source-file src="libs/ios/libcommon_audio_neon.a" framework="true" />
+		<source-file src="libs/ios/libcommon_video.a" framework="true" />
+		<source-file src="libs/ios/libcrnspr.a" framework="true" />
+		<source-file src="libs/ios/libcrnss.a" framework="true" />
+		<source-file src="libs/ios/libcrnssckbi.a" framework="true" />
+		<source-file src="libs/ios/libcrssl.a" framework="true" />
+		<source-file src="libs/ios/libexpat.a" framework="true" />
+		<source-file src="libs/ios/libG711.a" framework="true" />
+		<source-file src="libs/ios/libG722.a" framework="true" />
+		<source-file src="libs/ios/libicudata.a" framework="true" />
+		<source-file src="libs/ios/libicui18n.a" framework="true" />
+		<source-file src="libs/ios/libicuuc.a" framework="true" />
+		<source-file src="libs/ios/libiLBC.a" framework="true" />
+		<source-file src="libs/ios/libiSAC.a" framework="true" />
+		<source-file src="libs/ios/libisac_neon.a" framework="true" />
+		<source-file src="libs/ios/libiSACFix.a" framework="true" />
+		<source-file src="libs/ios/libjingle.a" framework="true" />
+		<source-file src="libs/ios/libjingle_media.a" framework="true" />
+		<source-file src="libs/ios/libjingle_p2p.a" framework="true" />
+		<source-file src="libs/ios/libjingle_peerconnection.a" framework="true" />
+		<source-file src="libs/ios/libjingle_peerconnection_objc.a" framework="true" />
+		<source-file src="libs/ios/libjingle_sound.a" framework="true" />
+		<source-file src="libs/ios/libjsoncpp.a" framework="true" />
+		<source-file src="libs/ios/libmedia_file.a" framework="true" />
+		<source-file src="libs/ios/libNetEq.a" framework="true" />
+		<source-file src="libs/ios/libNetEq4.a" framework="true" />
+		<source-file src="libs/ios/libnss_static.a" framework="true" />
+		<source-file src="libs/ios/libopus.a" framework="true" />
+		<source-file src="libs/ios/libpaced_sender.a" framework="true" />
+		<source-file src="libs/ios/libPCM16B.a" framework="true" />
+		<source-file src="libs/ios/librbe_components.a" framework="true" />
+		<source-file src="libs/ios/libremote_bitrate_estimator.a" framework="true" />
+		<source-file src="libs/ios/librtp_rtcp.a" framework="true" />
+		<source-file src="libs/ios/libsqlite_regexp.a" framework="true" />
+		<source-file src="libs/ios/libsrtp.a" framework="true" />
+		<source-file src="libs/ios/libsystem_wrappers.a" framework="true" />
+		<source-file src="libs/ios/libvideo_capture_module.a" framework="true" />
+		<source-file src="libs/ios/libvideo_coding_utility.a" framework="true" />
+		<source-file src="libs/ios/libvideo_engine_core.a" framework="true" />
+		<source-file src="libs/ios/libvideo_processing.a" framework="true" />
+		<source-file src="libs/ios/libvideo_render_module.a" framework="true" />
+		<source-file src="libs/ios/libvoice_engine.a" framework="true" />
+		<source-file src="libs/ios/libvpx.a" framework="true" />
+		<source-file src="libs/ios/libvpx_asm_offsets_vp8.a" framework="true" />
+		<source-file src="libs/ios/libvpx_asm_offsets_vpx_scale.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_i420.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_opus.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_utility.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_video_coding.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_vp8.a" framework="true" />
+		<source-file src="libs/ios/libyuv.a" framework="true" />
+		<source-file src="libs/ios/libyuv_neon.a" framework="true" />
+    </platform>
+
+    <platform name="android">
+        <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
+        
+        <config-file target="res/xml/config.xml" parent="/*">
+			<feature name="WebRTCPlugin">
+				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
+			</feature>	
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+			<uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+			<uses-permission android:name="android.permission.RECORD_AUDIO" />
+			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        </config-file>
+
+        <source-file src="libs/android/libjingle_peerconnection.jar" target-dir="libs"/>
+		<source-file src="libs/android/armeabi-v7a/libjingle_peerconnection_so.so" target-dir="libs/armeabi-v7a"/>
+    </platform>
+</plugin>
