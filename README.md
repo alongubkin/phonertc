@@ -120,7 +120,7 @@ In iOS, it's slightly more complicated. Run:
 
     cordova build ios
     
-This command will result in an error, it's fine. Open the project in Xcode and change the following options in the project settings:
+This command will result in an error. Open the project in Xcode and change the following options in the project settings:
 
     Valid Architectures => armv7
     Build Active Architecture Only => No
