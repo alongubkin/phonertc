@@ -47,7 +47,7 @@ Next, edit `/etc/turnserver.conf` and change the following options:
     external-ip=<public EC2 ip address>
     min-port=32355 
     max-port=65535
-    realm=realm
+    realm=<your domain>
     
 Also uncomment the following options:
 
