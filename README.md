@@ -109,7 +109,7 @@ signaling.onMessage = function (message) {
 };
 ```
 
-#### Building
+### Building
 
 Building for Android is easy. You can just:
 
