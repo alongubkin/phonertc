@@ -137,7 +137,7 @@ To create an IPA, go to Product > Archive.
 
 ### Note on native libraries
 
-The `libs` directory contains compiled libraries from the [official webrtc project](https://code.google.com/p/webrtc/). If you want to build them yourself, use the following tutorials:
+The `libs` directory contains compiled libraries from the [official WebRTC project](https://code.google.com/p/webrtc/). If you want to build them yourself, use the following tutorials:
 
 Android: https://code.google.com/p/webrtc/source/browse/trunk/talk/examples/android/README
 
