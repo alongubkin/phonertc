@@ -4,11 +4,11 @@ PhoneRTC is an open-source standalone video/voice chat solution for PhoneGap bas
 
 ### Features
 
-* Completely open source
-* Android and iOS support
-* Simple JavaScript API
-* Video and voice chat
-* Use your own servers without relying on any third-party
+* Completely open source.
+* Android and iOS support.
+* Simple JavaScript API.
+* Video and voice chat.
+* Use your own servers without relying on any third-party.
 
 ### How does PhoneRTC differ from OpenTok, Weemo, etc?
 
