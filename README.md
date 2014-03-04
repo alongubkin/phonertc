@@ -8,3 +8,4 @@ WebRTC is a peer-to-peer protocol, but it still needs some servers: a signaling 
 
 Other solutions, such as OpenTok and Weemo, require you to use their own third-party servers. That means they are much easier to use, but that also means that they are less open, have a subscription model, and you are generally less in control.
 
+PhoneRTC allows you to use your own servers, without relying on anyone. 
