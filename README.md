@@ -11,6 +11,11 @@ PhoneRTC is an open-source standalone video/voice chat solution for PhoneGap bas
 * Use your own servers without relying on any third-party.
 * Perfect for hybrid mobile apps using Angular.
 
+### Requirements
+
+* TURN server ([rfc5766-turn-server](https://code.google.com/p/rfc5766-turn-server/) on Amazon EC2)
+* Signaling server (SignalR or socket.io are perfect for this) 
+
 ### How does PhoneRTC differ from OpenTok, Weemo, etc?
 
 WebRTC is a peer-to-peer protocol, but it still needs some servers: a signaling server for initializing the call and a proxy server if the peer-to-peer connection fails.
