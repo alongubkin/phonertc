@@ -76,7 +76,6 @@ Add the plugin:
     cordova plugin add https://github.com/alongubkin/phonertc.git
     
 ### Usage Example 
-
 ```javascript
 phonertc.call({ 
     isInitator: true, // Caller or callee?
