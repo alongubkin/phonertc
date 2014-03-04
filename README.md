@@ -58,4 +58,4 @@ Next, open `/etc/turnuserdb.conf` and add a new user at the end of the file (the
 
 To start the TURN server, run the following command:
 
-    /etc/init.d/rfc5766-turn-server start
+    sudo /etc/init.d/rfc5766-turn-server start
