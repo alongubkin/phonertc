@@ -230,7 +230,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onIceCandidate(final IceCandidate iceCandidate) {
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					try {
 						JSONObject json = new JSONObject();
@@ -250,7 +250,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		@Override
 		public void onAddStream(final MediaStream arg0) {
 			// TODO Auto-generated method stub
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					try {
 						JSONObject data = new JSONObject();
@@ -310,7 +310,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private class SDPObserver implements SdpObserver {
 		@Override
 		public void onCreateSuccess(final SessionDescription origSdp) {
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					SessionDescription sdp = new SessionDescription(
 							origSdp.type, preferISAC(origSdp.description));
@@ -330,7 +330,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onSetSuccess() {
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (isInitiator) {
 						if (pc.getRemoteDescription() != null) {
@@ -358,7 +358,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onCreateFailure(final String error) {
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					throw new RuntimeException("createSDP error: " + error);
 				}
@@ -367,7 +367,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onSetFailure(final String error) {
-			WebRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
+			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					//throw new RuntimeException("setSDP error: " + error);
 				}
