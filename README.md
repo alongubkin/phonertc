@@ -1,6 +1,6 @@
 ## PhoneRTC
 
-PhoneRTC is an open-source standalone video/voice chat solution for PhoneGap based on WebRTC.
+WebRTC for PhoneGap apps!
 
 ### Features
 
