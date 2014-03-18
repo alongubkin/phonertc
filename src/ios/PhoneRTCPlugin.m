@@ -28,7 +28,6 @@
                                     password: turnPassword];
         
         self.webRTC = [[PhoneRTCDelegate alloc] init];
-        self.webRTC.currentUserId = currentUserId;
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
         [self.webRTC onICEServers:@[stunServer, turnServer]];

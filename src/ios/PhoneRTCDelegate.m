@@ -217,10 +217,10 @@ didSetSessionDescriptionWithError:(NSError *)error {
 
 
 @implementation PCObserver {
-    id<WEBRTCSendMessage> _delegate;
+    id<PHONERTCSendMessage> _delegate;
 }
 
-- (id)initWithDelegate:(id<WEBRTCSendMessage>)delegate {
+- (id)initWithDelegate:(id<PHONERTCSendMessage>)delegate {
     if (self = [super init]) {
         _delegate = delegate;
     }
