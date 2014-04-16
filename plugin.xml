@@ -132,7 +132,7 @@
         <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
         
         <config-file target="res/xml/config.xml" parent="/*">
-			<feature name="WebRTCPlugin">
+			<feature name="PhoneRTCPlugin">
 				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
 			</feature>	
         </config-file>
