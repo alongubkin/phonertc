@@ -181,10 +181,10 @@ didSetSessionDescriptionWithError:(NSError *)error {
                              JSONObjectWithData:[message dataUsingEncoding:NSUTF8StringEncoding]
                              options:0
                              error:&error];
-    NSAssert(!error,
-             @"%@",
-             [NSString stringWithFormat:@"Error: %@", error.description]);
-    NSAssert([objects count] > 0, @"Invalid JSON object");
+    // NSAssert(!error,
+    //          @"%@",
+    //          [NSString stringWithFormat:@"Error: %@", error.description]);
+    // NSAssert([objects count] > 0, @"Invalid JSON object");
     
     NSString *value = [objects objectForKey:@"type"];
     if ([value compare:@"candidate"] == NSOrderedSame) {
