@@ -2,6 +2,8 @@
 
 WebRTC for PhoneGap apps!
 
+**Note:** PhoneRTC is still at very early stages.
+
 ### Features
 
 * Completely open source.
