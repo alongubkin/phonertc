@@ -5,7 +5,7 @@
 @interface PhoneRTCPlugin : CDVPlugin
 @property(nonatomic, strong) PhoneRTCDelegate *webRTC;
 @property(nonatomic, strong) NSString *sendMessageCallbackId;
-- (void)openCallActivity:(CDVInvokedUrlCommand*)command;
+- (void)call:(CDVInvokedUrlCommand*)command;
 - (void)receiveMessage:(CDVInvokedUrlCommand*)command;
 @end
 
