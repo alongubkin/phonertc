@@ -2,7 +2,7 @@
 
 WebRTC for PhoneGap apps!
 
-**Note:** PhoneRTC is still at very early stages.
+**Note:** PhoneRTC is still at very early stages. Right now, it's more like a proof-of-concept than a production-ready library. 
 
 ### Features
 
