@@ -29,13 +29,21 @@
 
 #import "RTCTypes.h"
 
+@class RTCMediaStreamTrack;
+@protocol RTCMediaStreamTrackDelegate<NSObject>
+
+- (void)mediaStreamTrackDidChange:(RTCMediaStreamTrack*)mediaStreamTrack;
+
+@end
+
 // RTCMediaStreamTrack implements the interface common to RTCAudioTrack and
 // RTCVideoTrack.  Do not create an instance of this class, rather create one
 // of the derived classes.
 @interface RTCMediaStreamTrack : NSObject
 
-@property(nonatomic, assign, readonly) NSString *kind;
-@property(nonatomic, assign, readonly) NSString *label;
+@property(nonatomic, readonly) NSString* kind;
+@property(nonatomic, readonly) NSString* label;
+@property(nonatomic, weak) id<RTCMediaStreamTrackDelegate> delegate;
 
 - (BOOL)isEnabled;
 - (BOOL)setEnabled:(BOOL)enabled;

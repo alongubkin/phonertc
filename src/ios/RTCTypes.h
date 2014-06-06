@@ -55,6 +55,12 @@ typedef enum {
   RTCSignalingClosed,
 } RTCSignalingState;
 
+// RTCStatsOutputLevel correspond to webrtc::StatsOutputLevel
+typedef enum {
+  RTCStatsOutputLevelStandard,
+  RTCStatsOutputLevelDebug,
+} RTCStatsOutputLevel;
+
 // RTCSourceState corresponds to the states in webrtc::SourceState.
 typedef enum {
   RTCSourceStateInitializing,

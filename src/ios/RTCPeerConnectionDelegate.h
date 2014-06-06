@@ -29,6 +29,7 @@
 
 #import "RTCTypes.h"
 
+@class RTCDataChannel;
 @class RTCICECandidate;
 @class RTCMediaStream;
 @class RTCPeerConnection;
@@ -66,5 +67,9 @@
 // New Ice candidate have been found.
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
         gotICECandidate:(RTCICECandidate *)candidate;
+
+// New data channel has been opened.
+- (void)peerConnection:(RTCPeerConnection*)peerConnection
+    didOpenDataChannel:(RTCDataChannel*)dataChannel;
 
 @end
