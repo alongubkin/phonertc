@@ -22,7 +22,6 @@ WebRTC for PhoneGap apps!
 
 * Video chat (really soon)
 * Group chat
-* PhoneGap Build support
 * API documentation
 * Volume control
 
