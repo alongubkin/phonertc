@@ -12,7 +12,7 @@
 #import "RTCVideoRenderer.h"
 #import "RTCVideoCapturer.h"
 #import "RTCVideoTrack.h"
-#import "RTCSessionDescriptonDelegate.h"
+#import "RTCSessionDescriptionDelegate.h"
 
 @protocol PHONERTCSendMessage<NSObject>
 - (void)sendMessage:(NSData*)message;
@@ -28,7 +28,7 @@
 
 @interface PhoneRTCDelegate : UIResponder<ICEServerDelegate,
                                         PHONERTCSendMessage,
-                                        RTCSessionDescriptonDelegate>
+                                        RTCSessionDescriptionDelegate>
 @property(nonatomic, strong) PCObserver *pcObserver;
 @property(nonatomic, strong) RTCPeerConnection *peerConnection;
 @property(nonatomic, strong) RTCPeerConnectionFactory *peerConnectionFactory;
