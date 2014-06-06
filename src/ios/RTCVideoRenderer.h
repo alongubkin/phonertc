@@ -26,27 +26,45 @@
  */
 
 #import <Foundation/Foundation.h>
+#if TARGET_OS_IPHONE
+#import <UIKit/UIKit.h>
+#endif
 
-@protocol RTCVideoRendererDelegate;
-struct CGRect;
+@class RTCI420Frame;
+@class RTCVideoRenderer;
+
+// RTCVideoRendererDelegate is a protocol for an object that must be
+// implemented to get messages when rendering.
+@protocol RTCVideoRendererDelegate<NSObject>
+
+// The size of the frame.
+- (void)renderer:(RTCVideoRenderer*)renderer didSetSize:(CGSize)size;
+
+// The frame to be displayed.
+- (void)renderer:(RTCVideoRenderer*)renderer
+    didReceiveFrame:(RTCI420Frame*)frame;
+
+@end
 
 // Interface for rendering VideoFrames from a VideoTrack
 @interface RTCVideoRenderer : NSObject
 
-@property(nonatomic, strong) id<RTCVideoRendererDelegate> delegate;
-
-// A convenience method to create a renderer and window and render frames into
-// that window.
-+ (RTCVideoRenderer *)videoRenderGUIWithFrame:(CGRect)frame;
+@property(nonatomic, weak) id<RTCVideoRendererDelegate> delegate;
 
 // Initialize the renderer.  Requires a delegate which does the actual drawing
 // of frames.
-- (id)initWithDelegate:(id<RTCVideoRendererDelegate>)delegate;
+- (instancetype)initWithDelegate:(id<RTCVideoRendererDelegate>)delegate;
+
+#if TARGET_OS_IPHONE
+// DEPRECATED. See https://code.google.com/p/webrtc/issues/detail?id=3341 for
+// details.
+- (instancetype)initWithView:(UIView*)view;
+#endif
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Disallow init and don't add to documentation
-- (id)init __attribute__(
-    (unavailable("init is not a supported initializer for this class.")));
+- (id)init __attribute__((
+    unavailable("init is not a supported initializer for this class.")));
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 @end

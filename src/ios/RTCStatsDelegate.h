@@ -1,6 +1,6 @@
 /*
  * libjingle
- * Copyright 2013, Google Inc.
+ * Copyright 2014, Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,22 +28,12 @@
 #import <Foundation/Foundation.h>
 
 @class RTCPeerConnection;
-@class RTCSessionDescription;
 
-extern NSString* const kRTCSessionDescriptionDelegateErrorDomain;
-extern int const kRTCSessionDescriptionDelegateErrorCode;
+// RTCSessionDescriptionDelegate is a protocol for receiving statistic
+// reports from RTCPeerConnection.
+@protocol RTCStatsDelegate<NSObject>
 
-// RTCSessionDescriptonDelegate is a protocol for listening to callback messages
-// when RTCSessionDescriptions are created or set.
-@protocol RTCSessionDescriptonDelegate<NSObject>
-
-// Called when creating a session.
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-    didCreateSessionDescription:(RTCSessionDescription *)sdp
-                          error:(NSError *)error;
-
-// Called when setting a local or remote description.
-- (void)peerConnection:(RTCPeerConnection *)peerConnection
-    didSetSessionDescriptionWithError:(NSError *)error;
+- (void)peerConnection:(RTCPeerConnection*)peerConnection
+           didGetStats:(NSArray*)stats;  // NSArray of RTCStatsReport*.
 
 @end

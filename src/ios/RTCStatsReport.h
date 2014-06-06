@@ -1,6 +1,6 @@
 /*
  * libjingle
- * Copyright 2013, Google Inc.
+ * Copyright 2014, Google Inc.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -27,18 +27,19 @@
 
 #import <Foundation/Foundation.h>
 
-@class RTCI420Frame;
-@class RTCVideoRenderer;
+// ObjectiveC friendly wrapper around a StatsReport object.
+// See talk/app/webrtc/statsypes.h
+@interface RTCStatsReport : NSObject
 
-// RTCVideoRendererDelegate is a protocol for an object that must be
-// implemented to get messages when rendering.
-@protocol RTCVideoRendererDelegate<NSObject>
+@property(nonatomic, readonly) NSString* reportId;
+@property(nonatomic, readonly) NSString* type;
+@property(nonatomic, readonly) CFTimeInterval timestamp;
+@property(nonatomic, readonly) NSArray* values;  // NSArray of RTCPair*.
 
-// The size of the frame.
-- (void)videoRenderer:(RTCVideoRenderer *)videoRenderer setSize:(CGSize)size;
-
-// The frame to be displayed.
-- (void)videoRenderer:(RTCVideoRenderer *)videoRenderer
-          renderFrame:(RTCI420Frame *)frame;
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
+// Disallow init and don't add to documentation
+- (id)init __attribute__((
+    unavailable("init is not a supported initializer for this class.")));
+#endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
 @end

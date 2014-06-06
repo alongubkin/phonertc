@@ -27,33 +27,23 @@
 
 #import <Foundation/Foundation.h>
 
-#import "RTCTypes.h"
+@class RTCPeerConnection;
+@class RTCSessionDescription;
 
-@class RTCMediaStreamTrack;
-@protocol RTCMediaStreamTrackDelegate<NSObject>
+extern NSString* const kRTCSessionDescriptionDelegateErrorDomain;
+extern int const kRTCSessionDescriptionDelegateErrorCode;
 
-- (void)mediaStreamTrackDidChange:(RTCMediaStreamTrack*)mediaStreamTrack;
+// RTCSessionDescriptionDelegate is a protocol for listening to callback
+// messages when RTCSessionDescriptions are created or set.
+@protocol RTCSessionDescriptionDelegate<NSObject>
 
-@end
+// Called when creating a session.
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+    didCreateSessionDescription:(RTCSessionDescription *)sdp
+                          error:(NSError *)error;
 
-// RTCMediaStreamTrack implements the interface common to RTCAudioTrack and
-// RTCVideoTrack.  Do not create an instance of this class, rather create one
-// of the derived classes.
-@interface RTCMediaStreamTrack : NSObject
-
-@property(nonatomic, readonly) NSString* kind;
-@property(nonatomic, readonly) NSString* label;
-@property(nonatomic, weak) id<RTCMediaStreamTrackDelegate> delegate;
-
-- (BOOL)isEnabled;
-- (BOOL)setEnabled:(BOOL)enabled;
-- (RTCTrackState)state;
-- (BOOL)setState:(RTCTrackState)state;
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-// Disallow init and don't add to documentation
-- (id)init __attribute__(
-    (unavailable("init is not a supported initializer for this class.")));
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+// Called when setting a local or remote description.
+- (void)peerConnection:(RTCPeerConnection *)peerConnection
+    didSetSessionDescriptionWithError:(NSError *)error;
 
 @end

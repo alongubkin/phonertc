@@ -27,12 +27,16 @@
 
 #import "RTCPeerConnectionDelegate.h"
 
+@class RTCDataChannel;
+@class RTCDataChannelInit;
 @class RTCICECandidate;
 @class RTCICEServers;
 @class RTCMediaConstraints;
 @class RTCMediaStream;
+@class RTCMediaStreamTrack;
 @class RTCSessionDescription;
-@protocol RTCSessionDescriptonDelegate;
+@protocol RTCSessionDescriptionDelegate;
+@protocol RTCStatsDelegate;
 
 // RTCPeerConnection is an ObjectiveC friendly wrapper around a PeerConnection
 // object.  See the documentation in talk/app/webrtc/peerconnectioninterface.h.
@@ -40,6 +44,8 @@
 // the JS APIs: http://dev.w3.org/2011/webrtc/editor/webrtc.html and
 // http://www.w3.org/TR/mediacapture-streams/
 @interface RTCPeerConnection : NSObject
+
+@property(nonatomic, weak) id<RTCPeerConnectionDelegate> delegate;
 
 // Accessor methods to active local streams.
 @property(nonatomic, strong, readonly) NSArray *localStreams;
@@ -66,26 +72,30 @@
 // remote peer is notified.
 - (void)removeStream:(RTCMediaStream *)stream;
 
+// Create a data channel.
+- (RTCDataChannel*)createDataChannelWithLabel:(NSString*)label
+                                       config:(RTCDataChannelInit*)config;
+
 // Create a new offer.
-// Success or failure will be reported via RTCSessionDescriptonDelegate.
-- (void)createOfferWithDelegate:(id<RTCSessionDescriptonDelegate>)delegate
+// Success or failure will be reported via RTCSessionDescriptionDelegate.
+- (void)createOfferWithDelegate:(id<RTCSessionDescriptionDelegate>)delegate
                     constraints:(RTCMediaConstraints *)constraints;
 
 // Create an answer to an offer.
-// Success or failure will be reported via RTCSessionDescriptonDelegate.
-- (void)createAnswerWithDelegate:(id<RTCSessionDescriptonDelegate>)delegate
+// Success or failure will be reported via RTCSessionDescriptionDelegate.
+- (void)createAnswerWithDelegate:(id<RTCSessionDescriptionDelegate>)delegate
                      constraints:(RTCMediaConstraints *)constraints;
 
 // Sets the local session description.
-// Success or failure will be reported via RTCSessionDescriptonDelegate.
+// Success or failure will be reported via RTCSessionDescriptionDelegate.
 - (void)
-    setLocalDescriptionWithDelegate:(id<RTCSessionDescriptonDelegate>)delegate
+    setLocalDescriptionWithDelegate:(id<RTCSessionDescriptionDelegate>)delegate
                  sessionDescription:(RTCSessionDescription *)sdp;
 
 // Sets the remote session description.
-// Success or failure will be reported via RTCSessionDescriptonDelegate.
+// Success or failure will be reported via RTCSessionDescriptionDelegate.
 - (void)
-    setRemoteDescriptionWithDelegate:(id<RTCSessionDescriptonDelegate>)delegate
+    setRemoteDescriptionWithDelegate:(id<RTCSessionDescriptionDelegate>)delegate
                   sessionDescription:(RTCSessionDescription *)sdp;
 
 // Restarts or updates the ICE Agent process of gathering local candidates
@@ -99,7 +109,12 @@
 // Terminates all media and closes the transport.
 - (void)close;
 
-// TODO(hughv): Implement GetStats.
+// Gets statistics for the media track. If |mediaStreamTrack| is nil statistics
+// are gathered for all tracks.
+// Statistics information will be reported via RTCStatsDelegate.
+- (BOOL)getStatsWithDelegate:(id<RTCStatsDelegate>)delegate
+            mediaStreamTrack:(RTCMediaStreamTrack*)mediaStreamTrack
+            statsOutputLevel:(RTCStatsOutputLevel)statsOutputLevel;
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Disallow init and don't add to documentation
