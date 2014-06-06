@@ -12,6 +12,7 @@
     self.queuedRemoteCandidates = [NSMutableArray array];
     self.peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
     self.pcObserver = [[PCObserver alloc] initWithDelegate:self];
+    [RTCPeerConnectionFactory initializeSSL];
     self.peerConnection =
     [self.peerConnectionFactory peerConnectionWithICEServers:servers
                                                  constraints:[[RTCMediaConstraints alloc] init]
