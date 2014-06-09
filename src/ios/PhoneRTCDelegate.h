@@ -1,4 +1,6 @@
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import <Cordova/CDVViewController.h>
 
 #import "RTCICECandidate.h"
 #import "RTCICEServer.h"

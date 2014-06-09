@@ -12,19 +12,47 @@
     self.queuedRemoteCandidates = [NSMutableArray array];
     self.peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
     self.pcObserver = [[PCObserver alloc] initWithDelegate:self];
+    // TODO: Enable DTLS on the media streams by default
     [RTCPeerConnectionFactory initializeSSL];
     self.peerConnection =
     [self.peerConnectionFactory peerConnectionWithICEServers:servers
                                                  constraints:[[RTCMediaConstraints alloc] init]
                                                     delegate:self.pcObserver];
-    
+
     RTCMediaStream *lms =
     [self.peerConnectionFactory mediaStreamWithLabel:@"ARDAMS"];
+
+    // Local capture copied from AppRTC
+    NSString* cameraID = nil;
+    for (AVCaptureDevice* captureDevice in
+         [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+        // TODO: Make this camera option configurable
+        if (captureDevice.position == AVCaptureDevicePositionFront) {
+            cameraID = [captureDevice localizedName];
+            break;
+        }
+    }
+    NSAssert(cameraID, @"Unable to get the front camera id");
+
+    // TODO: Fix constraints
+    RTCVideoSource* videoSource = [self.peerConnectionFactory
+                        videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
+                        constraints:[[RTCMediaConstraints alloc] init]];
+    RTCVideoTrack* localVideoTrack =
+        [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
+    if (localVideoTrack) {
+        [lms addVideoTrack:localVideoTrack];
+        [self sendLocalVideoTrack:localVideoTrack];
+    }
     [lms addAudioTrack:[self.peerConnectionFactory audioTrackWithID:@"ARDAMSa0"]];
+
     [self.peerConnection addStream:lms constraints:[[RTCMediaConstraints alloc] init]];
-    
+
+    // End local capture
+
     if ([self isInitiator]) {
-        RTCMediaConstraints *_constraints = [[RTCMediaConstraints alloc] initWithMandatoryConstraints:@[[[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"], [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"false"]] optionalConstraints:@[]];
+        // TODO: make constraints global and configurable from client.
+        RTCMediaConstraints *_constraints = [[RTCMediaConstraints alloc] initWithMandatoryConstraints:@[[[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"], [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"]] optionalConstraints:@[]];
         [self.peerConnection createOfferWithDelegate:self constraints: _constraints];
     }
 }
@@ -45,6 +73,7 @@ didCreateSessionDescription:(RTCSessionDescription *)origSdp
      sdp:[PhoneRTCDelegate preferISAC:origSdp.description]];
     [self.peerConnection setLocalDescriptionWithDelegate:self
                                           sessionDescription:sdp];
+
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         NSDictionary *json = @{ @"type" : sdp.type, @"sdp" : sdp.description };
         NSError *error2;
@@ -63,7 +92,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
         NSAssert(NO, error.description);
         return;
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         if ([self isInitiator]) {
             if (self.peerConnection.remoteDescription) {
@@ -78,7 +107,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
                 [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"];
                 
                 RTCPair *video =
-                [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"false"];
+                [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"];
                 NSArray *mandatory = @[ audio , video ];
                 
                 RTCMediaConstraints *constraints =
@@ -173,6 +202,12 @@ didSetSessionDescriptionWithError:(NSError *)error {
 {
     NSLog(@"sendMessage 1");
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendMessage" object:message];
+}
+
+- (void)sendLocalVideoTrack:(RTCVideoTrack* )track
+{
+    NSLog(@"sendLocalVideoTrack 1");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendLocalVideoTrack" object:track];
 }
 
 - (void)receiveMessage:(NSString *)message
