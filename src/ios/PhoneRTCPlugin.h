@@ -7,6 +7,7 @@
 @property(nonatomic, strong) PhoneRTCDelegate *webRTC;
 @property(nonatomic, strong) NSString *sendMessageCallbackId;
 @property(nonatomic, strong) RTCEAGLVideoView* localVideoView;
+@property(nonatomic, strong) RTCEAGLVideoView* remoteVideoView;
 - (void)call:(CDVInvokedUrlCommand*)command;
 - (void)receiveMessage:(CDVInvokedUrlCommand*)command;
 @end

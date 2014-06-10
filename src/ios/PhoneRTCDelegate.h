@@ -18,6 +18,7 @@
 
 @protocol PHONERTCSendMessage<NSObject>
 - (void)sendMessage:(NSData*)message;
+- (void)sendRemoteVideoTrack:(RTCVideoTrack*)track;
 @end
 
 @interface PCObserver : NSObject<RTCPeerConnectionDelegate>

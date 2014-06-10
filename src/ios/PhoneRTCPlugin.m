@@ -3,6 +3,7 @@
 
 @implementation PhoneRTCPlugin
 @synthesize localVideoView;
+@synthesize remoteVideoView;
 
 - (void)call:(CDVInvokedUrlCommand*)command
 {
@@ -11,6 +12,10 @@
     localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 50, 300, 300)];
     localVideoView.hidden = YES;
     [self.webView.superview addSubview:localVideoView];
+
+    remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 350, 300, 300)];
+    remoteVideoView.hidden = YES;
+    [self.webView.superview addSubview:remoteVideoView];
 
     self.sendMessageCallbackId = command.callbackId;
 
@@ -39,6 +44,7 @@
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addRemoteVideoTrack:) name:@"SendRemoteVideoTrack" object:nil];
 
         [self.webRTC onICEServers:@[stunServer, turnServer]];
     });
@@ -82,6 +88,14 @@
     localVideoView.videoTrack = track;
     localVideoView.hidden = NO;
     [self.webView.superview bringSubviewToFront:localVideoView];
+}
+
+- (void)addRemoteVideoTrack:(NSNotification *)notification {
+    NSLog(@"addRemoteStream 1");
+    RTCVideoTrack* track = [notification object];
+    remoteVideoView.videoTrack = track;
+    remoteVideoView.hidden = NO;
+    [self.webView.superview bringSubviewToFront:remoteVideoView];
 }
 
 @end

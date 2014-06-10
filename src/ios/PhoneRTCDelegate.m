@@ -210,6 +210,12 @@ didSetSessionDescriptionWithError:(NSError *)error {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendLocalVideoTrack" object:track];
 }
 
+- (void)sendRemoteVideoTrack:(RTCVideoTrack* )track
+{
+    NSLog(@"sendRemoteVideoTrack 1");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendRemoteVideoTrack" object:track];
+}
+
 - (void)receiveMessage:(NSString *)message
 {
     NSError *error;
@@ -279,6 +285,9 @@ didSetSessionDescriptionWithError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         NSAssert([stream.audioTracks count] >= 1,
                  @"Expected at least 1 audio stream");
+        if ([stream.videoTracks count] > 0) {
+            [_delegate sendRemoteVideoTrack:stream.videoTracks[0]];
+        }
     });
     [_delegate sendMessage:[@"{\"type\": \"__answered\"}" dataUsingEncoding:NSUTF8StringEncoding]];
 }
@@ -328,4 +337,3 @@ peerConnectionOnRenegotiationNeeded:(RTCPeerConnection *)peerConnection {
 }
 
 @end
-
