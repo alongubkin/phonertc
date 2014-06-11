@@ -11,10 +11,12 @@
     // TODO: Configure the video frame accurately
     localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 50, 300, 300)];
     localVideoView.hidden = YES;
+    localVideoView.userInteractionEnabled = NO;
     [self.webView.superview addSubview:localVideoView];
 
     remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 350, 300, 300)];
     remoteVideoView.hidden = YES;
+    remoteVideoView.userInteractionEnabled = NO;
     [self.webView.superview addSubview:remoteVideoView];
 
     self.sendMessageCallbackId = command.callbackId;
