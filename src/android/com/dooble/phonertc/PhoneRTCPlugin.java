@@ -92,7 +92,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					cordova.getActivity().runOnUiThread(new Runnable() {
 						public void run() {
 							factory = new PeerConnectionFactory();
-							pc = factory.createPeerConnection(iceServers, new MediaConstraints(),
+							MediaConstraints pcMediaConstraints = new MediaConstraints();
+							pcMediaConstraints.optional.add(new MediaConstraints.KeyValuePair(
+								"DtlsSrtpKeyAgreement", "true"));
+							pc = factory.createPeerConnection(iceServers, pcMediaConstraints,
 									pcObserver);
 							
 							MediaStream lMS = factory.createLocalMediaStream("ARDAMS");
