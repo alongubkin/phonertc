@@ -7,24 +7,26 @@
 
 - (void)call:(CDVInvokedUrlCommand*)command
 {
-    // TODO: Only add video frame if video is enabled
-    // TODO: Configure the video frame accurately
-    localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 50, 300, 300)];
-    localVideoView.hidden = YES;
-    localVideoView.userInteractionEnabled = NO;
-    [self.webView.superview addSubview:localVideoView];
-
-    remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake(50, 350, 300, 300)];
-    remoteVideoView.hidden = YES;
-    remoteVideoView.userInteractionEnabled = NO;
-    [self.webView.superview addSubview:remoteVideoView];
-
     self.sendMessageCallbackId = command.callbackId;
 
     BOOL isInitator = [[command.arguments objectAtIndex:0] boolValue];
 	NSString *turnServerHost = (NSString *)[command.arguments objectAtIndex:1];
 	NSString *turnUsername = (NSString *)[command.arguments objectAtIndex:2];
 	NSString *turnPassword = (NSString *)[command.arguments objectAtIndex:3];
+    NSDictionary *localVideo = [[command.arguments objectAtIndex:4] objectForKey:@"localVideo"];
+    NSDictionary *remoteVideo = [[command.arguments objectAtIndex:4] objectForKey:@"remoteVideo"];
+
+    // TODO: Only add video frame if video is enabled
+    // TODO: Configure the video frame accurately
+    localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[localVideo objectForKey:@"x"] intValue], [[localVideo objectForKey:@"y"] intValue], [[localVideo objectForKey:@"width"] intValue], [[localVideo objectForKey:@"height"] intValue])];
+    localVideoView.hidden = YES;
+    localVideoView.userInteractionEnabled = NO;
+    [self.webView.superview addSubview:localVideoView];
+
+    remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[remoteVideo objectForKey:@"x"] intValue], [[remoteVideo objectForKey:@"y"] intValue], [[remoteVideo objectForKey:@"width"] intValue], [[remoteVideo objectForKey:@"height"] intValue])];
+    remoteVideoView.hidden = YES;
+    remoteVideoView.userInteractionEnabled = NO;
+    [self.webView.superview addSubview:remoteVideoView];
 
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
     [pluginResult setKeepCallbackAsBool:true];
