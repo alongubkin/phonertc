@@ -54,6 +54,15 @@
     });
 }
 
+- (void)updateVideoPosition:(CDVInvokedUrlCommand*)command
+{
+    // This will update the position of the video elements when the page moves
+    NSDictionary *localVideo = [[command.arguments objectAtIndex:0] objectForKey:@"localVideo"];
+    NSDictionary *remoteVideo = [[command.arguments objectAtIndex:0] objectForKey:@"remoteVideo"];
+    localVideoView.frame = CGRectMake([[localVideo objectForKey:@"x"] intValue], [[localVideo objectForKey:@"y"] intValue], [[localVideo objectForKey:@"width"] intValue], [[localVideo objectForKey:@"height"] intValue]);
+    remoteVideoView.frame = CGRectMake([[remoteVideo objectForKey:@"x"] intValue], [[remoteVideo objectForKey:@"y"] intValue], [[remoteVideo objectForKey:@"width"] intValue], [[remoteVideo objectForKey:@"height"] intValue]);
+}
+
 - (void)receiveMessage:(CDVInvokedUrlCommand*)command
 {
     NSString *message = [command.arguments objectAtIndex:0];
