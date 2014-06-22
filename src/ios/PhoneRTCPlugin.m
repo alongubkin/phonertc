@@ -17,7 +17,6 @@
     NSDictionary *remoteVideo = [[command.arguments objectAtIndex:4] objectForKey:@"remoteVideo"];
 
     // TODO: Only add video frame if video is enabled
-    // TODO: Configure the video frame accurately
     localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[localVideo objectForKey:@"x"] intValue], [[localVideo objectForKey:@"y"] intValue], [[localVideo objectForKey:@"width"] intValue], [[localVideo objectForKey:@"height"] intValue])];
     localVideoView.hidden = YES;
     localVideoView.userInteractionEnabled = NO;
@@ -45,6 +44,19 @@
         
         self.webRTC = [[PhoneRTCDelegate alloc] init];
         self.webRTC.isInitiator = isInitator;
+        // TODO: Set Audio/Video correctly
+        self.webRTC.constraints = [[RTCMediaConstraints alloc]
+           initWithMandatoryConstraints:
+                @[
+                     [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
+                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"]
+                 ]
+            optionalConstraints:
+                @[
+                     [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
+                     [[RTCPair alloc] initWithKey:@"DtlsSrtpAgreement" value:@"true"]
+                 ]
+       ];
 
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];

@@ -16,7 +16,7 @@
     [RTCPeerConnectionFactory initializeSSL];
     self.peerConnection =
     [self.peerConnectionFactory peerConnectionWithICEServers:servers
-                                                 constraints:[[RTCMediaConstraints alloc] init]
+                                                 constraints:[self constraints]
                                                     delegate:self.pcObserver];
 
     RTCMediaStream *lms =
@@ -34,7 +34,8 @@
     }
     NSAssert(cameraID, @"Unable to get the front camera id");
 
-    // TODO: Fix constraints
+    // TODO: Only handle video if video was giveng
+    // TODO: Find out about what the constraints are for this
     RTCVideoSource* videoSource = [self.peerConnectionFactory
                         videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
                         constraints:[[RTCMediaConstraints alloc] init]];
@@ -46,14 +47,12 @@
     }
     [lms addAudioTrack:[self.peerConnectionFactory audioTrackWithID:@"ARDAMSa0"]];
 
-    [self.peerConnection addStream:lms constraints:[[RTCMediaConstraints alloc] init]];
+    [self.peerConnection addStream:lms constraints:[self constraints]];
 
     // End local capture
 
     if ([self isInitiator]) {
-        // TODO: make constraints global and configurable from client.
-        RTCMediaConstraints *_constraints = [[RTCMediaConstraints alloc] initWithMandatoryConstraints:@[[[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"], [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"]] optionalConstraints:@[]];
-        [self.peerConnection createOfferWithDelegate:self constraints: _constraints];
+        [self.peerConnection createOfferWithDelegate:self constraints:[self constraints]];
     }
 }
 
@@ -103,18 +102,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
             if (self.peerConnection.localDescription != nil) {
                 [self drainRemoteCandidates];
             } else {
-                RTCPair *audio =
-                [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"];
-                
-                RTCPair *video =
-                [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"];
-                NSArray *mandatory = @[ audio , video ];
-                
-                RTCMediaConstraints *constraints =
-                [[RTCMediaConstraints alloc] initWithMandatoryConstraints:mandatory
-                                                      optionalConstraints:nil];
-                
-                [self.peerConnection createAnswerWithDelegate:self constraints:constraints];
+                [self.peerConnection createAnswerWithDelegate:self constraints:[self constraints]];
             }
         }
     
@@ -187,6 +175,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
     self.peerConnectionFactory = nil;
     self.pcObserver = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
+    // TODO: Cleanup video
     
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
 }
@@ -272,6 +261,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
 - (void)peerConnectionOnError:(RTCPeerConnection *)peerConnection {
     NSLog(@"PCO onError.");
     NSAssert(NO, @"PeerConnection failed.");
+    // TODO: Cleanup video
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
@@ -295,6 +285,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
          removedStream:(RTCMediaStream *)stream {
     NSLog(@"PCO onRemoveStream.");
+    // TODO: Remove video elements
 }
 
 - (void)

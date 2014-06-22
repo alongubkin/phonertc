@@ -36,8 +36,9 @@
 @property(nonatomic, strong) RTCPeerConnection *peerConnection;
 @property(nonatomic, strong) RTCPeerConnectionFactory *peerConnectionFactory;
 @property(nonatomic, strong) NSMutableArray *queuedRemoteCandidates;
-
+@property(nonatomic, strong) RTCMediaConstraints *constraints;
 @property (assign) BOOL isInitiator;
+
 
 + (NSString *)preferISAC:(NSString *)origSDP;
 - (void)drainRemoteCandidates;
