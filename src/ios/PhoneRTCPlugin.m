@@ -13,20 +13,22 @@
 	NSString *turnServerHost = (NSString *)[command.arguments objectAtIndex:1];
 	NSString *turnUsername = (NSString *)[command.arguments objectAtIndex:2];
 	NSString *turnPassword = (NSString *)[command.arguments objectAtIndex:3];
-    NSDictionary *localVideo = [[command.arguments objectAtIndex:4] objectForKey:@"localVideo"];
-    NSDictionary *remoteVideo = [[command.arguments objectAtIndex:4] objectForKey:@"remoteVideo"];
+    NSString *useVideo = @"false";
+    if ([command.arguments count] > 4 && [command.arguments objectAtIndex:4] != [NSNull null]) {
+        NSDictionary *localVideo = [[command.arguments objectAtIndex:4] objectForKey:@"localVideo"];
+        NSDictionary *remoteVideo = [[command.arguments objectAtIndex:4] objectForKey:@"remoteVideo"];
+        localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[localVideo objectForKey:@"x"] intValue], [[localVideo objectForKey:@"y"] intValue], [[localVideo objectForKey:@"width"] intValue], [[localVideo objectForKey:@"height"] intValue])];
+        localVideoView.hidden = YES;
+        localVideoView.userInteractionEnabled = NO;
+        [self.webView.superview addSubview:localVideoView];
 
-    // TODO: Only add video frame if video is enabled
-    localVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[localVideo objectForKey:@"x"] intValue], [[localVideo objectForKey:@"y"] intValue], [[localVideo objectForKey:@"width"] intValue], [[localVideo objectForKey:@"height"] intValue])];
-    localVideoView.hidden = YES;
-    localVideoView.userInteractionEnabled = NO;
-    [self.webView.superview addSubview:localVideoView];
+        remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[remoteVideo objectForKey:@"x"] intValue], [[remoteVideo objectForKey:@"y"] intValue], [[remoteVideo objectForKey:@"width"] intValue], [[remoteVideo objectForKey:@"height"] intValue])];
+        remoteVideoView.hidden = YES;
+        remoteVideoView.userInteractionEnabled = NO;
+        [self.webView.superview addSubview:remoteVideoView];
 
-    remoteVideoView = [[RTCEAGLVideoView alloc] initWithFrame:CGRectMake([[remoteVideo objectForKey:@"x"] intValue], [[remoteVideo objectForKey:@"y"] intValue], [[remoteVideo objectForKey:@"width"] intValue], [[remoteVideo objectForKey:@"height"] intValue])];
-    remoteVideoView.hidden = YES;
-    remoteVideoView.userInteractionEnabled = NO;
-    [self.webView.superview addSubview:remoteVideoView];
-
+        useVideo = @"true";
+    }
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
     [pluginResult setKeepCallbackAsBool:true];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
@@ -41,15 +43,14 @@
                                     initWithURI:[NSURL URLWithString:turnServerHost]
                                     username: turnUsername
                                     password: turnPassword];
-        
+        // TODO: PhoneRTCDelegate should take constructor arguments
         self.webRTC = [[PhoneRTCDelegate alloc] init];
         self.webRTC.isInitiator = isInitator;
-        // TODO: Set Audio/Video correctly
         self.webRTC.constraints = [[RTCMediaConstraints alloc]
            initWithMandatoryConstraints:
                 @[
                      [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
-                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"true"]
+                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:useVideo]
                  ]
             optionalConstraints:
                 @[
