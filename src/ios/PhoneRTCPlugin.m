@@ -13,7 +13,7 @@
 	NSString *turnServerHost = (NSString *)[command.arguments objectAtIndex:1];
 	NSString *turnUsername = (NSString *)[command.arguments objectAtIndex:2];
 	NSString *turnPassword = (NSString *)[command.arguments objectAtIndex:3];
-    NSString *useVideo = @"false";
+    BOOL doVideo = false;
     if ([command.arguments count] > 4 && [command.arguments objectAtIndex:4] != [NSNull null]) {
         NSDictionary *localVideo = [[command.arguments objectAtIndex:4] objectForKey:@"localVideo"];
         NSDictionary *remoteVideo = [[command.arguments objectAtIndex:4] objectForKey:@"remoteVideo"];
@@ -27,7 +27,7 @@
         remoteVideoView.userInteractionEnabled = NO;
         [self.webView.superview addSubview:remoteVideoView];
 
-        useVideo = @"true";
+        doVideo = true;
     }
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
     [pluginResult setKeepCallbackAsBool:true];
@@ -46,11 +46,12 @@
         // TODO: PhoneRTCDelegate should take constructor arguments
         self.webRTC = [[PhoneRTCDelegate alloc] init];
         self.webRTC.isInitiator = isInitator;
+        self.webRTC.doVideo = doVideo;
         self.webRTC.constraints = [[RTCMediaConstraints alloc]
            initWithMandatoryConstraints:
                 @[
                      [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
-                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:useVideo]
+                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:(doVideo ? @"true" : @"false")]
                  ]
             optionalConstraints:
                 @[

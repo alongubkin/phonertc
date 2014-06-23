@@ -37,6 +37,7 @@
 @property(nonatomic, strong) RTCPeerConnectionFactory *peerConnectionFactory;
 @property(nonatomic, strong) NSMutableArray *queuedRemoteCandidates;
 @property(nonatomic, strong) RTCMediaConstraints *constraints;
+@property (assign) BOOL doVideo;
 @property (assign) BOOL isInitiator;
 
 

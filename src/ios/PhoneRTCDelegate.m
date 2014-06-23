@@ -22,28 +22,28 @@
     RTCMediaStream *lms =
     [self.peerConnectionFactory mediaStreamWithLabel:@"ARDAMS"];
 
-    // Local capture copied from AppRTC
-    NSString* cameraID = nil;
-    for (AVCaptureDevice* captureDevice in
-         [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
-        // TODO: Make this camera option configurable
-        if (captureDevice.position == AVCaptureDevicePositionFront) {
-            cameraID = [captureDevice localizedName];
-            break;
+    // TODO: Make Camera Selectable
+    if ([self doVideo]) {
+        // Local capture copied from AppRTC
+        NSString* cameraID = nil;
+        for (AVCaptureDevice* captureDevice in
+             [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+            // TODO: Make this camera option configurable
+            if (captureDevice.position == AVCaptureDevicePositionFront) {
+                cameraID = [captureDevice localizedName];
+                break;
+            }
         }
-    }
-    NSAssert(cameraID, @"Unable to get the front camera id");
-
-    // TODO: Only handle video if video was giveng
-    // TODO: Find out about what the constraints are for this
-    RTCVideoSource* videoSource = [self.peerConnectionFactory
-                        videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
-                        constraints:[[RTCMediaConstraints alloc] init]];
-    RTCVideoTrack* localVideoTrack =
-        [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
-    if (localVideoTrack) {
-        [lms addVideoTrack:localVideoTrack];
-        [self sendLocalVideoTrack:localVideoTrack];
+        NSAssert(cameraID, @"Unable to get the front camera id");
+        RTCVideoSource* videoSource = [self.peerConnectionFactory
+                            videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
+                            constraints:[[RTCMediaConstraints alloc] init]];
+        RTCVideoTrack* localVideoTrack =
+            [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
+        if (localVideoTrack) {
+            [lms addVideoTrack:localVideoTrack];
+            [self sendLocalVideoTrack:localVideoTrack];
+        }
     }
     [lms addAudioTrack:[self.peerConnectionFactory audioTrackWithID:@"ARDAMSa0"]];
 
