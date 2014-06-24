@@ -12,7 +12,6 @@
     self.queuedRemoteCandidates = [NSMutableArray array];
     self.peerConnectionFactory = [[RTCPeerConnectionFactory alloc] init];
     self.pcObserver = [[PCObserver alloc] initWithDelegate:self];
-    // TODO: Enable DTLS on the media streams by default
     [RTCPeerConnectionFactory initializeSSL];
     self.peerConnection =
     [self.peerConnectionFactory peerConnectionWithICEServers:servers
@@ -174,10 +173,11 @@ didSetSessionDescriptionWithError:(NSError *)error {
     self.peerConnection = nil;
     self.peerConnectionFactory = nil;
     self.pcObserver = nil;
+    self.constraints = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
-    // TODO: Cleanup video
-    
+
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self resetUi];
 }
 
 - (void)drainRemoteCandidates {
@@ -203,6 +203,10 @@ didSetSessionDescriptionWithError:(NSError *)error {
 {
     NSLog(@"sendRemoteVideoTrack 1");
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendRemoteVideoTrack" object:track];
+}
+
+- (void)resetUi {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ResetUI" object:nil];
 }
 
 - (void)receiveMessage:(NSString *)message
@@ -261,7 +265,6 @@ didSetSessionDescriptionWithError:(NSError *)error {
 - (void)peerConnectionOnError:(RTCPeerConnection *)peerConnection {
     NSLog(@"PCO onError.");
     NSAssert(NO, @"PeerConnection failed.");
-    // TODO: Cleanup video
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
@@ -285,7 +288,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
          removedStream:(RTCMediaStream *)stream {
     NSLog(@"PCO onRemoveStream.");
-    // TODO: Remove video elements
+    [_delegate resetUi];
 }
 
 - (void)

@@ -63,6 +63,7 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addRemoteVideoTrack:) name:@"SendRemoteVideoTrack" object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetUi:) name:@"ResetUI" object:nil];
 
         [self.webRTC onICEServers:@[stunServer, turnServer]];
     });
@@ -123,6 +124,15 @@
     remoteVideoView.videoTrack = track;
     remoteVideoView.hidden = NO;
     [self.webView.superview bringSubviewToFront:remoteVideoView];
+}
+
+- (void)resetUi:(NSNotification *)notification {
+    localVideoView.hidden = YES;
+    [localVideoView removeFromSuperview];
+    localVideoView = nil;
+    remoteVideoView.hidden = YES;
+    [remoteVideoView removeFromSuperview];
+    remoteVideoView = nil;
 }
 
 @end
