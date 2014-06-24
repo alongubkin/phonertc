@@ -15,17 +15,43 @@
     [RTCPeerConnectionFactory initializeSSL];
     self.peerConnection =
     [self.peerConnectionFactory peerConnectionWithICEServers:servers
-                                                 constraints:[[RTCMediaConstraints alloc] init]
+                                                 constraints:[self constraints]
                                                     delegate:self.pcObserver];
-    
+
     RTCMediaStream *lms =
     [self.peerConnectionFactory mediaStreamWithLabel:@"ARDAMS"];
+
+    // TODO: Make Camera Selectable
+    if ([self doVideo]) {
+        // Local capture copied from AppRTC
+        NSString* cameraID = nil;
+        for (AVCaptureDevice* captureDevice in
+             [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo]) {
+            // TODO: Make this camera option configurable
+            if (captureDevice.position == AVCaptureDevicePositionFront) {
+                cameraID = [captureDevice localizedName];
+                break;
+            }
+        }
+        NSAssert(cameraID, @"Unable to get the front camera id");
+        RTCVideoSource* videoSource = [self.peerConnectionFactory
+                            videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
+                            constraints:[[RTCMediaConstraints alloc] init]];
+        RTCVideoTrack* localVideoTrack =
+            [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
+        if (localVideoTrack) {
+            [lms addVideoTrack:localVideoTrack];
+            [self sendLocalVideoTrack:localVideoTrack];
+        }
+    }
     [lms addAudioTrack:[self.peerConnectionFactory audioTrackWithID:@"ARDAMSa0"]];
-    [self.peerConnection addStream:lms constraints:[[RTCMediaConstraints alloc] init]];
-    
+
+    [self.peerConnection addStream:lms constraints:[self constraints]];
+
+    // End local capture
+
     if ([self isInitiator]) {
-        RTCMediaConstraints *_constraints = [[RTCMediaConstraints alloc] initWithMandatoryConstraints:@[[[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"], [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"false"]] optionalConstraints:@[]];
-        [self.peerConnection createOfferWithDelegate:self constraints: _constraints];
+        [self.peerConnection createOfferWithDelegate:self constraints:[self constraints]];
     }
 }
 
@@ -45,6 +71,7 @@ didCreateSessionDescription:(RTCSessionDescription *)origSdp
      sdp:[PhoneRTCDelegate preferISAC:origSdp.description]];
     [self.peerConnection setLocalDescriptionWithDelegate:self
                                           sessionDescription:sdp];
+
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         NSDictionary *json = @{ @"type" : sdp.type, @"sdp" : sdp.description };
         NSError *error2;
@@ -63,7 +90,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
         NSAssert(NO, error.description);
         return;
     }
-    
+
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         if ([self isInitiator]) {
             if (self.peerConnection.remoteDescription) {
@@ -74,18 +101,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
             if (self.peerConnection.localDescription != nil) {
                 [self drainRemoteCandidates];
             } else {
-                RTCPair *audio =
-                [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"];
-                
-                RTCPair *video =
-                [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:@"false"];
-                NSArray *mandatory = @[ audio , video ];
-                
-                RTCMediaConstraints *constraints =
-                [[RTCMediaConstraints alloc] initWithMandatoryConstraints:mandatory
-                                                      optionalConstraints:nil];
-                
-                [self.peerConnection createAnswerWithDelegate:self constraints:constraints];
+                [self.peerConnection createAnswerWithDelegate:self constraints:[self constraints]];
             }
         }
     
@@ -157,9 +173,11 @@ didSetSessionDescriptionWithError:(NSError *)error {
     self.peerConnection = nil;
     self.peerConnectionFactory = nil;
     self.pcObserver = nil;
+    self.constraints = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
-    
+
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self resetUi];
 }
 
 - (void)drainRemoteCandidates {
@@ -173,6 +191,22 @@ didSetSessionDescriptionWithError:(NSError *)error {
 {
     NSLog(@"sendMessage 1");
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendMessage" object:message];
+}
+
+- (void)sendLocalVideoTrack:(RTCVideoTrack* )track
+{
+    NSLog(@"sendLocalVideoTrack 1");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendLocalVideoTrack" object:track];
+}
+
+- (void)sendRemoteVideoTrack:(RTCVideoTrack* )track
+{
+    NSLog(@"sendRemoteVideoTrack 1");
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendRemoteVideoTrack" object:track];
+}
+
+- (void)resetUi {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"ResetUI" object:nil];
 }
 
 - (void)receiveMessage:(NSString *)message
@@ -244,6 +278,9 @@ didSetSessionDescriptionWithError:(NSError *)error {
     dispatch_async(dispatch_get_main_queue(), ^(void) {
         NSAssert([stream.audioTracks count] >= 1,
                  @"Expected at least 1 audio stream");
+        if ([stream.videoTracks count] > 0) {
+            [_delegate sendRemoteVideoTrack:stream.videoTracks[0]];
+        }
     });
     [_delegate sendMessage:[@"{\"type\": \"__answered\"}" dataUsingEncoding:NSUTF8StringEncoding]];
 }
@@ -251,6 +288,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
          removedStream:(RTCMediaStream *)stream {
     NSLog(@"PCO onRemoveStream.");
+    [_delegate resetUi];
 }
 
 - (void)
@@ -293,4 +331,3 @@ peerConnectionOnRenegotiationNeeded:(RTCPeerConnection *)peerConnection {
 }
 
 @end
-

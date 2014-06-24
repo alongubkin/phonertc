@@ -1,4 +1,6 @@
 #import <Foundation/Foundation.h>
+#import <AVFoundation/AVFoundation.h>
+#import <Cordova/CDVViewController.h>
 
 #import "RTCICECandidate.h"
 #import "RTCICEServer.h"
@@ -16,6 +18,8 @@
 
 @protocol PHONERTCSendMessage<NSObject>
 - (void)sendMessage:(NSData*)message;
+- (void)sendRemoteVideoTrack:(RTCVideoTrack*)track;
+- (void)resetUi;
 @end
 
 @interface PCObserver : NSObject<RTCPeerConnectionDelegate>
@@ -33,8 +37,10 @@
 @property(nonatomic, strong) RTCPeerConnection *peerConnection;
 @property(nonatomic, strong) RTCPeerConnectionFactory *peerConnectionFactory;
 @property(nonatomic, strong) NSMutableArray *queuedRemoteCandidates;
-
+@property(nonatomic, strong) RTCMediaConstraints *constraints;
+@property (assign) BOOL doVideo;
 @property (assign) BOOL isInitiator;
+
 
 + (NSString *)preferISAC:(NSString *)origSDP;
 - (void)drainRemoteCandidates;

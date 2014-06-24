@@ -9,6 +9,7 @@ WebRTC for PhoneGap apps!
 * Completely open source.
 * Android and iOS support.
 * Simple JavaScript API.
+* Video chat (iOS only).
 * Voice chat.
 * Use your own servers without relying on any third-parties.
 * Perfect for hybrid mobile apps using Angular.
@@ -20,7 +21,7 @@ WebRTC for PhoneGap apps!
 
 ### Upcoming features
 
-* Video chat (really soon)
+* Video chat for Android (really soon)
 * Group chat
 * API documentation
 * Volume control
@@ -118,6 +119,47 @@ signaling.onMessage = function (message) {
 };
 ```
 
+### iOS Video Example
+
+iOS Video is completely backwards compatible with non-video calls.
+
+```javascript
+    isInitator: true, // Caller or callee?
+    turn: {
+        host: 'turn:turn.example.com:3478',
+        username: 'user',
+        password: 'pass'
+    },
+    sendMessageCallback: function (data) {
+        // PhoneRTC wants to send a message to your target, use
+        // your signaling server here to send the message.
+        signaling.sendMessage(target, { 
+            type: 'webrtc_handshake',
+            data: data
+        });
+    },
+    answerCallback: function () {
+        alert('Callee answered!');
+    },
+    disconnectCallback: function () {
+        alert('Call disconnected!');
+    },
+    // If you do not want to do video do not include any video objects
+    video: {
+    	localVideo: document.getElementById('localVideo'),
+        remoteVideo: document.getElementById('remoteVideo')
+    }
+});
+
+signaling.onMessage = function (message) {
+    if (message.type === 'webrtc_handshake') {
+        // when a message is received from the signaling server, 
+        // notify the PhoneRTC plugin.
+        phonertc.receiveMessage(message.data);
+    }
+};
+```
+
 ### Building
 
 Building for Android is easy. You can just:
@@ -125,16 +167,16 @@ Building for Android is easy. You can just:
     cordova build android
     cordova run android
 
-In iOS, it's slightly more complicated. Run:
+In iOS, it's slightly more complicated. Run the following code. It will prepare all of the web code to be deployed to your device. It must be re-run every time you change any web code:
 
-    cordova build ios
+    cordova prepare ios
     
-This command will result in an error. Open the project in Xcode and change the following options in the project settings:
+Open the project in Xcode and change the following options in the project settings (these must be changed for both your project and the CordovaLib project):
 
     Valid Architectures => armv7
     Build Active Architecture Only => No
 
-In the target choose a real iOS device, not the simulator, otherwise it won't build.
+In the target choose a real iOS device, not the simulator, otherwise it won't build. You should now be able to run this on your device.
 
 To create an IPA, go to Product > Archive.
 
@@ -145,3 +187,7 @@ The `libs` directory contains compiled libraries from the [official WebRTC proje
 Android: https://code.google.com/p/webrtc/source/browse/trunk/talk/examples/android/README
 
 iOS: https://code.google.com/p/webrtc/source/browse/trunk/talk/app/webrtc/objc/README
+
+### Contributors
+
+iOS Video Support: [@egreenmachine](https://github.com/egreenmachine) (BitCoin Donations: ```12pDZFVov6rDPjhGTz9Xj4qqegdoCJF3Ea```)
