@@ -56,7 +56,7 @@
             optionalConstraints:
                 @[
                      [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
-                     [[RTCPair alloc] initWithKey:@"DtlsSrtpAgreement" value:@"true"]
+                     [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"]
                  ]
        ];
 
