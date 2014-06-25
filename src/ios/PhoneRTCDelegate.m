@@ -169,15 +169,16 @@ didSetSessionDescriptionWithError:(NSError *)error {
 }
 
 - (void)disconnect {
+    [self resetUi];
     [self sendMessage:[@"{\"type\": \"bye\"}" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.peerConnection close];
     self.peerConnection = nil;
-    self.peerConnectionFactory = nil;
     self.pcObserver = nil;
     self.constraints = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
 
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
-    [self resetUi];
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"Complete" object:nil];
 }
 
 - (void)drainRemoteCandidates {

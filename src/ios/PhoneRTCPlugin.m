@@ -33,6 +33,12 @@
     [pluginResult setKeepCallbackAsBool:true];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
+    // TODO: Make these only run once.
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addRemoteVideoTrack:) name:@"SendRemoteVideoTrack" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetUi:) name:@"ResetUI" object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(complete:) name:@"Complete" object:nil];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
                                              (unsigned long)NULL), ^(void) {
         RTCICEServer *stunServer = [[RTCICEServer alloc]
@@ -58,13 +64,7 @@
                      [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
                      [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"]
                  ]
-       ];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addRemoteVideoTrack:) name:@"SendRemoteVideoTrack" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetUi:) name:@"ResetUI" object:nil];
-
+        ];
         [self.webRTC onICEServers:@[stunServer, turnServer]];
     });
 }
@@ -127,12 +127,19 @@
 }
 
 - (void)resetUi:(NSNotification *)notification {
+    self.localVideoView.videoTrack = nil;
+    self.remoteVideoView.videoTrack = nil;
     localVideoView.hidden = YES;
     [localVideoView removeFromSuperview];
-    localVideoView = nil;
     remoteVideoView.hidden = YES;
     [remoteVideoView removeFromSuperview];
+    localVideoView = nil;
     remoteVideoView = nil;
+}
+
+- (void)complete:(NSNotification *)notification {
+    self.webRTC = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end
