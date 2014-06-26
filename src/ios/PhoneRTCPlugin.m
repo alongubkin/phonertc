@@ -33,40 +33,33 @@
     [pluginResult setKeepCallbackAsBool:true];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT,
-                                             (unsigned long)NULL), ^(void) {
-        RTCICEServer *stunServer = [[RTCICEServer alloc]
-                                    initWithURI:[NSURL URLWithString:@"stun:stun.l.google.com:19302"]
-                                    username: @""
-                                    password: @""];
-        RTCICEServer *turnServer = [[RTCICEServer alloc]
-                                    initWithURI:[NSURL URLWithString:turnServerHost]
-                                    username: turnUsername
-                                    password: turnPassword];
-        // TODO: PhoneRTCDelegate should take constructor arguments
-        self.webRTC = [[PhoneRTCDelegate alloc] init];
-        self.webRTC.isInitiator = isInitator;
-        self.webRTC.doVideo = doVideo;
-        self.webRTC.constraints = [[RTCMediaConstraints alloc]
-           initWithMandatoryConstraints:
-                @[
-                     [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
-                     [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:(doVideo ? @"true" : @"false")]
-                 ]
-            optionalConstraints:
-                @[
-                     [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
-                     [[RTCPair alloc] initWithKey:@"DtlsSrtpAgreement" value:@"true"]
-                 ]
-       ];
-
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addLocalVideoTrack:) name:@"SendLocalVideoTrack" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(addRemoteVideoTrack:) name:@"SendRemoteVideoTrack" object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(resetUi:) name:@"ResetUI" object:nil];
-
-        [self.webRTC onICEServers:@[stunServer, turnServer]];
-    });
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sendMessage:) name:@"SendMessage" object:nil];
+    RTCICEServer *stunServer = [[RTCICEServer alloc]
+                                initWithURI:[NSURL URLWithString:@"stun:stun.l.google.com:19302"]
+                                username: @""
+                                password: @""];
+    RTCICEServer *turnServer = [[RTCICEServer alloc]
+                                initWithURI:[NSURL URLWithString:turnServerHost]
+                                username: turnUsername
+                                password: turnPassword];
+    // TODO: PhoneRTCDelegate should take constructor arguments
+    self.webRTC = [[PhoneRTCDelegate alloc] init];
+    self.webRTC.delegate = self;
+    self.webRTC.isInitiator = isInitator;
+    self.webRTC.doVideo = doVideo;
+    self.webRTC.constraints = [[RTCMediaConstraints alloc]
+       initWithMandatoryConstraints:
+            @[
+                 [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
+                 [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:(doVideo ? @"true" : @"false")]
+             ]
+        optionalConstraints:
+            @[
+                 [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
+                 [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"]
+             ]
+    ];
+    [self.webRTC onICEServers:@[stunServer, turnServer]];
 }
 
 - (void)updateVideoPosition:(CDVInvokedUrlCommand*)command
@@ -110,29 +103,37 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self.sendMessageCallbackId];
 }
 
-- (void)addLocalVideoTrack:(NSNotification *)notification {
+- (void)addLocalVideoTrack:(RTCVideoTrack *)track {
     NSLog(@"addLocalStream 1");
-    RTCVideoTrack* track = [notification object];
     localVideoView.videoTrack = track;
     localVideoView.hidden = NO;
     [self.webView.superview bringSubviewToFront:localVideoView];
 }
 
-- (void)addRemoteVideoTrack:(NSNotification *)notification {
+- (void)addRemoteVideoTrack:(RTCVideoTrack *)track {
     NSLog(@"addRemoteStream 1");
-    RTCVideoTrack* track = [notification object];
     remoteVideoView.videoTrack = track;
     remoteVideoView.hidden = NO;
     [self.webView.superview bringSubviewToFront:remoteVideoView];
 }
 
-- (void)resetUi:(NSNotification *)notification {
+- (void)resetUi {
+    NSLog(@"Reset Ui");
+    self.localVideoView.videoTrack = nil;
+    self.remoteVideoView.videoTrack = nil;
     localVideoView.hidden = YES;
     [localVideoView removeFromSuperview];
-    localVideoView = nil;
     remoteVideoView.hidden = YES;
     [remoteVideoView removeFromSuperview];
+    localVideoView = nil;
     remoteVideoView = nil;
+}
+
+- (void)callComplete {
+    NSLog(@"Call Complete");
+    self.webRTC.delegate = nil;
+    self.webRTC = nil;
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 @end

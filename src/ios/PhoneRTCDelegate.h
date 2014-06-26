@@ -22,6 +22,13 @@
 - (void)resetUi;
 @end
 
+@protocol PhoneRTCProtocol<NSObject>
+- (void)addLocalVideoTrack:(RTCVideoTrack *)track;
+- (void)addRemoteVideoTrack:(RTCVideoTrack *)track;
+- (void)resetUi;
+- (void)callComplete;
+@end
+
 @interface PCObserver : NSObject<RTCPeerConnectionDelegate>
 - (id)initWithDelegate:(id<PHONERTCSendMessage>)delegate;
 @end
@@ -38,9 +45,10 @@
 @property(nonatomic, strong) RTCPeerConnectionFactory *peerConnectionFactory;
 @property(nonatomic, strong) NSMutableArray *queuedRemoteCandidates;
 @property(nonatomic, strong) RTCMediaConstraints *constraints;
-@property (assign) BOOL doVideo;
-@property (assign) BOOL isInitiator;
-
+@property(nonatomic, weak) id<PhoneRTCProtocol> delegate;
+@property(nonatomic, strong) RTCVideoCapturer *capturer;
+@property(assign) BOOL doVideo;
+@property(assign) BOOL isInitiator;
 
 + (NSString *)preferISAC:(NSString *)origSDP;
 - (void)drainRemoteCandidates;

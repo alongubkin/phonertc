@@ -41,7 +41,7 @@
             [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
         if (localVideoTrack) {
             [lms addVideoTrack:localVideoTrack];
-            [self sendLocalVideoTrack:localVideoTrack];
+            [self.delegate addLocalVideoTrack:localVideoTrack];
         }
     }
     [lms addAudioTrack:[self.peerConnectionFactory audioTrackWithID:@"ARDAMSa0"]];
@@ -169,15 +169,17 @@ didSetSessionDescriptionWithError:(NSError *)error {
 }
 
 - (void)disconnect {
+    [self.delegate resetUi];
     [self sendMessage:[@"{\"type\": \"bye\"}" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self.peerConnection close];
     self.peerConnection = nil;
-    self.peerConnectionFactory = nil;
     self.pcObserver = nil;
     self.constraints = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
+    self.peerConnectionFactory = nil;
 
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
-    [self resetUi];
+    [self.delegate callComplete];
 }
 
 - (void)drainRemoteCandidates {
@@ -193,20 +195,9 @@ didSetSessionDescriptionWithError:(NSError *)error {
     [[NSNotificationCenter defaultCenter] postNotificationName:@"SendMessage" object:message];
 }
 
-- (void)sendLocalVideoTrack:(RTCVideoTrack* )track
-{
-    NSLog(@"sendLocalVideoTrack 1");
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendLocalVideoTrack" object:track];
-}
-
 - (void)sendRemoteVideoTrack:(RTCVideoTrack* )track
 {
-    NSLog(@"sendRemoteVideoTrack 1");
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"SendRemoteVideoTrack" object:track];
-}
-
-- (void)resetUi {
-    [[NSNotificationCenter defaultCenter] postNotificationName:@"ResetUI" object:nil];
+    [self.delegate addRemoteVideoTrack:track];
 }
 
 - (void)receiveMessage:(NSString *)message
