@@ -6,14 +6,13 @@ WebRTC for PhoneGap apps!
 
 ### Features
 
-* Completely open source.
-* Android and iOS support.
-* Simple JavaScript API.
-* Video chat (iOS only).
-* Voice chat.
-* Use your own servers without relying on any third-parties.
-* Perfect for hybrid mobile apps using Angular.
-
+* Completely open source
+* Android and iOS support
+* Simple JavaScript API
+* Video & Voice chat
+* Use your own servers without relying on any third-parties
+* Perfect for hybrid mobile apps using Angular
+* 
 ### Requirements
 
 * TURN server - [rfc5766-turn-server](https://code.google.com/p/rfc5766-turn-server/) on Amazon EC2 is a good option here
@@ -21,7 +20,6 @@ WebRTC for PhoneGap apps!
 
 ### Upcoming features
 
-* Video chat for Android (really soon)
 * Group chat
 * API documentation
 * Volume control
