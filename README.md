@@ -87,6 +87,8 @@ Add the plugin:
     
 ### Usage Example 
 ```javascript
+var phonertc = cordova.require('com.dooble.phonertc.PhoneRTC');
+
 phonertc.call({ 
     isInitator: true, // Caller or callee?
     turn: {
@@ -107,45 +109,8 @@ phonertc.call({
     },
     disconnectCallback: function () {
         alert('Call disconnected!');
-    }
-});
-
-signaling.onMessage = function (message) {
-    if (message.type === 'webrtc_handshake') {
-        // when a message is received from the signaling server, 
-        // notify the PhoneRTC plugin.
-        phonertc.receiveMessage(message.data);
-    }
-};
-```
-
-### iOS Video Example
-
-iOS Video is completely backwards compatible with non-video calls.
-
-```javascript
-    isInitator: true, // Caller or callee?
-    turn: {
-        host: 'turn:turn.example.com:3478',
-        username: 'user',
-        password: 'pass'
     },
-    sendMessageCallback: function (data) {
-        // PhoneRTC wants to send a message to your target, use
-        // your signaling server here to send the message.
-        signaling.sendMessage(target, { 
-            type: 'webrtc_handshake',
-            data: data
-        });
-    },
-    answerCallback: function () {
-        alert('Callee answered!');
-    },
-    disconnectCallback: function () {
-        alert('Call disconnected!');
-    },
-    // If you do not want to do video do not include any video objects
-    video: {
+    video: {  // Remove this property if you don't want video chat
     	localVideo: document.getElementById('localVideo'),
         remoteVideo: document.getElementById('remoteVideo')
     }
