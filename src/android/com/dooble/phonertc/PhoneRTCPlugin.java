@@ -69,7 +69,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			final String turnServerHost = args.getString(1);
 			final String turnUsername = args.getString(2);
 			final String turnPassword = args.getString(3);
-			final JSONObject video = args.getJSONObject(4);
+			final JSONObject video = (!args.isNull(4)) ? args.getJSONObject(4) : null;
 			
 			_callbackContext = callbackContext;
 			queuedRemoteCandidates = new LinkedList<IceCandidate>();
