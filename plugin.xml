@@ -15,8 +15,6 @@
         <clobbers target="cordova.plugins.phonertc" />
     </js-module>
 
-    <asset src="www/phonertc.js" target="phonertc.js" />
-
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
 			<feature name="PhoneRTCPlugin">
