@@ -1,6 +1,6 @@
 ## PhoneRTC
 
-WebRTC for PhoneGap apps!
+WebRTC for Cordova apps!
 
 **Note:** PhoneRTC is still at very early stages. Right now, it's more like a proof-of-concept than a production-ready library. 
 
