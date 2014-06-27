@@ -12,7 +12,7 @@ WebRTC for PhoneGap apps!
 * Video & Voice chat
 * Use your own servers without relying on any third-parties
 * Perfect for hybrid mobile apps using Angular
-* 
+
 ### Requirements
 
 * TURN server - [rfc5766-turn-server](https://code.google.com/p/rfc5766-turn-server/) on Amazon EC2 is a good option here
