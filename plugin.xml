@@ -14,7 +14,7 @@
     <js-module src="www/phonertc.js" name="PhoneRTC">
         <clobbers target="cordova.plugins.phonertc" />
     </js-module>
-
+	
     <platform name="ios">
         <config-file target="config.xml" parent="/*">
 			<feature name="PhoneRTCPlugin">
@@ -134,7 +134,9 @@
 
     <platform name="android">
         <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
-        
+        <source-file src="src/android/com/dooble/phonertc/FramePool.java" target-dir="src/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/VideoStreamsView.java" target-dir="src/com/dooble/phonertc" />
+		
         <config-file target="res/xml/config.xml" parent="/*">
 			<feature name="PhoneRTCPlugin">
 				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
@@ -142,10 +144,14 @@
         </config-file>
 
         <config-file target="AndroidManifest.xml" parent="/manifest">
+			<uses-feature android:name="android.hardware.camera" />
+			<uses-feature android:name="android.hardware.camera.autofocus" />
+			<uses-feature android:glEsVersion="0x00020000" android:required="true"></uses-feature>		
 			<uses-permission android:name="android.permission.INTERNET" />
 			<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 			<uses-permission android:name="android.permission.RECORD_AUDIO" />
 			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+			<uses-permission android:name="android.permission.CAMERA" />
         </config-file>
 
         <source-file src="libs/android/libjingle_peerconnection.jar" target-dir="libs"/>
