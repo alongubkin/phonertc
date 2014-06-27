@@ -102,7 +102,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
 							"OfferToReceiveAudio", "true"));
 					sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-							"OfferToReceiveVideo", "true"));
+							"OfferToReceiveVideo", (video != null) ? "true" : "false"));
 		
 					cordova.getActivity().runOnUiThread(new Runnable() {
 						public void run() {
@@ -326,9 +326,11 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			// TODO Auto-generated method stub
 			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					stream.videoTracks.get(0).addRenderer(new VideoRenderer(
-						new VideoCallbacks(remoteVideoView, VideoStreamsView.Endpoint.REMOTE)));
-				  
+					if (remoteVideoView != null) {
+						stream.videoTracks.get(0).addRenderer(new VideoRenderer(
+							new VideoCallbacks(remoteVideoView, VideoStreamsView.Endpoint.REMOTE)));
+					}
+					
 					try {
 						JSONObject data = new JSONObject();
 						data.put("type", "__answered");
