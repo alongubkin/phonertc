@@ -51,6 +51,8 @@ exports.call = function (options) {
       width : videoElements.remoteVideo.offsetWidth,
       height : videoElements.remoteVideo.offsetHeight
     };
+    videoElements.localVideo.style.visibility = 'hidden';
+    videoElements.remoteVideo.style.visibility = 'hidden';
   }
 
   exec(

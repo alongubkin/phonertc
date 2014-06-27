@@ -4,6 +4,10 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import android.graphics.Point;
+import android.webkit.WebView;
+
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -20,6 +24,11 @@ import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
 import org.webrtc.PeerConnection.IceConnectionState;
 import org.webrtc.PeerConnection.IceGatheringState;
+import org.webrtc.VideoCapturer;
+import org.webrtc.VideoRenderer;
+import org.webrtc.VideoRenderer.I420Frame;
+import org.webrtc.VideoSource;
+import org.webrtc.VideoTrack;
 
 import android.media.AudioManager;
 import android.util.Log;
@@ -28,6 +37,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	public static final String ACTION_CALL = "call";
 	public static final String ACTION_RECEIVE_MESSAGE = "receiveMessage";
 	public static final String ACTION_DISCONNECT = "disconnect";
+	public static final String ACTION_UPDATE_VIDEO_POSITION = "updateVideoPosition";
 	
 	CallbackContext _callbackContext;
 
@@ -45,6 +55,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] quit = new Boolean[] { false };
 	
+	private VideoSource videoSource;
+	private VideoStreamsView localVideoView;
+  	private VideoStreamsView remoteVideoView;
+	
 	@Override
 	public boolean execute(String action, JSONArray args,
 			CallbackContext callbackContext) throws JSONException {
@@ -55,6 +69,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			final String turnServerHost = args.getString(1);
 			final String turnUsername = args.getString(2);
 			final String turnPassword = args.getString(3);
+			final JSONObject video = args.getJSONObject(4);
 			
 			_callbackContext = callbackContext;
 			queuedRemoteCandidates = new LinkedList<IceCandidate>();
@@ -76,7 +91,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					
 					abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity()),
 							"Failed to initializeAndroidGlobals");
-		
+					
 					final LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<PeerConnection.IceServer>();
 					iceServers.add(new PeerConnection.IceServer(
 							"stun:stun.l.google.com:19302"));
@@ -87,7 +102,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
 							"OfferToReceiveAudio", "true"));
 					sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-							"OfferToReceiveVideo", "false"));
+							"OfferToReceiveVideo", "true"));
 		
 					cordova.getActivity().runOnUiThread(new Runnable() {
 						public void run() {
@@ -99,12 +114,31 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 									pcObserver);
 							
 							MediaStream lMS = factory.createLocalMediaStream("ARDAMS");
+							
+							if (video != null) {
+								try {
+									localVideoView = createVideoView(video.getJSONObject("localVideo"));
+									remoteVideoView = createVideoView(video.getJSONObject("remoteVideo"));
+								
+									VideoCapturer capturer = getVideoCapturer();
+									videoSource = factory.createVideoSource(capturer, new MediaConstraints());
+									VideoTrack videoTrack =
+										factory.createVideoTrack("ARDAMSv0", videoSource);
+									videoTrack.addRenderer(new VideoRenderer(new VideoCallbacks(
+										localVideoView, VideoStreamsView.Endpoint.REMOTE)));
+									lMS.addTrack(videoTrack);
+								} catch (JSONException e) {
+									Log.e("com.dooble.phonertc", "A JSON exception has occured while trying to add video.", e);
+								}								
+							}
+	  
 							lMS.addTrack(factory.createAudioTrack("ARDAMSa0"));
 							pc.addStream(lMS, new MediaConstraints());
 							
 							if (isInitiator) {
 								pc.createOffer(sdpObserver, sdpMediaConstraints);
 							}
+							
 						}
 					});
 			    }
@@ -168,6 +202,21 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		return false;
 	}
 
+	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+		WebView.LayoutParams params = new WebView.LayoutParams(config.getInt("width") * 2,
+			config.getInt("height") * 2, 
+			config.getInt("x"), 
+			config.getInt("y"));
+
+		Point displaySize = new Point(config.getInt("width") * 2,
+			config.getInt("height") * 2);
+		
+		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize);
+		webView.addView(view, params);
+		
+		return view;
+	}
+	
 	void sendMessage(JSONObject data) {
 		PluginResult result = new PluginResult(PluginResult.Status.OK, data);
 		result.setKeepCallback(true);
@@ -228,7 +277,29 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			throw new RuntimeException(msg);
 		}
 	}
-
+	
+	// Cycle through likely device names for the camera and return the first
+	// capturer that works, or crash if none do.
+	private VideoCapturer getVideoCapturer() {
+		String[] cameraFacing = { "front", "back" };
+		int[] cameraIndex = { 0, 1 };
+		int[] cameraOrientation = { 0, 90, 180, 270 };
+		for (String facing : cameraFacing) {
+			for (int index : cameraIndex) {
+				for (int orientation : cameraOrientation) {
+					String name = "Camera " + index + ", Facing " + facing +
+						", Orientation " + orientation;
+					VideoCapturer capturer = VideoCapturer.create(name);
+					if (capturer != null) {
+						// logAndToast("Using camera: " + name);
+						return capturer;
+					}
+				}
+			}
+		}
+		throw new RuntimeException("Failed to open capturer");
+	}
+  
 	private class PCObserver implements PeerConnection.Observer {
 
 		@Override
@@ -251,10 +322,13 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		}
 
 		@Override
-		public void onAddStream(final MediaStream arg0) {
+		public void onAddStream(final MediaStream stream) {
 			// TODO Auto-generated method stub
 			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
+					stream.videoTracks.get(0).addRenderer(new VideoRenderer(
+						new VideoCallbacks(remoteVideoView, VideoStreamsView.Endpoint.REMOTE)));
+				  
 					try {
 						JSONObject data = new JSONObject();
 						data.put("type", "__answered");
@@ -267,7 +341,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		}
 
 		@Override
-		public void onDataChannel(DataChannel arg0) {
+		public void onDataChannel(DataChannel stream) {
 			// TODO Auto-generated method stub
 
 		}
@@ -422,4 +496,33 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			
 		}
 	}
+	
+	// Implementation detail: bridge the VideoRenderer.Callbacks interface to the
+	// VideoStreamsView implementation.
+	private class VideoCallbacks implements VideoRenderer.Callbacks {
+		private final VideoStreamsView view;
+		private final VideoStreamsView.Endpoint stream;
+
+		public VideoCallbacks(
+			VideoStreamsView view, VideoStreamsView.Endpoint stream) {
+			this.view = view;
+			this.stream = stream;
+			Log.d("CordovaLog", "VideoCallbacks");
+		}
+
+		@Override
+		public void setSize(final int width, final int height) {
+			Log.d("setSize", width + " " + height);
+			view.queueEvent(new Runnable() {
+				public void run() {
+					view.setSize(stream, width, height);
+				}
+			});
+		}
+
+		@Override
+		public void renderFrame(I420Frame frame) {
+			view.queueFrame(stream, frame);
+		}
+	}	
 }
