@@ -203,13 +203,16 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	}
 
 	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
-		WebView.LayoutParams params = new WebView.LayoutParams(config.getInt("width") * 2,
-			config.getInt("height") * 2,
-			config.getInt("x"),
-			config.getInt("y"));
+		int devicePixelRatio = config.getInt("devicePixelRatio");
 
-		Point displaySize = new Point(config.getInt("width") * 2,
-			config.getInt("height") * 2);
+		int width = config.getInt("width") * devicePixelRatio;
+		int height = config.getInt("height") * devicePixelRatio;
+		int x = config.getInt("x") * devicePixelRatio;
+		int y = config.getInt("y") * devicePixelRatio;
+
+		WebView.LayoutParams params = new WebView.LayoutParams(width, height, x, y);
+
+		Point displaySize = new Point(width, height);
 
 		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize);
 		webView.addView(view, params);
