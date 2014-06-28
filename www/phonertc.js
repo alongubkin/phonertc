@@ -37,7 +37,9 @@ exports.call = function (options) {
     video = {};
     videoElements.localVideo = options.video.localVideo;
     videoElements.remoteVideo = options.video.remoteVideo;
+    var devicePixelRatio = window.devicePixelRatio || 2;
     video.localVideo = {
+      devicePixelRatio: devicePixelRatio,
       // get these values by doing a lookup on the dom
       x : videoElements.localVideo.getBoundingClientRect().left,
       y : videoElements.localVideo.getBoundingClientRect().top,
@@ -45,14 +47,13 @@ exports.call = function (options) {
       height : videoElements.localVideo.offsetHeight
     };
     video.remoteVideo = {
+      devicePixelRatio: devicePixelRatio,
       // get these values by doing a lookup on the dom
       x : videoElements.remoteVideo.getBoundingClientRect().left,
       y : videoElements.remoteVideo.getBoundingClientRect().top,
       width : videoElements.remoteVideo.offsetWidth,
       height : videoElements.remoteVideo.offsetHeight
     };
-    videoElements.localVideo.style.visibility = 'hidden';
-    videoElements.remoteVideo.style.visibility = 'hidden';
   }
 
   exec(
