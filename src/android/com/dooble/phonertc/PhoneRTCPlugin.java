@@ -14,6 +14,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.AudioSource;
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -55,6 +56,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] quit = new Boolean[] { false };
 
+	private AudioSource audioSource;
+
 	private VideoSource videoSource;
 	private VideoStreamsView localVideoView;
 	private VideoStreamsView remoteVideoView;
@@ -89,7 +92,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
-					abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity()),
+					abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true),
 							"Failed to initializeAndroidGlobals");
 
 					final LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<PeerConnection.IceServer>();
@@ -132,7 +135,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 								}
 							}
 
-							lMS.addTrack(factory.createAudioTrack("ARDAMSa0"));
+							audioSource = factory.createAudioSource(new MediaConstraints());
+							lMS.addTrack(factory.createAudioTrack("ARDAMSa0", audioSource));
 							pc.addStream(lMS, new MediaConstraints());
 
 							if (isInitiator) {
