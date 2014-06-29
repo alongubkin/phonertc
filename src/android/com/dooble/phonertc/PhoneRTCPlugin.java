@@ -84,8 +84,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					AudioManager audioManager = ((AudioManager) cordova.getActivity().getSystemService(cordova.getActivity().AUDIO_SERVICE));
 					@SuppressWarnings("deprecation")
 					boolean isWiredHeadsetOn = audioManager.isWiredHeadsetOn();
-					audioManager.setMode(isWiredHeadsetOn ? AudioManager.MODE_IN_CALL
-							: AudioManager.MODE_IN_COMMUNICATION);
+					//audioManager.setMode(isWiredHeadsetOn ? AudioManager.MODE_IN_CALL
+					//		: AudioManager.MODE_IN_COMMUNICATION);
 					audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
