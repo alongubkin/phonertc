@@ -245,7 +245,7 @@ public class VideoStreamsView
 
   // Remote image should span the full screen.
   private static final FloatBuffer remoteVertices = directNativeFloatBuffer(
-      new float[] { 1, -1, -1, -1, 1, 1, -1, 1 });
+      new float[] { 1, 1, 1, -1, -1, 1, -1, -1 });
 
   // Texture Coordinates mapping the entire texture.
   private static final FloatBuffer textureCoords = directNativeFloatBuffer(
