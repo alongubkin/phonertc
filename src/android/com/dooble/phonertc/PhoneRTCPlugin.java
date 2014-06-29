@@ -200,13 +200,29 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		} else if (action.equals(ACTION_DISCONNECT)) {
 			Log.e("com.dooble.phonertc", "DISCONNECT");
 			disconnect();
+		} else if (action.equals(ACTION_UPDATE_VIDEO_POSITION)) {
+			final JSONObject videoElements = args.getJSONObject(0);
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run () {
+					try {
+						if (localVideoView != null && videoElements.has("localVideo")) {
+							localVideoView.setLayoutParams(getLayoutParams(videoElements.getJSONObject("localVideo")));
+						}
+						if (remoteVideoView != null && videoElements.has("remoteVideo")) {
+							remoteVideoView.setLayoutParams(getLayoutParams(videoElements.getJSONObject("remoteVideo")));
+						}
+					} catch (JSONException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
 		}
 
 		callbackContext.error("Invalid action");
 		return false;
 	}
 
-	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+	WebView.LayoutParams getLayoutParams (JSONObject config) throws JSONException {
 		int devicePixelRatio = config.getInt("devicePixelRatio");
 
 		int width = config.getInt("width") * devicePixelRatio;
@@ -216,7 +232,13 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		WebView.LayoutParams params = new WebView.LayoutParams(width, height, x, y);
 
-		Point displaySize = new Point(width, height);
+		return params;
+	}
+
+	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+		WebView.LayoutParams params = getLayoutParams(config);
+
+		Point displaySize = new Point(params.width, params.height);
 
 		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize);
 		webView.addView(view, params);
