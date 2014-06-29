@@ -5,21 +5,9 @@ var videoElements;
 exports.updateVideoPosition = function updateVideoPosition () {
   // This function should listen for scrolling and update the position of the elements to cordova exec
   if (videoElements) {
-    var video = {};
-    var devicePixelRatio = window.devicePixelRatio || 2;
-    video.localVideo = {
-      devicePixelRatio: devicePixelRatio,
-      x : videoElements.localVideo.getBoundingClientRect().left,
-      y : videoElements.localVideo.getBoundingClientRect().top,
-      width : videoElements.localVideo.offsetWidth,
-      height : videoElements.localVideo.offsetHeight
-    };
-    video.remoteVideo = {
-      devicePixelRatio: devicePixelRatio,
-      x : videoElements.remoteVideo.getBoundingClientRect().left,
-      y : videoElements.remoteVideo.getBoundingClientRect().top,
-      width : videoElements.remoteVideo.offsetWidth,
-      height : videoElements.remoteVideo.offsetHeight
+    var video = {
+      localVideo: getLayoutParams(videoElements.localVideo),
+      remoteVideo: getLayoutParams(videoElements.remoteVideo)
     };
     // Update Video Element positioning
     exec(
@@ -33,31 +21,30 @@ exports.updateVideoPosition = function updateVideoPosition () {
 
 document.addEventListener("touchmove", exports.updateVideoPosition);
 
+function getLayoutParams (videoElement) {
+  var boundingRect = videoElement.getBoundingClientRect();
+  return {
+    devicePixelRatio: window.devicePixelRatio || 2,
+    // get these values by doing a lookup on the dom
+    x : boundingRect.left,
+    y : boundingRect.top,
+    width : videoElement.offsetWidth,
+    height : videoElement.offsetHeight
+  };
+}
+
 exports.call = function (options) {
   // options should contain a video option if video is enabled
   // sets the initial video options a dom listener needs to be added to watch for movements.
   var video;
   if (options.video) {
-    videoElements = {};
-    video = {};
-    videoElements.localVideo = options.video.localVideo;
-    videoElements.remoteVideo = options.video.remoteVideo;
-    var devicePixelRatio = window.devicePixelRatio || 2;
-    video.localVideo = {
-      devicePixelRatio: devicePixelRatio,
-      // get these values by doing a lookup on the dom
-      x : videoElements.localVideo.getBoundingClientRect().left,
-      y : videoElements.localVideo.getBoundingClientRect().top,
-      width : videoElements.localVideo.offsetWidth,
-      height : videoElements.localVideo.offsetHeight
+    videoElements = {
+      localVideo: options.video.localVideo,
+      remoteVideo: options.video.remoteVideo
     };
-    video.remoteVideo = {
-      devicePixelRatio: devicePixelRatio,
-      // get these values by doing a lookup on the dom
-      x : videoElements.remoteVideo.getBoundingClientRect().left,
-      y : videoElements.remoteVideo.getBoundingClientRect().top,
-      width : videoElements.remoteVideo.offsetWidth,
-      height : videoElements.remoteVideo.offsetHeight
+    video = {
+      localVideo: getLayoutParams(videoElements.localVideo),
+      remoteVideo: getLayoutParams(videoElements.remoteVideo)
     };
   }
 
