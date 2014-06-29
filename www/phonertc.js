@@ -2,17 +2,20 @@ var exec = require('cordova/exec');
 
 var videoElements;
 
-document.addEventListener("touchmove", function () {
+exports.updateVideoPosition = function updateVideoPosition () {
   // This function should listen for scrolling and update the position of the elements to cordova exec
   if (videoElements) {
     var video = {};
+    var devicePixelRatio = window.devicePixelRatio || 2;
     video.localVideo = {
+      devicePixelRatio: devicePixelRatio,
       x : videoElements.localVideo.getBoundingClientRect().left,
       y : videoElements.localVideo.getBoundingClientRect().top,
       width : videoElements.localVideo.offsetWidth,
       height : videoElements.localVideo.offsetHeight
     };
     video.remoteVideo = {
+      devicePixelRatio: devicePixelRatio,
       x : videoElements.remoteVideo.getBoundingClientRect().left,
       y : videoElements.remoteVideo.getBoundingClientRect().top,
       width : videoElements.remoteVideo.offsetWidth,
@@ -26,7 +29,9 @@ document.addEventListener("touchmove", function () {
       'updateVideoPosition',
       [video]);
   }
-});
+};
+
+document.addEventListener("touchmove", exports.updateVideoPosition);
 
 exports.call = function (options) {
   // options should contain a video option if video is enabled
