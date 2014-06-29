@@ -14,6 +14,7 @@ import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.AudioSource;
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -55,6 +56,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] quit = new Boolean[] { false };
 
+	private AudioSource audioSource;
+
 	private VideoSource videoSource;
 	private VideoStreamsView localVideoView;
 	private VideoStreamsView remoteVideoView;
@@ -89,7 +92,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
 					audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 
-					abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity()),
+					abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true),
 							"Failed to initializeAndroidGlobals");
 
 					final LinkedList<PeerConnection.IceServer> iceServers = new LinkedList<PeerConnection.IceServer>();
@@ -132,7 +135,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 								}
 							}
 
-							lMS.addTrack(factory.createAudioTrack("ARDAMSa0"));
+							audioSource = factory.createAudioSource(new MediaConstraints());
+							lMS.addTrack(factory.createAudioTrack("ARDAMSa0", audioSource));
 							pc.addStream(lMS, new MediaConstraints());
 
 							if (isInitiator) {
@@ -196,13 +200,29 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		} else if (action.equals(ACTION_DISCONNECT)) {
 			Log.e("com.dooble.phonertc", "DISCONNECT");
 			disconnect();
+		} else if (action.equals(ACTION_UPDATE_VIDEO_POSITION)) {
+			final JSONObject videoElements = args.getJSONObject(0);
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run () {
+					try {
+						if (localVideoView != null && videoElements.has("localVideo")) {
+							localVideoView.setLayoutParams(getLayoutParams(videoElements.getJSONObject("localVideo")));
+						}
+						if (remoteVideoView != null && videoElements.has("remoteVideo")) {
+							remoteVideoView.setLayoutParams(getLayoutParams(videoElements.getJSONObject("remoteVideo")));
+						}
+					} catch (JSONException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			});
 		}
 
 		callbackContext.error("Invalid action");
 		return false;
 	}
 
-	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+	WebView.LayoutParams getLayoutParams (JSONObject config) throws JSONException {
 		int devicePixelRatio = config.getInt("devicePixelRatio");
 
 		int width = config.getInt("width") * devicePixelRatio;
@@ -212,7 +232,13 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		WebView.LayoutParams params = new WebView.LayoutParams(width, height, x, y);
 
-		Point displaySize = new Point(width, height);
+		return params;
+	}
+
+	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+		WebView.LayoutParams params = getLayoutParams(config);
+
+		Point displaySize = new Point(params.width, params.height);
 
 		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize);
 		webView.addView(view, params);
