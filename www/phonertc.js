@@ -26,8 +26,8 @@ function getLayoutParams (videoElement) {
   return {
     devicePixelRatio: window.devicePixelRatio || 2,
     // get these values by doing a lookup on the dom
-    x : boundingRect.left,
-    y : boundingRect.top,
+    x : boundingRect.left + window.scrollX,
+    y : boundingRect.top + window.scrollY,
     width : videoElement.offsetWidth,
     height : videoElement.offsetHeight
   };
