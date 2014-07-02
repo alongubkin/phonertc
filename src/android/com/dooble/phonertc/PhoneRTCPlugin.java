@@ -253,7 +253,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	}
 
 	private String preferISAC(String sdpDescription) {
-		String[] lines = sdpDescription.split("\n");
+		String[] lines = sdpDescription.split("\r?\n");
 		int mLineIndex = -1;
 		String isac16kRtpMap = null;
 		Pattern isac16kPattern = Pattern
@@ -296,7 +296,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		lines[mLineIndex] = newMLine.toString();
 		StringBuilder newSdpDescription = new StringBuilder();
 		for (String line : lines) {
-			newSdpDescription.append(line).append("\n");
+			newSdpDescription.append(line).append("\r\n");
 		}
 		return newSdpDescription.toString();
 	}
