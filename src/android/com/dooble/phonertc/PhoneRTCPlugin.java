@@ -58,6 +58,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	private AudioSource audioSource;
 
+	private VideoCapturer videoCapturer;
 	private VideoSource videoSource;
 	private VideoStreamsView localVideoView;
 	private VideoStreamsView remoteVideoView;
@@ -310,6 +311,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	// Cycle through likely device names for the camera and return the first
 	// capturer that works, or crash if none do.
 	private VideoCapturer getVideoCapturer() {
+		if (videoCapturer != null) {
+			return videoCapturer;
+		}
 		String[] cameraFacing = { "front", "back" };
 		int[] cameraIndex = { 0, 1 };
 		int[] cameraOrientation = { 0, 90, 180, 270 };
@@ -511,6 +515,25 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					if (localVideoView != null) {
+						webView.removeView(localVideoView);
+						localVideoView = null;
+					}
+
+					if (remoteVideoView != null) {
+						webView.removeView(remoteVideoView);
+						remoteVideoView = null;
+					}
+				}
+			});
+
+			if (videoSource != null) {
+				videoSource.dispose();
+				videoSource = null;
 			}
 
 			if (factory != null) {
