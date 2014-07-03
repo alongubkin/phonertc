@@ -122,7 +122,8 @@ didSetSessionDescriptionWithError:(NSError *)error {
 + (NSString *)preferISAC:(NSString *)origSDP {
     int mLineIndex = -1;
     NSString* isac16kRtpMap = nil;
-    NSArray* lines = [origSDP componentsSeparatedByString:@"\r?\n"];
+    origSDP = [origSDP stringByReplacingOccurrencesOfString:@"\r\n" withString:@"\n"];
+    NSArray* lines = [origSDP componentsSeparatedByString:@"\n"];
     NSRegularExpression* isac16kRegex = [NSRegularExpression
                                          regularExpressionWithPattern:@"^a=rtpmap:(\\d+) ISAC/16000[\r]?$"
                                          options:0
