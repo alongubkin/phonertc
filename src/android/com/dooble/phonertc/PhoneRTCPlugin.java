@@ -1,6 +1,7 @@
 package com.dooble.phonertc;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
+import org.webrtc.MediaStreamTrack;
 import org.webrtc.PeerConnection;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SdpObserver;
@@ -39,6 +41,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	public static final String ACTION_RECEIVE_MESSAGE = "receiveMessage";
 	public static final String ACTION_DISCONNECT = "disconnect";
 	public static final String ACTION_UPDATE_VIDEO_POSITION = "updateVideoPosition";
+	public static final String ACTION_SET_ENABLED_MEDIUM = "setEnabledMedium";
 
 	CallbackContext _callbackContext;
 
@@ -52,6 +55,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private MediaConstraints sdpMediaConstraints;
 
 	private LinkedList<IceCandidate> queuedRemoteCandidates ;
+
+	private MediaStream localStream;
+	private MediaStream remoteStream;
 
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] quit = new Boolean[] { false };
@@ -117,7 +123,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 							pc = factory.createPeerConnection(iceServers, pcMediaConstraints,
 									pcObserver);
 
-							MediaStream lMS = factory.createLocalMediaStream("ARDAMS");
+							localStream = factory.createLocalMediaStream("ARDAMS");
 
 							if (video != null) {
 								try {
@@ -130,15 +136,15 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 										factory.createVideoTrack("ARDAMSv0", videoSource);
 									videoTrack.addRenderer(new VideoRenderer(new VideoCallbacks(
 										localVideoView, VideoStreamsView.Endpoint.REMOTE)));
-									lMS.addTrack(videoTrack);
+									localStream.addTrack(videoTrack);
 								} catch (JSONException e) {
 									Log.e("com.dooble.phonertc", "A JSON exception has occured while trying to add video.", e);
 								}
 							}
 
 							audioSource = factory.createAudioSource(new MediaConstraints());
-							lMS.addTrack(factory.createAudioTrack("ARDAMSa0", audioSource));
-							pc.addStream(lMS, new MediaConstraints());
+							localStream.addTrack(factory.createAudioTrack("ARDAMSa0", audioSource));
+							pc.addStream(localStream, new MediaConstraints());
 
 							if (isInitiator) {
 								pc.createOffer(sdpObserver, sdpMediaConstraints);
@@ -217,10 +223,39 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					}
 				}
 			});
+		} else if (action.equals(ACTION_SET_ENABLED_MEDIUM)) {
+			String mediumType = args.getString(0);
+			Boolean enabled = args.getBoolean(1);
+			setEnabledMedium(mediumType, enabled);
 		}
 
 		callbackContext.error("Invalid action");
 		return false;
+	}
+
+	private void setEnabledMedium (String mediumType, boolean enabled) {
+		setEnabledStream(localStream, mediumType, enabled);
+		setEnabledStream(remoteStream, mediumType, enabled);
+	}
+
+	private void setEnabledStream (MediaStream stream, String mediumType,
+			boolean enabled) {
+		if (stream == null) {
+			return;
+		}
+
+		if ("audio".equals(mediumType)) {
+			setEnabledTracks(stream.audioTracks, enabled);
+		} else if ("video".equals(mediumType)) {
+			setEnabledTracks(stream.videoTracks, enabled);
+		}
+	}
+
+	private void setEnabledTracks (List<? extends MediaStreamTrack> tracks,
+			boolean enabled) {
+		for (MediaStreamTrack track : tracks) {
+			track.setEnabled(enabled);
+		}
 	}
 
 	WebView.LayoutParams getLayoutParams (JSONObject config) throws JSONException {
@@ -356,7 +391,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onAddStream(final MediaStream stream) {
-			// TODO Auto-generated method stub
+			remoteStream = stream;
 			PhoneRTCPlugin.this.cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (remoteVideoView != null) {

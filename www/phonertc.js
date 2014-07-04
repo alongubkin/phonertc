@@ -64,6 +64,15 @@ exports.call = function (options) {
     [options.isInitator, options.turn.host, options.turn.username, options.turn.password, video]);
 };
 
+exports.setEnabledMedium = function (mediumType, enabled) {
+  exec(
+    function () {},
+    null,
+    'PhoneRTCPlugin',
+    'setEnabledMedium',
+    [mediumType, enabled]);
+}
+
 exports.receiveMessage = function (data) {
   exec(
     null,
