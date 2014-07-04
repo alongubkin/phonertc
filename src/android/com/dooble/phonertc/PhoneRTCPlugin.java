@@ -233,9 +233,23 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		return false;
 	}
 
-	private void setEnabledMedium (String mediumType, boolean enabled) {
+	private void setEnabledMedium (String mediumType, final boolean enabled) {
 		setEnabledStream(localStream, mediumType, enabled);
 		setEnabledStream(remoteStream, mediumType, enabled);
+
+		if ("video".equals(mediumType)) {
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run () {
+					if (enabled) {
+						localVideoView.setVisibility(WebView.VISIBLE);
+						remoteVideoView.setVisibility(WebView.VISIBLE);
+					} else {
+						localVideoView.setVisibility(WebView.GONE);
+						remoteVideoView.setVisibility(WebView.GONE);
+					}
+				}
+			});
+		}
 	}
 
 	private void setEnabledStream (MediaStream stream, String mediumType,
