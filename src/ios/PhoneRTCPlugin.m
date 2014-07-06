@@ -115,6 +115,7 @@
     remoteVideoView.videoTrack = track;
     remoteVideoView.hidden = NO;
     [self.webView.superview bringSubviewToFront:remoteVideoView];
+    [self.webView.superview bringSubviewToFront:localVideoView];
 }
 
 - (void)resetUi {
