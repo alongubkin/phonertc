@@ -444,8 +444,14 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		@Override
 		public void onIceGatheringChange(IceGatheringState arg0) {
-			// TODO Auto-generated method stub
-
+			try {
+				JSONObject json = new JSONObject();
+				json.put("type", "IceGatheringChange");
+				json.put("state", arg0.name());
+				sendMessage(json);
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
