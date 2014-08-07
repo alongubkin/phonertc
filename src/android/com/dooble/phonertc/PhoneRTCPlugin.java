@@ -127,8 +127,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 							if (video != null) {
 								try {
-									localVideoView = createVideoView(video.getJSONObject("localVideo"));
-									remoteVideoView = createVideoView(video.getJSONObject("remoteVideo"));
+									localVideoView = createVideoView(video.getJSONObject("localVideo"), true);
+									remoteVideoView = createVideoView(video.getJSONObject("remoteVideo"), false);
 
 									VideoCapturer capturer = getVideoCapturer();
 									videoSource = factory.createVideoSource(capturer, new MediaConstraints());
@@ -285,12 +285,12 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		return params;
 	}
 
-	VideoStreamsView createVideoView(JSONObject config) throws JSONException {
+	VideoStreamsView createVideoView(JSONObject config, boolean isMirrored) throws JSONException {
 		WebView.LayoutParams params = getLayoutParams(config);
 
 		Point displaySize = new Point(params.width, params.height);
 
-		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize);
+		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize, isMirrored);
 		webView.addView(view, params);
 
 		return view;

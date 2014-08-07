@@ -45,9 +45,12 @@ public class VideoStreamsView
   private EnumMap<Endpoint, I420Frame> framesToRender =
       new EnumMap<Endpoint, I420Frame>(Endpoint.class);
 
-  public VideoStreamsView(Context c, Point screenDimensions) {
+  private boolean isMirrored;
+
+  public VideoStreamsView(Context c, Point screenDimensions, boolean isMirrored) {
     super(c);
     this.screenDimensions = screenDimensions;
+    this.isMirrored = isMirrored;
     setPreserveEGLContextOnPause(true);
     setEGLContextClientVersion(2);
     setRenderer(this);
@@ -133,7 +136,8 @@ public class VideoStreamsView
   @Override
   public void onDrawFrame(GL10 unused) {
     GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-    drawRectangle(yuvTextures[1], remoteVertices);
+    FloatBuffer vertices = isMirrored ? localVertices : remoteVertices;
+    drawRectangle(yuvTextures[1], vertices);
     ++numFramesSinceLastLog;
     long now = System.nanoTime();
     if (lastFPSLogTime == -1 || now - lastFPSLogTime > 1e9) {
@@ -246,6 +250,9 @@ public class VideoStreamsView
   // Remote image should span the full screen.
   private static final FloatBuffer remoteVertices = directNativeFloatBuffer(
       new float[] { -1, 1, -1, -1, 1, 1, 1, -1 });
+  // Local image should be mirrored.
+  private static final FloatBuffer localVertices = directNativeFloatBuffer(
+      new float[] { 1, 1, 1, -1, -1, 1, -1, -1 });
 
   // Texture Coordinates mapping the entire texture.
   private static final FloatBuffer textureCoords = directNativeFloatBuffer(
