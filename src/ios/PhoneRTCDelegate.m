@@ -314,6 +314,24 @@ peerConnectionOnRenegotiationNeeded:(RTCPeerConnection *)peerConnection {
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
    iceGatheringChanged:(RTCICEGatheringState)newState {
     NSLog(@"PCO onIceGatheringChange. %d", newState);
+    NSString *stateString;
+    switch(newState) {
+        case RTCICEGatheringNew:
+            stateString = @"NEW";
+            break;
+        case RTCICEGatheringGathering:
+            stateString = @"GATHERING";
+            break;
+        case RTCICEGatheringComplete:
+            stateString = @"COMPLETE";
+            break;
+    }
+    NSDictionary *json =
+    @{ @"type" : @"IceGatheringChange",
+       @"state" : stateString
+       };
+    NSError *error;
+    [_delegate sendMessage:[NSJSONSerialization dataWithJSONObject:json options:0 error:&error]];
 }
 
 - (void)peerConnection:(RTCPeerConnection *)peerConnection
