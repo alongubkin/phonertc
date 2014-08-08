@@ -100,7 +100,6 @@
 		<source-file src="libs/ios/libjingle_sound.a" framework="true" />
 		<source-file src="libs/ios/libjsoncpp.a" framework="true" />
 		<source-file src="libs/ios/libmedia_file.a" framework="true" />
-		<source-file src="libs/ios/libNetEq4.a" framework="true" />
 		<source-file src="libs/ios/libnss_static.a" framework="true" />
 		<source-file src="libs/ios/libopus.a" framework="true" />
 		<source-file src="libs/ios/libpaced_sender.a" framework="true" />
