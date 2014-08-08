@@ -6,6 +6,32 @@
 @synthesize peerConnection = _peerConnection;
 @synthesize peerConnectionFactory = _peerConnectionFactory;
 @synthesize queuedRemoteCandidates = _queuedRemoteCandidates;
+@synthesize capturer = _capturer;
+
+- (id)initWithDelegate:(id)delegate andIsInitiator:(BOOL)isInitiator {
+    return [self initWithDelegate:delegate andIsInitiator:isInitiator andDoVideo:false];
+}
+
+- (id)initWithDelegate:(id)delegate andIsInitiator:(BOOL)isInitiator andDoVideo:(BOOL)doVideo{
+    self = [super init];
+    self.delegate = delegate;
+    self.isInitiator = isInitiator;
+    self.doVideo = doVideo;
+
+    self.constraints = [[RTCMediaConstraints alloc]
+                        initWithMandatoryConstraints:
+                        @[
+                          [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
+                          [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:(self.doVideo ? @"true" : @"false")]
+                          ]
+                        optionalConstraints:
+                        @[
+                          [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
+                          [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"]
+                          ]
+                        ];
+    return self;
+}
 
 - (void)onICEServers:(NSArray*)servers
 {
@@ -21,7 +47,6 @@
     RTCMediaStream *lms =
     [self.peerConnectionFactory mediaStreamWithLabel:@"ARDAMS"];
 
-    // TODO: Make Camera Selectable
     if ([self doVideo]) {
         // Local capture copied from AppRTC
         NSString* cameraID = nil;
@@ -34,8 +59,9 @@
             }
         }
         NSAssert(cameraID, @"Unable to get the front camera id");
+        self.capturer = [RTCVideoCapturer capturerWithDeviceName:cameraID];
         RTCVideoSource* videoSource = [self.peerConnectionFactory
-                            videoSourceWithCapturer:[RTCVideoCapturer capturerWithDeviceName:cameraID]
+                            videoSourceWithCapturer:self.capturer
                             constraints:[[RTCMediaConstraints alloc] init]];
         RTCVideoTrack* localVideoTrack =
             [self.peerConnectionFactory videoTrackWithID:@"ARDAMSv0" source:videoSource];
@@ -178,6 +204,7 @@ didSetSessionDescriptionWithError:(NSError *)error {
     self.constraints = nil;
     [RTCPeerConnectionFactory deinitializeSSL];
     self.peerConnectionFactory = nil;
+    self.capturer = nil;
 
     [self sendMessage:[@"{\"type\": \"__disconnected\"}" dataUsingEncoding:NSUTF8StringEncoding]];
     [self.delegate callComplete];

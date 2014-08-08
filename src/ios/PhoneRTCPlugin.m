@@ -42,23 +42,7 @@
                                 initWithURI:[NSURL URLWithString:turnServerHost]
                                 username: turnUsername
                                 password: turnPassword];
-    // TODO: PhoneRTCDelegate should take constructor arguments
-    self.webRTC = [[PhoneRTCDelegate alloc] init];
-    self.webRTC.delegate = self;
-    self.webRTC.isInitiator = isInitator;
-    self.webRTC.doVideo = doVideo;
-    self.webRTC.constraints = [[RTCMediaConstraints alloc]
-       initWithMandatoryConstraints:
-            @[
-                 [[RTCPair alloc] initWithKey:@"OfferToReceiveAudio" value:@"true"],
-                 [[RTCPair alloc] initWithKey:@"OfferToReceiveVideo" value:(doVideo ? @"true" : @"false")]
-             ]
-        optionalConstraints:
-            @[
-                 [[RTCPair alloc] initWithKey:@"internalSctpDataChannels" value:@"true"],
-                 [[RTCPair alloc] initWithKey:@"DtlsSrtpKeyAgreement" value:@"true"]
-             ]
-    ];
+    self.webRTC = [[PhoneRTCDelegate alloc] initWithDelegate:self andIsInitiator:isInitator andDoVideo:doVideo];
     [self.webRTC onICEServers:@[stunServer, turnServer]];
 }
 

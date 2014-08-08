@@ -51,6 +51,8 @@
 @property(assign) BOOL isInitiator;
 
 + (NSString *)preferISAC:(NSString *)origSDP;
+- (id)initWithDelegate:(id)delegate andIsInitiator:(BOOL)isInitiator;
+- (id)initWithDelegate:(id)delegate andIsInitiator:(BOOL)isInitiator andDoVideo:(BOOL)doVideo;
 - (void)drainRemoteCandidates;
 
 - (void)sendMessage:(NSData*)message;
