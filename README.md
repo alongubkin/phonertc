@@ -151,6 +151,8 @@ Android: https://code.google.com/p/webrtc/source/browse/trunk/talk/examples/andr
 
 iOS: https://code.google.com/p/webrtc/source/browse/trunk/talk/app/webrtc/objc/README
 
+You can also use build scripts from [pristineio/webrtc-build-scripts](https://github.com/pristineio/webrtc-build-scripts)
+
 ### Contributors
 
 iOS Video Support: [@egreenmachine](https://github.com/egreenmachine) (BitCoin Donations: ```12pDZFVov6rDPjhGTz9Xj4qqegdoCJF3Ea```)
