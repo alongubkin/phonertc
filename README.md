@@ -158,4 +158,5 @@ You can also use build scripts from [pristineio/webrtc-build-scripts](https://gi
 
 ### Contributors
 
-iOS Video Support: [@egreenmachine](https://github.com/egreenmachine) (BitCoin Donations: ```12pDZFVov6rDPjhGTz9Xj4qqegdoCJF3Ea```)
+[@egreenmachine](https://github.com/egreenmachine)
+[@joseph-onsip](https://github.com/joseph-onsip)
