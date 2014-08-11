@@ -19,7 +19,9 @@ exports.updateVideoPosition = function updateVideoPosition () {
   }
 };
 
-document.addEventListener("touchmove", exports.updateVideoPosition);
+if (cordova.platformId !== 'android') {
+  document.addEventListener("touchmove", exports.updateVideoPosition);
+}
 
 function getLayoutParams (videoElement) {
   var boundingRect = videoElement.getBoundingClientRect();
