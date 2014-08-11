@@ -84,6 +84,9 @@ Add the plugin:
     cordova plugin add https://github.com/alongubkin/phonertc.git
     
 ### Usage Example 
+
+Note that this should be done on the callee side *before* the caller side.
+
 ```javascript
 var phonertc = cordova.require('com.dooble.phonertc.PhoneRTC');
 
