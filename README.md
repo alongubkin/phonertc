@@ -12,6 +12,7 @@ WebRTC for Cordova apps!
 * Video & Voice chat
 * Use your own servers without relying on any third-parties
 * Perfect for hybrid mobile apps using Angular
+* Use with [AudioToggle](https://github.com/alongubkin/audiotoggle) to switch between speaker and earpiece
 
 ### Requirements
 
