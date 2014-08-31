@@ -169,7 +169,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 									(String) json.get("id"), json.getInt("label"),
 									(String) json.get("candidate"));
 							if (queuedRemoteCandidates != null) {
-								queuedRemoteCandidates.add(candidate);
+								synchronized (queuedRemoteCandidates) {
+									queuedRemoteCandidates.add(candidate);
+								}
 							} else {
 								cordova.getActivity().runOnUiThread(new Runnable() {
 									public void run() {
@@ -545,10 +547,13 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			if (queuedRemoteCandidates == null)
 				return;
 
-			for (IceCandidate candidate : queuedRemoteCandidates) {
-				pc.addIceCandidate(candidate);
+			synchronized (queuedRemoteCandidates) {
+				for (IceCandidate candidate : queuedRemoteCandidates) {
+					pc.addIceCandidate(candidate);
+				}
+				
+				queuedRemoteCandidates = null;
 			}
-			queuedRemoteCandidates = null;
 		}
 	}
 
