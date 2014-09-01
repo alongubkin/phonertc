@@ -54,14 +54,15 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private PeerConnection pc;
 	private MediaConstraints sdpMediaConstraints;
 
-	private LinkedList<IceCandidate> queuedRemoteCandidates ;
-
+	private LinkedList<IceCandidate> queuedRemoteCandidates;
+	private Object queuedRemoteCandidatesLocker = new Object();
+	
 	private MediaStream localStream;
 	private MediaStream remoteStream;
 
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] quit = new Boolean[] { false };
-
+	
 	private AudioSource audioSource;
 
 	private VideoCapturer videoCapturer;
@@ -169,7 +170,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 									(String) json.get("id"), json.getInt("label"),
 									(String) json.get("candidate"));
 							if (queuedRemoteCandidates != null) {
-								synchronized (queuedRemoteCandidates) {
+								synchronized (queuedRemoteCandidatesLocker) {
 									queuedRemoteCandidates.add(candidate);
 								}
 							} else {
@@ -547,7 +548,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			if (queuedRemoteCandidates == null)
 				return;
 
-			synchronized (queuedRemoteCandidates) {
+			synchronized (queuedRemoteCandidatesLocker) {
 				for (IceCandidate candidate : queuedRemoteCandidates) {
 					pc.addIceCandidate(candidate);
 				}
