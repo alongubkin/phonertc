@@ -175,7 +175,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 								} else {
 									cordova.getActivity().runOnUiThread(new Runnable() {
 										public void run() {
-											pc.addIceCandidate(candidate);
+											if (pc != null) {
+												pc.addIceCandidate(candidate);
+											}
 										}
 									});	
 								}
