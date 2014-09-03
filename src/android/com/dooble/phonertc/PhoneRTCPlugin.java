@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import android.graphics.Point;
 import android.webkit.WebView;
 
-
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
@@ -169,17 +168,19 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 							final IceCandidate candidate = new IceCandidate(
 									(String) json.get("id"), json.getInt("label"),
 									(String) json.get("candidate"));
-							if (queuedRemoteCandidates != null) {
-								synchronized (queuedRemoteCandidatesLocker) {
+							
+							synchronized (queuedRemoteCandidatesLocker) {
+								if (queuedRemoteCandidates != null) {
 									queuedRemoteCandidates.add(candidate);
+								} else {
+									cordova.getActivity().runOnUiThread(new Runnable() {
+										public void run() {
+											pc.addIceCandidate(candidate);
+										}
+									});	
 								}
-							} else {
-								cordova.getActivity().runOnUiThread(new Runnable() {
-									public void run() {
-										pc.addIceCandidate(candidate);
-									}
-								});
 							}
+
 						} else if (type.equals("answer") || type.equals("offer")) {
 							final SessionDescription sdp = new SessionDescription(
 									SessionDescription.Type.fromCanonicalForm(type),
@@ -545,10 +546,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		}
 
 		private void drainRemoteCandidates() {
-			if (queuedRemoteCandidates == null)
-				return;
-
 			synchronized (queuedRemoteCandidatesLocker) {
+				if (queuedRemoteCandidates == null)
+					return;
+				
 				for (IceCandidate candidate : queuedRemoteCandidates) {
 					pc.addIceCandidate(candidate);
 				}
