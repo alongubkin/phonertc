@@ -1,6 +1,9 @@
 angular.module('phonertcdemo')
 
   .controller('CallCtrl', function ($scope, $state, $stateParams, signaling) {
+    var duplicateMessages = [];
+    var callStarted = false;
+
     $scope.callInProgress = false;
     $scope.isCalling = $stateParams.isCalling === 'true';
     $scope.contactName = $stateParams.contactName;
@@ -14,6 +17,7 @@ angular.module('phonertcdemo')
               password: 'test'
           },
           sendMessageCallback: function (data) {
+            callStarted = true;
             signaling.emit('sendMessage', $scope.contactName, { 
               type: 'phonertc_handshake',
               data: data
@@ -21,9 +25,11 @@ angular.module('phonertcdemo')
           },
           answerCallback: function () {
             alert('Answered!');
+            callStarted = true;
           },
           disconnectCallback: function () {
-            alert('Call disconnected!');
+            signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
+            $state.go('app.contacts');
           }
         });
     }
@@ -33,15 +39,21 @@ angular.module('phonertcdemo')
     }
 
     $scope.ignore = function () {
-      signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
-      $state.go('app.contacts');
+      if (callStarted) { 
+        cordova.plugins.phonertc.disconnect();
+      } else {
+        signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
+        $state.go('app.contacts');
+      }
     };
 
     $scope.answer = function () {
       $scope.callInProgress = true;
       call(false);
 
-      signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
+      setTimeout(function () {
+        signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
+      }, 1500);
     };
 
     signaling.on('messageReceived', function (name, message) {
@@ -59,11 +71,22 @@ angular.module('phonertcdemo')
           break;
 
         case 'ignore':
-          $state.go('app.contacts');
+          if (callStarted) {
+            cordova.plugins.phonertc.disconnect();
+          } else {
+            $state.go('app.contacts');
+          }
+
           break;
 
         case 'phonertc_handshake':
-          cordova.plugins.phonertc.receiveMessage(message.data);
+          var dataAsString = JSON.stringify(message.data);
+
+          if (duplicateMessages.indexOf(dataAsString) === -1) {
+            cordova.plugins.phonertc.receiveMessage(message.data);
+            duplicateMessages.push(dataAsString);
+          }
+          
           break;
       } 
     });
