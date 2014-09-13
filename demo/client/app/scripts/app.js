@@ -9,12 +9,16 @@ angular.module('phonertcdemo', ['ionic', 'ui.router', 'phonertcdemo.config'])
         abstract: true,
         templateUrl: 'templates/app.html'
       })
+      .state('app.login', {
+        url: '/login',
+        templateUrl: 'templates/login.html'
+      })
       .state('app.contacts', {
         url: '/contacts',
         templateUrl: 'templates/contacts.html'
       });
 
-    $urlRouterProvider.otherwise('/app/contacts');
+    $urlRouterProvider.otherwise('/app/login');
   })
 
   .run(function($ionicPlatform) {
