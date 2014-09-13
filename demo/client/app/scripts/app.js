@@ -21,6 +21,11 @@ angular.module('phonertcdemo', ['ionic',
         url: '/contacts',
         controller: 'ContactsCtrl',
         templateUrl: 'templates/contacts.html'
+      })
+      .state('app.call', {
+        url: '/call/:contactName?isCalling',
+        controller: 'CallCtrl',
+        templateUrl: 'templates/call.html'
       });
 
     $urlRouterProvider.otherwise('/app/login');
@@ -37,6 +42,16 @@ angular.module('phonertcdemo', ['ionic',
       if(window.StatusBar) {
         // org.apache.cordova.statusbar required
         StatusBar.styleDefault();
+      }
+    });
+  })
+
+  .run(function ($state, signaling) {
+    signaling.on('messageReceived', function (name, message) {
+      switch (message.type) {
+        case 'call':
+          $state.go('app.call', { isCalling: false, contactName: name });
+          break;
       }
     });
   });

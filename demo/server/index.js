@@ -35,6 +35,16 @@ io.on('connection', function (socket) {
     console.log(name + ' logged in');
   });
 
+  socket.on('sendMessage', function (name, message) {
+    var currentUser = _.find(users, { socket: socket.id });
+    if (!currentUser) { return; }
+
+    var contact = _.find(users, { name: name });
+    
+    io.to(contact.socket)
+      .emit('messageReceived', currentUser.name, message);
+  });
+
   socket.on('disconnect', function () {
     var index = _.findIndex(users, { socket: socket.id });
     if (index !== -1) {
