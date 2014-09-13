@@ -1,6 +1,6 @@
 angular.module('phonertcdemo')
   .factory('signaling', function (socketFactory) {
-    var socket = io.connect('http://localhost:3000/');
+    var socket = io.connect('http://192.168.1.105:3000/');
     
     var socketFactory = socketFactory({
       ioSocket: socket
