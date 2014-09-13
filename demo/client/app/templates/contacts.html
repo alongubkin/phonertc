@@ -1,5 +1,13 @@
-<ion-view title="Contacts">
+<ion-view title="Contacts" hide-back-button="true">
   <ion-content>
-    test
+    <ul class="list">
+      <li class="item item-button-right" ng-repeat="contact in contacts">
+        <i class="icon ion-record" style="color: green"></i>
+        {{ contact }}
+        <button class="button button-positive">
+          <i class="icon ion-ios7-telephone"></i>
+        </button>
+      </li>
+    </ul>
   </ion-content>
 </ion-view>

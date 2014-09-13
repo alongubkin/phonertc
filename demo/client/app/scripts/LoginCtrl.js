@@ -1,11 +1,12 @@
 angular.module('phonertcdemo')
 
-  .controller('LoginCtrl', function ($scope, $state, $ionicPopup, signaling) {
+  .controller('LoginCtrl', function ($scope, $state, $ionicPopup, signaling, ContactsService) {
+    $scope.data = {};
     $scope.loading = false;
-    
-    $scope.login = function (name) {
+
+    $scope.login = function () {
       $scope.loading = true;
-      signaling.emit('login', name);
+      signaling.emit('login', $scope.data.name);
     };
 
     signaling.on('login_error', function (message) {
@@ -16,7 +17,8 @@ angular.module('phonertcdemo')
       });
     });
 
-    signaling.on('login_successful', function (message) {
+    signaling.on('login_successful', function (users) {
+      ContactsService.setOnlineUsers(users, $scope.data.name);
       $state.go('app.contacts');
     });
   });

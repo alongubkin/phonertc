@@ -19,13 +19,14 @@ angular.module('phonertcdemo', ['ionic',
       })
       .state('app.contacts', {
         url: '/contacts',
+        controller: 'ContactsCtrl',
         templateUrl: 'templates/contacts.html'
       });
 
     $urlRouterProvider.otherwise('/app/login');
   })
 
-  .run(function($ionicPlatform) {
+  .run(function ($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
       // for form inputs)

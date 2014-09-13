@@ -29,7 +29,7 @@ io.on('connection', function (socket) {
       socket: socket.id
     });
 
-    socket.emit('login_successful');
+    socket.emit('login_successful', _.pluck(users, 'name'));
     socket.broadcast.emit('online', name);
 
     console.log(name + ' logged in');
