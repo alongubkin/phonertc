@@ -137,6 +137,9 @@
 
     <platform name="android">
         <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/Session.java" target-dir="src/com/dooble/phonertc" />
+		<source-file src="src/android/com/dooble/phonertc/SessionConfig.java" target-dir="src/com/dooble/phonertc" />
+
         <source-file src="src/android/com/dooble/phonertc/FramePool.java" target-dir="src/com/dooble/phonertc" />
         <source-file src="src/android/com/dooble/phonertc/VideoStreamsView.java" target-dir="src/com/dooble/phonertc" />
 		
