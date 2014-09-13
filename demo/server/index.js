@@ -40,6 +40,7 @@ io.on('connection', function (socket) {
     if (!currentUser) { return; }
 
     var contact = _.find(users, { name: name });
+    if (!contact) { return; }
     
     io.to(contact.socket)
       .emit('messageReceived', currentUser.name, message);
