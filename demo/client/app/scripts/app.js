@@ -2,8 +2,7 @@
 
 angular.module('phonertcdemo', ['ionic', 
                                 'ui.router', 
-                                'phonertcdemo.config',
-                                'phonertcdemo.registration'])
+                                'config'])
 
   .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
@@ -12,27 +11,17 @@ angular.module('phonertcdemo', ['ionic',
         abstract: true,
         templateUrl: 'templates/app.html'
       })
-      .state('app.registration', {
-        url: '/registration',
-        abstract: true,
-        template: '<ion-nav-view></ion-nav-view>'
-      })
-      .state('app.registration.login', {
+      .state('app.login', {
         url: '/login',
         controller: 'LoginCtrl',
-        templateUrl: 'templates/registration/login.html'
-      })
-      .state('app.registration.register', {
-        url: '/register',
-        //controller: 'RegisterCtrl',
-        templateUrl: 'templates/registration/register.html'
+        templateUrl: 'templates/login.html'
       })
       .state('app.contacts', {
         url: '/contacts',
         templateUrl: 'templates/contacts.html'
       });
 
-    $urlRouterProvider.otherwise('/app/registration/login');
+    $urlRouterProvider.otherwise('/app/login');
   })
 
   .run(function($ionicPlatform) {
