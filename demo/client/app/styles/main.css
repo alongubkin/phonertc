@@ -1,1 +1,12 @@
-/* Your application styles go here */
+.progress-bar-icon {
+	font-size: 36px;
+	margin: auto;
+	position: absolute;
+	top: 0; 
+	left: 0; 
+	bottom: 0; 
+	right: 0; 
+	height: 36px;
+	width: 36px;
+	z-index: 3;
+}

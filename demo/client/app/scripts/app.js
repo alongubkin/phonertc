@@ -2,7 +2,8 @@
 
 angular.module('phonertcdemo', ['ionic', 
                                 'ui.router', 
-                                'config'])
+                                'config',
+                                'btford.socket-io'])
 
   .config(function ($stateProvider, $urlRouterProvider) {
     $stateProvider
