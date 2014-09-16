@@ -13,6 +13,8 @@ import org.webrtc.AudioTrack;
 import org.webrtc.MediaConstraints;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.VideoCapturer;
+import org.webrtc.VideoRenderer;
+import org.webrtc.VideoRendererGui;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
@@ -29,8 +31,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private PeerConnectionFactory _peerConnectionFactory;
 	private Session _session; // TODO: Map<String, Session>
 	private VideoTrack _videoTrack;
-		
-	private VideoStreamsView _localVideoView;
 	
 	@Override
 	public boolean execute(String action, JSONArray args,
@@ -46,12 +46,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			config.setTurnServerPassword(args.getString(3));
 			
 			final JSONObject video = args.isNull(4) ? null : args.getJSONObject(4);
-			
-			if (_peerConnectionFactory == null) {
-				abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true),
-						"Failed to initializeAndroidGlobals");
-			}
-			
+			 
 			// TODO: Remove this and use AudioToggle instead
 			AudioManager audioManager = ((AudioManager) cordova.getActivity().getSystemService(cordova.getActivity().AUDIO_SERVICE));
 			@SuppressWarnings("deprecation")
@@ -60,23 +55,31 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			//		: AudioManager.MODE_IN_COMMUNICATION);
 			audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
 			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
-
+			
+			if (_peerConnectionFactory == null) {
+				abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, 
+						VideoRendererGui.getEGLContext()),
+						"Failed to initializeAndroidGlobals");
+			}
+			
+			_peerConnectionFactory = new PeerConnectionFactory();
+			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					_peerConnectionFactory = new PeerConnectionFactory();
-					VideoStreamsView remoteVideoView = null;
-					
 					if (video != null) {
+										
+						Point displaySize = new Point();
+					    cordova.getActivity().getWindowManager().getDefaultDisplay().getSize(displaySize);
+
+						VideoGLView videoView = new VideoGLView(cordova.getActivity(), displaySize);
+						VideoRendererGui.setView(videoView);
+						
+						webView.addView(videoView);
+						
 						if (_videoTrack == null) {
 							initializeLocalVideoTrack();
 						}
-						
-						try {
-							remoteVideoView = createVideoView(video, false);
-						} catch (JSONException e) {
-							Log.e("com.dooble.phonertc", "A JSON exception has occured while trying to add video.", e);
-						}
-						
+
 						config.setLocalVideoTrack(_videoTrack);
 					}
 					
@@ -89,7 +92,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					
 					_session = new Session(cordova.getActivity(), 
 										   webView,
-										   remoteVideoView,
 										   _peerConnectionFactory,
 										   _callbackContext,
 										   config);
@@ -114,7 +116,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			return true;
 		}
 
-		callbackContext.error("Invalid action");
+		callbackContext.error("Invalid action: " + action);
 		return false;
 	}
 
@@ -124,6 +126,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 				new MediaConstraints());	
 		
 		_videoTrack = _peerConnectionFactory.createVideoTrack("ARDAMSv0", _videoSource);
+		_videoTrack.addRenderer(new VideoRenderer(VideoRendererGui.create(100, 100, 100, 100)));
 	}
 	
 	WebView.LayoutParams getLayoutParams (JSONObject config) throws JSONException {
@@ -138,17 +141,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		return params;
 	}
-
-	VideoStreamsView createVideoView(JSONObject config, boolean isMirrored) throws JSONException {
-		WebView.LayoutParams params = getLayoutParams(config);
-
-		Point displaySize = new Point(params.width, params.height);
-
-		VideoStreamsView view = new VideoStreamsView(cordova.getActivity(), displaySize, isMirrored);
-		webView.addView(view, params);
-
-		return view;
-	}
 	
 	private static void abortUnless(boolean condition, String msg) {
 		if (!condition) {
@@ -158,29 +150,24 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	// Cycle through likely device names for the camera and return the first
 	// capturer that works, or crash if none do.
-	private VideoCapturer getVideoCapturer() {
-		if (_videoCapturer != null) {
-			return _videoCapturer;
-		}
-		
-		String[] cameraFacing = { "front", "back" };
-		int[] cameraIndex = { 0, 1 };
-		int[] cameraOrientation = { 0, 90, 180, 270 };
-		for (String facing : cameraFacing) {
-			for (int index : cameraIndex) {
-				for (int orientation : cameraOrientation) {
-					String name = "Camera " + index + ", Facing " + facing +
-						", Orientation " + orientation;
-					VideoCapturer capturer = VideoCapturer.create(name);
-					if (capturer != null) {
-						// logAndToast("Using camera: " + name);
-						return capturer;
-					}
-				}
-			}
-		}
-		
-		throw new RuntimeException("Failed to open capturer");
-	}
+	 private VideoCapturer getVideoCapturer() {
+		    String[] cameraFacing = { "front", "back" };
+		    int[] cameraIndex = { 0, 1 };
+		    int[] cameraOrientation = { 0, 90, 180, 270 };
+		    for (String facing : cameraFacing) {
+		      for (int index : cameraIndex) {
+		        for (int orientation : cameraOrientation) {
+		          String name = "Camera " + index + ", Facing " + facing +
+		              ", Orientation " + orientation;
+		          VideoCapturer capturer = VideoCapturer.create(name);
+		          if (capturer != null) {
+		            // logAndToast("Using camera: " + name);
+		            return capturer;
+		          }
+		        }
+		      }
+		    }
+		    throw new RuntimeException("Failed to open capturer");
+		  }
 
 }

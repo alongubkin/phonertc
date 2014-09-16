@@ -20,6 +20,8 @@ import org.webrtc.VideoRenderer;
 import org.webrtc.PeerConnection.IceConnectionState;
 import org.webrtc.PeerConnection.IceGatheringState;
 import org.webrtc.VideoRenderer.I420Frame;
+import org.webrtc.VideoRendererGui;
+import org.webrtc.VideoTrack;
 
 import android.app.Activity;
 import android.util.Log;
@@ -29,7 +31,6 @@ public class Session {
 	Activity _activity;
 	WebView _webView;
 	CallbackContext _callbackContext;
-	VideoStreamsView _remoteVideoView;
 	PeerConnectionFactory _peerConnectionFactory;
 	SessionConfig _config;
 	MediaConstraints _sdpMediaConstraints;
@@ -47,13 +48,14 @@ public class Session {
 	private final SDPObserver _sdpObserver = new SDPObserver();
 	private final PCObserver _pcObserver = new PCObserver();
 
-	public Session(Activity activity, WebView webView, VideoStreamsView remoteVideoView, PeerConnectionFactory peerConnectionFactory, CallbackContext callbackContext, SessionConfig config) {
+	VideoRenderer.Callbacks _videoRenderer;
+	
+	public Session(Activity activity, WebView webView, PeerConnectionFactory peerConnectionFactory, CallbackContext callbackContext, SessionConfig config) {
 		_activity = activity;
 		_webView = webView;
 		_peerConnectionFactory = peerConnectionFactory;
 		_callbackContext = callbackContext;
 		_config = config;
-		_remoteVideoView = remoteVideoView;
 	}
 	
 	public void initialize() {
@@ -72,25 +74,33 @@ public class Session {
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
 				"OfferToReceiveAudio", "true"));
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-				"OfferToReceiveVideo", (_config.getLocalVideoTrack() != null) ? "true" : "false"));
+				"OfferToReceiveVideo", "true")); //(_config.getLocalVideoTrack() != null) ? "true" : "false"));
 		
 		// Initialize PeerConnection
 		MediaConstraints pcMediaConstraints = new MediaConstraints();
 		pcMediaConstraints.optional.add(new MediaConstraints.KeyValuePair(
 			"DtlsSrtpKeyAgreement", "true"));
+		
 		_peerConnection = _peerConnectionFactory.createPeerConnection(iceServers, pcMediaConstraints,
 				_pcObserver);
 		
 		// Initialize local stream
 		_localStream = _peerConnectionFactory.createLocalMediaStream("ARDAMS");
 		_localStream.addTrack(_config.getLocalAudioTrack());
-		
+		 
 		if (_config.getLocalVideoTrack() != null) {
 			_localStream.addTrack(_config.getLocalVideoTrack());
 		}
 		
 		_peerConnection.addStream(_localStream, new MediaConstraints());
 	
+		try {
+			_videoRenderer = VideoRendererGui.create(0, 0, 100, 100);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		// Create offer if initiator
 		if (_config.isInitiator()) {
 			_peerConnection.createOffer(_sdpObserver, _sdpMediaConstraints);
@@ -221,15 +231,8 @@ public class Session {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-
-			_activity.runOnUiThread(new Runnable() {
-				public void run() {
-					if (_remoteVideoView != null) {
-						_webView.removeView(_remoteVideoView);
-						_remoteVideoView = null;
-					}
-				}
-			});
+			
+			// TODO: cleanup video
 
 		}
 
@@ -269,9 +272,11 @@ public class Session {
 			
 			_activity.runOnUiThread(new Runnable() {
 				public void run() {
-					if (_remoteVideoView != null) {
-						stream.videoTracks.get(0).addRenderer(new VideoRenderer(
-							new VideoCallbacks(_remoteVideoView, VideoStreamsView.Endpoint.REMOTE)));
+					
+					VideoTrack videoTrack = stream.videoTracks.get(0);
+					
+					if (videoTrack != null) {
+						videoTrack.addRenderer(new VideoRenderer(_videoRenderer));
 					}
 
 					try {
@@ -413,35 +418,6 @@ public class Session {
 				
 				_queuedRemoteCandidates = null;
 			}
-		}
-	}
-
-	// Implementation detail: bridge the VideoRenderer.Callbacks interface to the
-	// VideoStreamsView implementation.
-	private class VideoCallbacks implements VideoRenderer.Callbacks {
-		private final VideoStreamsView view;
-		private final VideoStreamsView.Endpoint stream;
-
-		public VideoCallbacks(
-			VideoStreamsView view, VideoStreamsView.Endpoint stream) {
-			this.view = view;
-			this.stream = stream;
-			Log.d("CordovaLog", "VideoCallbacks");
-		}
-
-		@Override
-		public void setSize(final int width, final int height) {
-			Log.d("setSize", width + " " + height);
-			view.queueEvent(new Runnable() {
-				public void run() {
-					view.setSize(stream, width, height);
-				}
-			});
-		}
-
-		@Override
-		public void renderFrame(I420Frame frame) {
-			view.queueFrame(stream, frame);
 		}
 	}
 }

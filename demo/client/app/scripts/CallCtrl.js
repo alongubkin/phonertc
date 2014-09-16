@@ -12,7 +12,7 @@ angular.module('phonertcdemo')
       cordova.plugins.phonertc.call({ 
           isInitator: isInitiator, // Caller or callee?
           turn: {
-              host: 'turn:webrtc.dooble.biz:3478',
+              host: 'turn:ec2-54-68-238-149.us-west-2.compute.amazonaws.com:3478',
               username: 'test',
               password: 'test'
           },
@@ -20,7 +20,7 @@ angular.module('phonertcdemo')
             callStarted = true;
             signaling.emit('sendMessage', $scope.contactName, { 
               type: 'phonertc_handshake',
-              data: data
+              data: JSON.stringify(data)
             })
           },
           answerCallback: function () {
@@ -30,6 +30,10 @@ angular.module('phonertcdemo')
           disconnectCallback: function () {
             signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
             $state.go('app.contacts');
+          },
+          video: {
+            localVideo: document.getElementById('localVideo'),
+            remoteVideo: document.getElementById('remoteVideo')
           }
         });
     }
@@ -53,11 +57,13 @@ angular.module('phonertcdemo')
 
       setTimeout(function () {
         signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
-      }, 1500);
+      }, 3500);
     };
 
     signaling.on('messageReceived', function (name, message) {
-      if (name != $scope.contactName) {
+      console.log('messageReceived', name, $scope.contactName, message);
+
+      if (name !== $scope.contactName) {
         return;
       }
 
@@ -80,11 +86,11 @@ angular.module('phonertcdemo')
           break;
 
         case 'phonertc_handshake':
-          var dataAsString = JSON.stringify(message.data);
-
-          if (duplicateMessages.indexOf(dataAsString) === -1) {
-            cordova.plugins.phonertc.receiveMessage(message.data);
-            duplicateMessages.push(dataAsString);
+          if (duplicateMessages.indexOf(message.data) === -1) {
+            cordova.plugins.phonertc.receiveMessage(JSON.parse(message.data));
+            duplicateMessages.push(message.data);
+          } else {
+            console.log('-----> prevented duplicate message');
           }
           
           break;
