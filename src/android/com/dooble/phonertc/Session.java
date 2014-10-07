@@ -30,6 +30,7 @@ import android.webkit.WebView;
 
 public class Session {
 	PhoneRTCPlugin _plugin;
+	CallbackContext _callbackContext;
 	SessionConfig _config;
 	
 	MediaConstraints _sdpMediaConstraints;
@@ -49,8 +50,9 @@ public class Session {
 
 	VideoRenderer.Callbacks _videoRenderer;
 	
-	public Session(PhoneRTCPlugin plugin, SessionConfig config) {
+	public Session(PhoneRTCPlugin plugin, CallbackContext callbackContext, SessionConfig config) {
 		_plugin = plugin;
+		_callbackContext = callbackContext;
 		_config = config;
 	}
 	
@@ -153,7 +155,9 @@ public class Session {
 	}
 	
 	void sendMessage(JSONObject data) {
-		
+		PluginResult result = new PluginResult(PluginResult.Status.OK, data);
+		result.setKeepCallback(true);
+		_callbackContext.sendPluginResult(result);
 	}
 
 	String preferISAC(String sdpDescription) {

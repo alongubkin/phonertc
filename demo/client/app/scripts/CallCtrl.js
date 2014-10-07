@@ -8,34 +8,45 @@ angular.module('phonertcdemo')
     $scope.isCalling = $stateParams.isCalling === 'true';
     $scope.contactName = $stateParams.contactName;
     
+    var session;
+
     function call(isInitiator) {
-      cordova.plugins.phonertc.call({ 
-          isInitator: isInitiator, // Caller or callee?
-          turn: {
-              host: 'turn:ec2-54-68-238-149.us-west-2.compute.amazonaws.com:3478',
-              username: 'test',
-              password: 'test'
-          },
-          sendMessageCallback: function (data) {
-            callStarted = true;
-            signaling.emit('sendMessage', $scope.contactName, { 
-              type: 'phonertc_handshake',
-              data: JSON.stringify(data)
-            })
-          },
-          answerCallback: function () {
-            alert('Answered!');
-            callStarted = true;
-          },
-          disconnectCallback: function () {
-            signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
-            $state.go('app.contacts');
-          },
-          /*video: {
-            localVideo: document.getElementById('localVideo'),
-            remoteVideo: document.getElementById('remoteVideo')
-          }*/
+      var config = { 
+        isInitiator: isInitiator,
+        turn: {
+          host: 'turn:ec2-54-68-238-149.us-west-2.compute.amazonaws.com:3478',
+          username: 'test',
+          password: 'test'
+        },
+        streams: {
+          audio: true,
+          video: false
+        }
+      };
+
+      console.log(config);
+
+      session = new cordova.plugins.phonertc.Session(config);
+      
+      session.on('sendMessage', function (data) { 
+        callStarted = true;
+        signaling.emit('sendMessage', $scope.contactName, { 
+          type: 'phonertc_handshake',
+          data: JSON.stringify(data)
         });
+      });
+
+      session.on('answer', function () {
+        alert('Answered!');
+        callStarted = true;
+      });
+
+      session.on('disconnect', function () {
+        signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
+        $state.go('app.contacts');
+      });
+
+      session.call();
     }
 
     if ($scope.isCalling) {
@@ -44,7 +55,7 @@ angular.module('phonertcdemo')
 
     $scope.ignore = function () {
       if (callStarted) { 
-        cordova.plugins.phonertc.disconnect();
+        session.disconnect();
       } else {
         signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
         $state.go('app.contacts');
@@ -81,7 +92,7 @@ angular.module('phonertcdemo')
 
         case 'ignore':
           if (callStarted) {
-            cordova.plugins.phonertc.disconnect();
+            session.disconnect();
           } else {
             $state.go('app.contacts');
           }
@@ -90,7 +101,7 @@ angular.module('phonertcdemo')
 
         case 'phonertc_handshake':
           if (duplicateMessages.indexOf(message.data) === -1) {
-            cordova.plugins.phonertc.receiveMessage(JSON.parse(message.data));
+            session.receiveMessage(JSON.parse(message.data));
             duplicateMessages.push(message.data);
           } else {
             console.log('-----> prevented duplicate message');
@@ -101,6 +112,7 @@ angular.module('phonertcdemo')
     }
 
     signaling.on('messageReceived', onMessageReceive);
+
     $scope.$on('$destroy', function() { 
       console.log('remove listener');
       signaling.removeListener('messageReceived', onMessageReceive);

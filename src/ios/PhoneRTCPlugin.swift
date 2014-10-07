@@ -17,14 +17,7 @@ class PhoneRTCPlugin : CDVPlugin {
         self.callbackId = command.callbackId
         
         // create session config from the JS params
-        let config = SessionConfig(
-            isInitiator: command.arguments[0] as Bool,
-            turn: TurnConfig(
-                host: command.arguments[1] as String,
-                username: command.arguments[2] as String,
-                password: command.arguments[3] as String
-            )
-        )
+        let config = SessionConfig(data: command.arguments[0])
         
         // make sure the OK callback is permanent as we
         // use it to send messages to the JS
@@ -38,6 +31,10 @@ class PhoneRTCPlugin : CDVPlugin {
             peerConnectionFactory: peerConnectionFactory,
             config: config
         )
+    }
+    
+    func call(comamnd: CDVInvokedUrlCommand) {
+        session?.call()
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
@@ -56,6 +53,5 @@ class PhoneRTCPlugin : CDVPlugin {
         pluginResult.setKeepCallbackAsBool(true);
         
         self.commandDelegate.sendPluginResult(pluginResult, callbackId:self.callbackId)
-
     }
 }

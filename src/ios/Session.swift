@@ -7,11 +7,13 @@ class Session {
     var peerConnection: RTCPeerConnection!
     var pcObserver: PCObserver!
     var queuedRemoteCandidates: [RTCICECandidate]?
+    var peerConnectionFactory: RTCPeerConnectionFactory
     
     init(plugin: PhoneRTCPlugin, peerConnectionFactory: RTCPeerConnectionFactory, config: SessionConfig) {
         self.plugin = plugin
         self.queuedRemoteCandidates = []
         self.config = config
+        self.peerConnectionFactory = peerConnectionFactory
         
         // initialize basic media constraints
         self.constraints = RTCMediaConstraints(
@@ -23,17 +25,18 @@ class Session {
             optionalConstraints: [
                 RTCPair(key: "internalSctpDataChannels", value: "true"),
                 RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
-
             ]
         )
-
+    }
+    
+    func call() {
         // initialize a PeerConnection
         self.pcObserver = PCObserver(session: self)
         self.peerConnection =
             peerConnectionFactory.peerConnectionWithICEServers([],
                 constraints: self.constraints,
                 delegate: self.pcObserver)
-
+        
         // create a media stream and add audio and/or video tracks
         var mediaStream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
         mediaStream.addAudioTrack(peerConnectionFactory.audioTrackWithID("ARDAMSa0"))
@@ -45,6 +48,7 @@ class Session {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: constraints)
         }
+
     }
     
     func receiveMessage(message: String) {

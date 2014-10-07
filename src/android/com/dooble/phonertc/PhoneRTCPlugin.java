@@ -6,6 +6,7 @@ import android.webkit.WebView;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
+import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,14 +40,12 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		final CallbackContext _callbackContext = callbackContext;
 		
-		if (action.equals("createSessionObject")) {
-			final SessionConfig config = new SessionConfig();
-			config.setInitiator(args.getBoolean(0));
-			config.setTurnServerHost(args.getString(1));
-			config.setTurnServerUsername(args.getString(2));
-			config.setTurnServerPassword(args.getString(3));
+		if (action.equals("createSessionObject")) {		
+			final SessionConfig config = SessionConfig.fromJSON(args.getJSONObject(0));
 			
-			final JSONObject video = args.isNull(4) ? null : args.getJSONObject(4);
+			PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
+			result.setKeepCallback(true);
+			_callbackContext.sendPluginResult(result);
 			
 			if (_peerConnectionFactory == null) {
 				abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, 
@@ -58,31 +57,34 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					if (video != null) {		
-						Point displaySize = new Point();
+					/* Point displaySize = new Point();
 					    cordova.getActivity().getWindowManager().getDefaultDisplay().getSize(displaySize);
 
 						VideoGLView videoView = new VideoGLView(cordova.getActivity(), displaySize);
 						VideoRendererGui.setView(videoView);
 						
 						webView.addView(videoView);
-						
-						if (_videoTrack == null) {
-							initializeLocalVideoTrack();
-						}
+					*/
+					
+					if (config.isAudioStreamEnabled() && _audioTrack == null) {
+						initializeLocalAudioTrack();
 					}
 					
-					if (_audioTrack == null) {
-						_audioSource = _peerConnectionFactory.createAudioSource(new MediaConstraints());
-						_audioTrack = _peerConnectionFactory.createAudioTrack("ARDAMSa0", _audioSource);
+					if (config.isVideoStreamEnabled() && _videoTrack == null) {		
+						initializeLocalVideoTrack();
 					}
 					
-					_session = new Session(PhoneRTCPlugin.this, config);
-					_session.initialize();
+					_session = new Session(PhoneRTCPlugin.this, _callbackContext, config);	
 				}
 			});
 			
 			return true;
+		} else if (action.equals("call")) {
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					_session.initialize();
+				}
+			});
 		} else if (action.equals("receiveMessage")) {
 			final String message = args.getString(0);
 
@@ -110,6 +112,11 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		
 		_videoTrack = _peerConnectionFactory.createVideoTrack("ARDAMSv0", _videoSource);
 		_videoTrack.addRenderer(new VideoRenderer(VideoRendererGui.create(100, 100, 100, 100)));
+	}
+	
+	void initializeLocalAudioTrack() {
+		_audioSource = _peerConnectionFactory.createAudioSource(new MediaConstraints());
+		_audioTrack = _peerConnectionFactory.createAudioTrack("ARDAMSa0", _audioSource);
 	}
 	
 	WebView.LayoutParams getLayoutParams (JSONObject config) throws JSONException {
@@ -143,7 +150,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	
 	public WebView getWebView() {
 		return this.getWebView();
-		
 	}
 	
 	private static void abortUnless(boolean condition, String msg) {
