@@ -1,5 +1,6 @@
 import Foundation
 
+@objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
     var session: Session? // TODO: Map<String, Session>
     var peerConnectionFactory: RTCPeerConnectionFactory
