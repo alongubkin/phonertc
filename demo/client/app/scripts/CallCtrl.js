@@ -31,10 +31,10 @@ angular.module('phonertcdemo')
             signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
             $state.go('app.contacts');
           },
-          video: {
+          /*video: {
             localVideo: document.getElementById('localVideo'),
             remoteVideo: document.getElementById('remoteVideo')
-          }
+          }*/
         });
     }
 
@@ -52,15 +52,18 @@ angular.module('phonertcdemo')
     };
 
     $scope.answer = function () {
+      if ($scope.callInProgress) { return; }
       $scope.callInProgress = true;
+      
       call(false);
 
       setTimeout(function () {
+        console.log('sending answer');
         signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
       }, 3500);
     };
 
-    signaling.on('messageReceived', function (name, message) {
+    function onMessageReceive (name, message) {
       console.log('messageReceived', name, $scope.contactName, message);
 
       if (name !== $scope.contactName) {
@@ -95,6 +98,11 @@ angular.module('phonertcdemo')
           
           break;
       } 
-    });
+    }
 
+    signaling.on('messageReceived', onMessageReceive);
+    $scope.$on('$destroy', function() { 
+      console.log('remove listener');
+      signaling.removeListener('messageReceived', onMessageReceive);
+    });
   });
