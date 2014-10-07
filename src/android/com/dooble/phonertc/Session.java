@@ -8,6 +8,7 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.webrtc.AudioTrack;
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
@@ -28,11 +29,9 @@ import android.util.Log;
 import android.webkit.WebView;
 
 public class Session {
-	Activity _activity;
-	WebView _webView;
-	CallbackContext _callbackContext;
-	PeerConnectionFactory _peerConnectionFactory;
+	PhoneRTCPlugin _plugin;
 	SessionConfig _config;
+	
 	MediaConstraints _sdpMediaConstraints;
 	PeerConnection _peerConnection;
 	
@@ -50,11 +49,8 @@ public class Session {
 
 	VideoRenderer.Callbacks _videoRenderer;
 	
-	public Session(Activity activity, WebView webView, PeerConnectionFactory peerConnectionFactory, CallbackContext callbackContext, SessionConfig config) {
-		_activity = activity;
-		_webView = webView;
-		_peerConnectionFactory = peerConnectionFactory;
-		_callbackContext = callbackContext;
+	public Session(PhoneRTCPlugin plugin, SessionConfig config) {
+		_plugin = plugin;
 		_config = config;
 	}
 	
@@ -74,32 +70,33 @@ public class Session {
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
 				"OfferToReceiveAudio", "true"));
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-				"OfferToReceiveVideo", "true")); //(_config.getLocalVideoTrack() != null) ? "true" : "false"));
+				"OfferToReceiveVideo", _plugin.getLocalVideoTrack() != null ? "true" : "false"));
 		
 		// Initialize PeerConnection
 		MediaConstraints pcMediaConstraints = new MediaConstraints();
 		pcMediaConstraints.optional.add(new MediaConstraints.KeyValuePair(
 			"DtlsSrtpKeyAgreement", "true"));
 		
-		_peerConnection = _peerConnectionFactory.createPeerConnection(iceServers, pcMediaConstraints,
-				_pcObserver);
+		_peerConnection = _plugin.getPeerConnectionFactory()
+				.createPeerConnection(iceServers, pcMediaConstraints, _pcObserver);
 		
 		// Initialize local stream
-		_localStream = _peerConnectionFactory.createLocalMediaStream("ARDAMS");
-		_localStream.addTrack(_config.getLocalAudioTrack());
+		_localStream = _plugin.getPeerConnectionFactory().createLocalMediaStream("ARDAMS");
+		_localStream.addTrack(_plugin.getLocalAudioTrack());
 		 
-		if (_config.getLocalVideoTrack() != null) {
-			_localStream.addTrack(_config.getLocalVideoTrack());
+		if (_plugin.getLocalVideoTrack() != null) {
+			_localStream.addTrack(_plugin.getLocalVideoTrack());
 		}
 		
 		_peerConnection.addStream(_localStream, new MediaConstraints());
 	
+		/*
 		try {
 			_videoRenderer = VideoRendererGui.create(0, 0, 100, 100);
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		// Create offer if initiator
 		if (_config.isInitiator()) {
@@ -120,7 +117,7 @@ public class Session {
 					if (_queuedRemoteCandidates != null) {
 						_queuedRemoteCandidates.add(candidate);
 					} else {
-						_activity.runOnUiThread(new Runnable() {
+						_plugin.getActivity().runOnUiThread(new Runnable() {
 							public void run() {
 								if (_peerConnection != null) {
 									_peerConnection.addIceCandidate(candidate);
@@ -134,7 +131,7 @@ public class Session {
 				final SessionDescription sdp = new SessionDescription(
 						SessionDescription.Type.fromCanonicalForm(type),
 						preferISAC((String) json.get("sdp")));
-				_activity.runOnUiThread(new Runnable() {
+				_plugin.getActivity().runOnUiThread(new Runnable() {
 					public void run() {
 						_peerConnection.setRemoteDescription(_sdpObserver, sdp);
 					}
@@ -142,7 +139,7 @@ public class Session {
 			} else if (type.equals("bye")) {
 				Log.d("com.dooble.phonertc", "Remote end hung up; dropping PeerConnection");
 
-				_activity.runOnUiThread(new Runnable() {
+				_plugin.getActivity().runOnUiThread(new Runnable() {
 					public void run() {
 						disconnect();
 					}
@@ -156,9 +153,7 @@ public class Session {
 	}
 	
 	void sendMessage(JSONObject data) {
-		PluginResult result = new PluginResult(PluginResult.Status.OK, data);
-		result.setKeepCallback(true);
-		_callbackContext.sendPluginResult(result);
+		
 	}
 
 	String preferISAC(String sdpDescription) {
@@ -249,7 +244,7 @@ public class Session {
 
 		@Override
 		public void onIceCandidate(final IceCandidate iceCandidate) {
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					try {
 						JSONObject json = new JSONObject();
@@ -270,14 +265,14 @@ public class Session {
 		public void onAddStream(final MediaStream stream) {
 			_remoteStream = stream;
 			
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					
+					/*
 					VideoTrack videoTrack = stream.videoTracks.get(0);
 					
 					if (videoTrack != null) {
 						videoTrack.addRenderer(new VideoRenderer(_videoRenderer));
-					}
+					}*/
 
 					try {
 						JSONObject data = new JSONObject();
@@ -343,7 +338,7 @@ public class Session {
 	private class SDPObserver implements SdpObserver {
 		@Override
 		public void onCreateSuccess(final SessionDescription origSdp) {
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					SessionDescription sdp = new SessionDescription(
 							origSdp.type, preferISAC(origSdp.description));
@@ -363,7 +358,7 @@ public class Session {
 
 		@Override
 		public void onSetSuccess() {
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (_config.isInitiator()) {
 						if (_peerConnection.getRemoteDescription() != null) {
@@ -391,7 +386,7 @@ public class Session {
 
 		@Override
 		public void onCreateFailure(final String error) {
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					throw new RuntimeException("createSDP error: " + error);
 				}
@@ -400,7 +395,7 @@ public class Session {
 		
 		@Override
 		public void onSetFailure(final String error) {
-			_activity.runOnUiThread(new Runnable() {
+			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					//throw new RuntimeException("setSDP error: " + error);
 				}

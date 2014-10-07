@@ -1,5 +1,6 @@
 package com.dooble.phonertc;
 
+import android.app.Activity;
 import android.graphics.Point;
 import android.webkit.WebView;
 
@@ -46,15 +47,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			config.setTurnServerPassword(args.getString(3));
 			
 			final JSONObject video = args.isNull(4) ? null : args.getJSONObject(4);
-			 
-			// TODO: Remove this and use AudioToggle instead
-			AudioManager audioManager = ((AudioManager) cordova.getActivity().getSystemService(cordova.getActivity().AUDIO_SERVICE));
-			@SuppressWarnings("deprecation")
-			boolean isWiredHeadsetOn = audioManager.isWiredHeadsetOn();
-			//audioManager.setMode(isWiredHeadsetOn ? AudioManager.MODE_IN_CALL
-			//		: AudioManager.MODE_IN_COMMUNICATION);
-			audioManager.setSpeakerphoneOn(!isWiredHeadsetOn);
-			audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 			
 			if (_peerConnectionFactory == null) {
 				abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, 
@@ -66,8 +58,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					if (video != null) {
-										
+					if (video != null) {		
 						Point displaySize = new Point();
 					    cordova.getActivity().getWindowManager().getDefaultDisplay().getSize(displaySize);
 
@@ -79,8 +70,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 						if (_videoTrack == null) {
 							initializeLocalVideoTrack();
 						}
-
-						config.setLocalVideoTrack(_videoTrack);
 					}
 					
 					if (_audioTrack == null) {
@@ -88,13 +77,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 						_audioTrack = _peerConnectionFactory.createAudioTrack("ARDAMSa0", _audioSource);
 					}
 					
-					config.setLocalAudioTrack(_audioTrack); 
-					
-					_session = new Session(cordova.getActivity(), 
-										   webView,
-										   _peerConnectionFactory,
-										   _callbackContext,
-										   config);
+					_session = new Session(PhoneRTCPlugin.this, config);
 					_session.initialize();
 				}
 			});
@@ -142,6 +125,27 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		return params;
 	}
 	
+	public VideoTrack getLocalVideoTrack() {
+		return _videoTrack;
+	}
+	
+	public AudioTrack getLocalAudioTrack() {
+		return _audioTrack;
+	}
+	
+	public PeerConnectionFactory getPeerConnectionFactory() {
+		return _peerConnectionFactory;
+	}
+	
+	public Activity getActivity() {
+		return cordova.getActivity();
+	}
+	
+	public WebView getWebView() {
+		return this.getWebView();
+		
+	}
+	
 	private static void abortUnless(boolean condition, String msg) {
 		if (!condition) {
 			throw new RuntimeException(msg);
@@ -150,24 +154,23 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	// Cycle through likely device names for the camera and return the first
 	// capturer that works, or crash if none do.
-	 private VideoCapturer getVideoCapturer() {
-		    String[] cameraFacing = { "front", "back" };
-		    int[] cameraIndex = { 0, 1 };
-		    int[] cameraOrientation = { 0, 90, 180, 270 };
-		    for (String facing : cameraFacing) {
-		      for (int index : cameraIndex) {
-		        for (int orientation : cameraOrientation) {
-		          String name = "Camera " + index + ", Facing " + facing +
-		              ", Orientation " + orientation;
-		          VideoCapturer capturer = VideoCapturer.create(name);
-		          if (capturer != null) {
-		            // logAndToast("Using camera: " + name);
-		            return capturer;
-		          }
-		        }
-		      }
-		    }
-		    throw new RuntimeException("Failed to open capturer");
-		  }
-
+	private VideoCapturer getVideoCapturer() {
+		String[] cameraFacing = { "front", "back" };
+		int[] cameraIndex = { 0, 1 };
+		int[] cameraOrientation = { 0, 90, 180, 270 };
+		for (String facing : cameraFacing) {
+			for (int index : cameraIndex) {
+				for (int orientation : cameraOrientation) {
+					String name = "Camera " + index + ", Facing " + facing +
+						", Orientation " + orientation;
+					VideoCapturer capturer = VideoCapturer.create(name);
+					if (capturer != null) {
+						// logAndToast("Using camera: " + name);
+						return capturer;
+					}
+				}
+			}
+		}
+		throw new RuntimeException("Failed to open capturer");
+	}
 }

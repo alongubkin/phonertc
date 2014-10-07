@@ -8,8 +8,6 @@ public class SessionConfig {
 	private String _turnServerHost;
 	private String _turnServerUsername;
 	private String _turnServerPassword;
-	private VideoTrack _localVideoTrack;
-	private AudioTrack _localAudioTrack;
 	
 	public String getTurnServerHost() {
 		return _turnServerHost;
@@ -41,21 +39,5 @@ public class SessionConfig {
 
 	public void setInitiator(boolean _isInitiator) {
 		this._isInitiator = _isInitiator;
-	}
-
-	public VideoTrack getLocalVideoTrack() {
-		return _localVideoTrack;
-	}
-
-	public void setLocalVideoTrack(VideoTrack _localVideoTrack) {
-		this._localVideoTrack = _localVideoTrack;
-	}
-
-	public AudioTrack getLocalAudioTrack() {
-		return _localAudioTrack;
-	}
-
-	public void setLocalAudioTrack(AudioTrack _localAudioTrack) {
-		this._localAudioTrack = _localAudioTrack;
 	}
 }
