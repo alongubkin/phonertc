@@ -39,7 +39,10 @@ class Session {
         
         // create a media stream and add audio and/or video tracks
         var mediaStream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
-        mediaStream.addAudioTrack(peerConnectionFactory.audioTrackWithID("ARDAMSa0"))
+        
+        if self.config.streams.audio {
+            mediaStream.addAudioTrack(peerConnectionFactory.audioTrackWithID("ARDAMSa0"))
+        }
         
         self.peerConnection.addStream(mediaStream, constraints: self.constraints)
         
@@ -48,7 +51,7 @@ class Session {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: constraints)
         }
-
+        
     }
     
     func receiveMessage(message: String) {
@@ -65,7 +68,7 @@ class Session {
             let mid: String = data?.objectForKey("id") as NSString
             let sdpLineIndex: Int = (data?.objectForKey("label") as NSNumber).integerValue
             let sdp: String = data?.objectForKey("candidate") as NSString
-
+            
             let candidate = RTCICECandidate(
                 mid: mid,
                 index: sdpLineIndex,
@@ -116,13 +119,13 @@ class Session {
         for var i = 0;
             (i < lines.count) && (mLineIndex == -1 || isac16kRtpMap == nil);
             ++i {
-            let line = lines[i]
-            if line.hasPrefix("m=audio ") {
-                mLineIndex = i
-                continue
-            }
+                let line = lines[i]
+                if line.hasPrefix("m=audio ") {
+                    mLineIndex = i
+                    continue
+                }
                 
-            isac16kRtpMap = self.firstMatch(isac16kRegex!, string: line)
+                isac16kRtpMap = self.firstMatch(isac16kRegex!, string: line)
         }
         
         if mLineIndex == -1 {
@@ -136,7 +139,7 @@ class Session {
         }
         
         let origMLineParts = lines[mLineIndex].componentsSeparatedByString(" ")
-
+        
         var newMLine: [String] = []
         var origPartIndex = 0;
         
@@ -169,6 +172,5 @@ class Session {
         
         return nsString.substringWithRange(result!.rangeAtIndex(1))
     }
-
+    
 }
-
