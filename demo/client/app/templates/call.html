@@ -1,5 +1,5 @@
 <ion-view title="Call" hide-back-button="true">
-  <ion-content>
+  <ion-content on-scroll="updateVideoPosition()" on-scroll-complete="updateVideoPosition()">
     <div class="calling-container" ng-if="isCalling && !callInProgress">
       <p>Calling to <span class="balanced">{{ contactName }}</span>...</p>
 
@@ -24,8 +24,7 @@
       <p>Call in progress...</p>
     </div>
 
-    <div id="localVideo" style="width:200px; height:200px;background-color:green;margin-bottom:20px;"></div>
-    <div id="remoteVideo" style="width:200px; height:200px;background-color:red;margin-bottom:20px;"></div>
+    <video-view></video-view>
 
   </ion-content>
 </ion-view>

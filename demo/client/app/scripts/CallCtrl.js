@@ -1,6 +1,6 @@
 angular.module('phonertcdemo')
 
-  .controller('CallCtrl', function ($scope, $state, $stateParams, signaling) {
+  .controller('CallCtrl', function ($scope, $state, $rootScope, $stateParams, signaling) {
     var duplicateMessages = [];
     var callStarted = false;
 
@@ -20,11 +20,9 @@ angular.module('phonertcdemo')
         },
         streams: {
           audio: true,
-          video: false
+          video: true
         }
       };
-
-      console.log(config);
 
       session = new cordova.plugins.phonertc.Session(config);
       
@@ -73,6 +71,12 @@ angular.module('phonertcdemo')
         signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
       }, 3500);
     };
+
+    $scope.updateVideoPosition = function () {
+      if (cordova.platformId !== 'android') {
+        $rootScope.$broadcast('videoView.updatePosition');
+      }
+    }
 
     function onMessageReceive (name, message) {
       console.log('messageReceived', name, $scope.contactName, message);

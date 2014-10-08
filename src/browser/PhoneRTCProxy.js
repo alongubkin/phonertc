@@ -4,15 +4,14 @@ var SessionDescription = window.mozRTCSessionDescription || window.RTCSessionDes
 navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
 
 var localVideo = document.createElement('video');
-var remoteVideo = document.createElement('video');
 localVideo.autoplay = true;
 localVideo.muted = true;
+
+var remoteVideo = document.createElement('video');
 remoteVideo.autoplay = true;
 
-document.body.appendChild(localVideo);
-document.body.appendChild(remoteVideo);
-
 var config;
+var videoConfig;
 
 var peerConnection;
 var sendMessageCallback;
@@ -50,7 +49,7 @@ function call(success, error, opts) {
 				sendMessage(sessionDescription);
 	    }, function (error) {
 	    	console.log(error);
-	    }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: false }});
+	    }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: true }});
 		}
 	}, function (error) {
 		console.log(error);
@@ -72,7 +71,7 @@ function receiveMessage(success, error, opts) {
 			sendMessage(sessionDescription);
     }, function (error) {
     	console.log(error);
-    }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: false }});
+    }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: true }});
   } else if (message.type === 'answer') {
     setRemote(message);
   } else if (message.type === 'candidate') {
@@ -93,8 +92,13 @@ function receiveMessage(success, error, opts) {
   }
 }
 
-function disconnect() {
+function disconnect(success, error, opts) {
 	console.log('disconnect');
+}
+
+function setVideoView(success, error, opts) {
+
+	// remoteVideo.style.width = 
 }
 
 function onIceCandidate(event) {
@@ -203,7 +207,8 @@ module.exports = {
 	createSessionObject: createSessionObject,
 	call: call,
 	receiveMessage: receiveMessage,
-	disconnect: disconnect
+	disconnect: disconnect,
+	setVideoView: setVideoView
 };
 
 require("cordova/exec/proxy").add("PhoneRTCPlugin", module.exports);

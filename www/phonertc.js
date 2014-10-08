@@ -1,4 +1,5 @@
 var exec = require('cordova/exec');
+var videoViewConfig;
 
 function Session(config) { 
   // make sure that the config object is valid
@@ -120,3 +121,40 @@ Session.prototype.close = function () {
 };
 
 exports.Session = Session;
+
+function getLayoutParams(videoElement) {
+  var boundingRect = videoElement.getBoundingClientRect();
+
+  if (cordova.platformId === 'android') {
+    return {
+      devicePixelRatio: window.devicePixelRatio || 2,
+      position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
+      size: [videoElement.offsetWidth, videoElement.offsetHeight]
+    };
+  }
+
+  return {
+    position: [boundingRect.left, boundingRect.top],
+    size: [videoElement.offsetWidth, videoElement.offsetHeight]
+  };
+}
+
+function setVideoView(config) {
+  videoViewConfig = config;
+
+  if (config.container) {
+    config.containerParams = getLayoutParams(config.container);
+  }
+
+  exec(null, null, 'PhoneRTCPlugin', 'setVideoView', [config]);
+};
+
+if (cordova.platformId !== 'android') {
+  document.addEventListener('touchmove', function () {
+    if (videoViewConfig) {
+      setVideoView(videoViewConfig);
+    }
+  });
+}
+
+exports.setVideoView = setVideoView;

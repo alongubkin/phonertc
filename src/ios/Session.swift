@@ -19,7 +19,8 @@ class Session {
         self.constraints = RTCMediaConstraints(
             mandatoryConstraints: [
                 RTCPair(key: "OfferToReceiveAudio", value: "true"),
-                RTCPair(key: "OfferToReceiveVideo", value: "false"),
+                RTCPair(key: "OfferToReceiveVideo", value:
+                    self.plugin.videoConfig == nil ? "false" : "true"),
             ],
             
             optionalConstraints: [
@@ -44,6 +45,15 @@ class Session {
             mediaStream.addAudioTrack(peerConnectionFactory.audioTrackWithID("ARDAMSa0"))
         }
         
+        if self.config.streams.video {
+            // init local video track if needed
+            if self.plugin.localVideoTrack == nil {
+                self.plugin.initLocalVideoTrack()
+            }
+            
+            mediaStream.addVideoTrack(self.plugin.localVideoTrack!)
+        }
+        
         self.peerConnection.addStream(mediaStream, constraints: self.constraints)
         
         // create offer if initiator
@@ -51,7 +61,6 @@ class Session {
             self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
                 constraints: constraints)
         }
-        
     }
     
     func receiveMessage(message: String) {
@@ -68,7 +77,7 @@ class Session {
             let mid: String = data?.objectForKey("id") as NSString
             let sdpLineIndex: Int = (data?.objectForKey("label") as NSNumber).integerValue
             let sdp: String = data?.objectForKey("candidate") as NSString
-            
+
             let candidate = RTCICECandidate(
                 mid: mid,
                 index: sdpLineIndex,
@@ -105,6 +114,10 @@ class Session {
         
     }
     
+    func addVideoTrack(videoTrack: RTCVideoTrack) {
+        self.plugin.addRemoteVideoTrack(videoTrack)
+    }
+    
     func preferISAC(sdpDescription: String) -> String {
         var mLineIndex = -1
         var isac16kRtpMap: String?
@@ -119,13 +132,13 @@ class Session {
         for var i = 0;
             (i < lines.count) && (mLineIndex == -1 || isac16kRtpMap == nil);
             ++i {
-                let line = lines[i]
-                if line.hasPrefix("m=audio ") {
-                    mLineIndex = i
-                    continue
-                }
+            let line = lines[i]
+            if line.hasPrefix("m=audio ") {
+                mLineIndex = i
+                continue
+            }
                 
-                isac16kRtpMap = self.firstMatch(isac16kRegex!, string: line)
+            isac16kRtpMap = self.firstMatch(isac16kRegex!, string: line)
         }
         
         if mLineIndex == -1 {
@@ -139,7 +152,7 @@ class Session {
         }
         
         let origMLineParts = lines[mLineIndex].componentsSeparatedByString(" ")
-        
+
         var newMLine: [String] = []
         var origPartIndex = 0;
         
@@ -172,5 +185,5 @@ class Session {
         
         return nsString.substringWithRange(result!.rangeAtIndex(1))
     }
-    
 }
+

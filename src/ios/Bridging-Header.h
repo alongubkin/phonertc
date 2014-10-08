@@ -15,3 +15,5 @@
 #import "RTCAudioTrack.h"
 #import "RTCSessionDescriptionDelegate.h"
 #import "RTCDataChannel.h"
+#import "RTCEAGLVideoView.h"
+#import "RTCVideoSource.h"
