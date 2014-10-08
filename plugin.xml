@@ -73,7 +73,7 @@ In order to install PhoneRTC on iOS, please follow these steps:
         <source-file src="src/ios/PhoneRTCPlugin.swift" />
 		<source-file src="src/ios/PCObserver.swift" />
 		<source-file src="src/ios/Session.swift" />
-        <source-file src="src/ios/SessionConfig.swift" />
+        <source-file src="src/ios/Config.swift" />
 		<source-file src="src/ios/SessionDescriptionDelegate.swift" />
 
 		<framework src="libc++.dylib" />
