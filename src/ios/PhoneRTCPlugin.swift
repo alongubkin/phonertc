@@ -97,7 +97,7 @@ class PhoneRTCPlugin : CDVPlugin {
                         )
                     } else {
                         // otherwise, create the local video view
-                        self.localVideoView = self.createVideoView(params)
+                        self.localVideoView = self.createVideoView(params: params)
                         self.localVideoView?.videoTrack = self.localVideoTrack!
                     }
                 }
@@ -118,15 +118,22 @@ class PhoneRTCPlugin : CDVPlugin {
         self.commandDelegate.sendPluginResult(pluginResult, callbackId:self.callbackId)
     }
     
-    func createVideoView(params: VideoLayoutParams) -> RTCEAGLVideoView {
-        let frame = CGRectMake(
-            CGFloat(params.x + self.videoConfig!.container.x),
-            CGFloat(params.y + self.videoConfig!.container.y),
-            CGFloat(params.width),
-            CGFloat(params.height)
-        )
+    func createVideoView(params: VideoLayoutParams? = nil) -> RTCEAGLVideoView {
+        var view: RTCEAGLVideoView
         
-        let view = RTCEAGLVideoView(frame: frame)
+        if params != nil {
+            let frame = CGRectMake(
+                CGFloat(params!.x + self.videoConfig!.container.x),
+                CGFloat(params!.y + self.videoConfig!.container.y),
+                CGFloat(params!.width),
+                CGFloat(params!.height)
+            )
+            
+            view = RTCEAGLVideoView(frame: frame)
+        } else {
+            view = RTCEAGLVideoView()
+        }
+        
         view.userInteractionEnabled = false
         
         self.webView.addSubview(view)
@@ -159,14 +166,9 @@ class PhoneRTCPlugin : CDVPlugin {
             return
         }
         
-        // add a small video view as it will be resized
-        // and re-positioned in refreshVideoContainer
-        let videoView = createVideoView(VideoLayoutParams(
-            x: 100,
-            y: 100,
-            width: 100,
-            height: 100
-        ))
+        // add a video view without position/size as it will get
+        // resized and re-positioned in refreshVideoContainer
+        let videoView = createVideoView()
         
         videoView.videoTrack = videoTrack
         self.remoteVideoViews.append(videoView)
