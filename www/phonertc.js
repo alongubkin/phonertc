@@ -127,7 +127,6 @@ function getLayoutParams(videoElement) {
 
   if (cordova.platformId === 'android') {
     return {
-      devicePixelRatio: window.devicePixelRatio || 2,
       position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
       size: [videoElement.offsetWidth, videoElement.offsetHeight]
     };
@@ -142,11 +141,20 @@ function getLayoutParams(videoElement) {
 function setVideoView(config) {
   videoViewConfig = config;
 
-  if (config.container) {
-    config.containerParams = getLayoutParams(config.container);
+  var container = config.container;
+
+  if (container) {
+    config.containerParams = getLayoutParams(container);
+    delete config.container;
   }
 
+  config.devicePixelRatio = window.devicePixelRatio || 2;
+
   exec(null, null, 'PhoneRTCPlugin', 'setVideoView', [config]);
+
+  if (container) {
+    config.container = container;
+  }
 };
 
 if (cordova.platformId !== 'android') {
