@@ -1,0 +1,1173 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,200,500,700);
+
+/* reset --------------------------  */
+
+html,
+body,
+div,
+ul,
+ol,
+li,
+dl,
+dt,
+dd,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+dfn,
+del,
+p,
+blockquote,
+fieldset,
+input,
+textarea,
+select,
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+nav,
+section,
+button,
+canvas,
+video {
+    margin: 0;
+    padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+code,
+address,
+caption,
+cite,
+code,
+th,
+dfn,
+del {
+    font-weight: normal;
+    font-style: normal;
+}
+
+ul,
+ol {
+    list-style: none
+}
+
+fieldset,
+img {
+    border: none
+}
+
+caption,
+th {
+    text-align: left
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button {
+    cursor: pointer
+}
+
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+button,
+input[type="search"],
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+textarea {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    -ms-appearance: none;
+    appearance: none;
+}
+
+input,
+button,
+textarea {
+    line-height: normal;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+input[type="hidden"],
+[hidden],
+.hidden {
+    display: none
+}
+
+textarea {
+    overflow: auto;
+    resize: none;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+nav,
+section,
+.clearfix {
+    display: block
+}
+
+audio,
+canvas,
+video {
+    display: inline-block
+}
+
+a > img {
+    vertical-align: bottom
+}
+
+strong,
+.strong,
+b {
+    font-weight: bold
+}
+
+em,
+.italic,
+i {
+    font-style: italic
+}
+
+del,
+.del {
+    text-decoration: line-through
+}
+
+:focus {
+    outline: none
+}
+
+img {
+    max-width: 100%;
+    width: auto;
+    height: auto;
+}
+
+/* tools --------------------------  */
+
+.clear {
+    clear: both;
+    display: block;
+    line-height: 0;
+    height: 0;
+    font-size: 0;
+}
+
+.clearfix:after,
+.wrap:after,
+.spanning:after,
+.content:after,
+.main:after,
+aside:after,
+section:after,
+article:after,
+.text:after {
+    content: ".";
+    display: block;
+    clear: both;
+    visibility: hidden;
+    line-height: 0;
+    height: 0;
+    font-size: 0;
+}
+
+.align-left {
+    float: left !important
+}
+
+.align-right {
+    float: right !important
+}
+
+.overflow-hidden {
+    overflow: hidden;
+    display: block;
+}
+
+/* common --------------------------  */
+
+.comments .tab-prev,
+.comments .tab-next,
+.button-download:after {
+    background: url(../images/sprite.png) 0 0 no-repeat
+}
+
+html {
+    height: 100%;
+    background: white;
+}
+
+body {
+    height: 100%;
+    font: 16px/28px "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #222222;
+    -webkit-font-smoothing: antialiased;
+    -webkit-backface-visibility: hidden;
+    -ms-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+}
+
+.main {
+    min-height: 100%;
+    overflow: hidden;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.wrap {
+    margin: 0 auto;
+    padding: 0 15px;
+    max-width: 1140px;
+}
+
+a {
+    color: #10bbf1;
+    cursor: pointer;
+    background: transparent;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #40c9f4
+}
+
+a:active {
+    color: #0b97c3
+}
+
+.error {
+    color: red !important;
+    border-color: red !important;
+}
+
+.success {
+    color: #00cc00 !important;
+    border-color: #00cc00 !important;
+}
+
+.disabled {
+    color: #999999 !important;
+    border-color: #999999 !important;
+    cursor: default !important;
+}
+
+.input-text,
+.textarea {
+    width: 100%;
+    float: left;
+    border: 2px solid #d8d8d8;
+    background: white;
+    height: 58px;
+    padding: 10px 21px;
+    font: 500 17px/34px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -moz-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -ms-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -o-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -webkit-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.input-text:focus,
+.textarea:focus {
+    border-color: #aeaeae
+}
+
+.textarea {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif
+}
+
+.button {
+    color: white;
+    background: #10bbf1;
+    height: 58px;
+    border: 2px solid #10bbf1;
+    font: 500 22px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding: 0 21px;
+    -moz-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -ms-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -o-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -webkit-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.button:hover {
+    background: #40c9f4;
+    border-color: #40c9f4;
+}
+
+.button:active {
+    background: #0b97c3;
+    border-color: #0b97c3;
+}
+
+a.button {
+    text-decoration: none;
+    display: inline-block;
+    line-height: 54px;
+    color: white;
+}
+
+a.button:hover {
+    color: white
+}
+
+a.button:active {
+    color: white
+}
+
+a.button.button-stripe {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: white;
+}
+
+a.button.button-stripe:hover {
+    color: #222222;
+    background-color: white;
+    border-color: white;
+}
+
+a.button.button-stripe:active {
+    color: #222222;
+    background-color: #e5e5e5;
+    border-color: #e5e5e5;
+}
+
+::-webkit-input-placeholder {
+    color: #cccccc
+}
+
+:-moz-placeholder {
+    color: #cccccc
+}
+
+::-moz-placeholder {
+    color: #cccccc
+}
+
+:-ms-input-placeholder {
+    color: #cccccc
+}
+
+input:focus::-webkit-input-placeholder {
+    color: transparent
+}
+
+/* header --------------------------  */
+
+header {
+    padding: 104px 0;
+    background: url(../images/header.jpg) no-repeat 50% 50%;
+    font: 24px/36px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: white;
+    -moz-background-size: cover;
+    -webkit-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+header h1 {
+    font-size: 60px;
+    line-height: 60px;
+    font-weight: 500;
+    margin-bottom: 38px;
+}
+
+header h1 span {
+    font-weight: 200
+}
+
+header .autor {
+    padding: 12px 0 0;
+    font-size: 14px;
+    line-height: 24px;
+    font-weight: bold;
+    color: white;
+}
+
+header .autor a {
+    color: white
+}
+
+header .autor a:hover {
+    color: white;
+    opacity: 0.8;
+    filter: alpha(opacity=80);
+}
+
+header .autor a:active {
+    color: white;
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+header .buttons-wrapper {
+    padding-top: 53px
+}
+
+header .buttons-wrapper .button-stripe {
+    margin-left: 14px
+}
+
+.header-img {
+    float: right
+}
+
+.header-wrapper {
+    padding-top: 87px;
+    max-width: 655px;
+}
+
+/* footer --------------------------  */
+
+footer {
+    background: #324a57;
+    color: white;
+    font-size: 16px;
+    line-height: 28px;
+    padding: 90px 0;
+    text-align: center;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* home --------------------------  */
+
+/* content --------------------------  */
+
+.spanning {
+    clear: both
+}
+
+.newsletter {
+    
+    padding: 103px 0 109px;
+    text-align: center;
+}
+
+.newsletter p {
+    font-size: 16px;
+    line-height: 28px;
+    max-width: 556px;
+    margin: 0 auto;
+    clear: both;
+}
+
+.newsletter-title {
+    font: bold 48px/60px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 38px;
+}
+
+.newsletter-form {
+    position: relative;
+    display: inline-block;
+    padding-right: 169px;
+    max-width: 556px;
+    min-width: 556px;
+    height: 58px;
+    margin-bottom: 32px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.newsletter-form .button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    padding-left: 0;
+    padding-right: 0;
+    width: 149px;
+}
+
+.promo {
+    padding: 114px 0 54px
+}
+
+.promo-wrapper {
+    margin: 0 -15px
+}
+
+.promo-column {
+    padding: 0 15px 60px;
+    float: left;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    width: 25%;
+}
+
+.promo-column img {
+    display: block;
+    margin-bottom: 23px;
+}
+
+.promo-column h5 {
+    font: bold 18px/24px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+}
+
+.simple {
+    padding: 104px 0 89px
+}
+
+.simple-content {
+    float: right;
+    padding-top: 37px;
+    width: 420px;
+}
+
+.simple-content h3 {
+    font: 700 48px/48px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-transform: uppercase;
+    border-bottom: solid 6px #f4f4f4;
+    padding-bottom: 43px;
+    margin-bottom: 43px;
+}
+
+.simple-content ul {
+    margin-bottom: 5px
+}
+
+.simple-content ul li {
+    font-size: 23px;
+    line-height: 32px;
+    font-weight: 300;
+    margin-bottom: 31px;
+}
+
+.simple-content ul li img {
+    float: left;
+    margin-right: 23px;
+}
+
+.simple-content ul li span {
+    display: block;
+    overflow: hidden;
+}
+
+.simple-img {
+    float: left;
+    max-width: 587px;
+    width: 53%;
+}
+
+.simple-img img {
+    display: block;
+    margin: 0 auto;
+}
+
+.comments {
+    background: #10bbf1;
+    color: white;
+    text-align: center;
+    padding: 70px 0 60px;
+}
+
+.comments .box {
+    display: none;
+    padding: 0 195px 55px;
+}
+
+.comments .box.visible {
+    display: block
+}
+
+.comments .box h4 {
+    font: 500 36px/46px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    margin-bottom: 37px;
+}
+
+.comments .box h4 a {
+    font-weight: bold;
+    color: white;
+}
+
+.comments .box h4 a:hover {
+    text-decoration: underline
+}
+
+.comments .box p {
+    font-size: 19px;
+    line-height: 32px;
+    font-weight: 300;
+}
+
+.comments .tabs {
+    display: block;
+    text-align: center;
+    font-size: 0;
+    line-height: 0;
+}
+
+.comments .tabs li {
+    display: inline-block;
+    margin: 0 8px;
+    width: 11px;
+    height: 11px;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0);
+    cursor: pointer;
+    -moz-transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    -ms-transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    -o-transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    -webkit-transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.comments .tabs li:hover {
+    background-color: white
+}
+
+.comments .tabs li.active {
+    background-color: transparent;
+    box-shadow: 0 0 0 2px white;
+}
+
+.comments .tab {
+    position: relative
+}
+
+.comments .tab-prev,
+.comments .tab-next {
+    position: absolute;
+    left: 98px;
+    top: 94px;
+    width: 23px;
+    height: 16px;
+    background-position: 0 0;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+.comments .tab-prev:hover,
+.comments .tab-next:hover {
+    opacity: 1;
+    filter: alpha(opacity=100);
+}
+
+.comments .tab-next {
+    left: auto;
+    right: 98px;
+    background-position: -50px 0;
+}
+
+.video-title {
+    font: bold 48px/48px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 25px;
+}
+
+.video-subtitle {
+    font-size: 19px;
+    line-height: 25px;
+    color: #919191;
+    text-align: center;
+}
+
+.video {
+    padding: 108px 0 116px
+}
+
+.video-block {
+    padding-top: 34px;
+    margin: 0 auto 32px;
+    max-width: 760px;
+}
+
+.video-share-wrapper {
+    clear: both;
+    text-align: center;
+}
+
+.social-list {
+    display: inline-block
+}
+
+.social-list li {
+    font-size: 19px;
+    line-height: 38px;
+    float: left;
+    margin: 0 9px;
+}
+
+.social-list li a {
+    font-size: 15px;
+    line-height: 38px;
+    display: block;
+    width: 160px;
+    height: 38px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    background-color: #3bcbff;
+    color: white;
+    text-align: center;
+    -moz-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -ms-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -o-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    -webkit-transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+    transition: color 0.1s linear, background-color 0.1s linear, border-color 0.1s linear;
+}
+
+.social-list li a:hover {
+    background-color: #6ed9ff
+}
+
+.social-list li a:active {
+    background-color: #08bdff
+}
+
+.social-list li a.social-facebook {
+    background-color: #1e3aa6
+}
+
+.social-list li a.social-facebook:hover {
+    background-color: #2649d1
+}
+
+.social-list li a.social-facebook:active {
+    background-color: #162b7b
+}
+
+.social-list li a.social-google {
+    background-color: #d72d26
+}
+
+.social-list li a.social-google:hover {
+    background-color: #e05650
+}
+
+.social-list li a.social-google:active {
+    background-color: #ac241e
+}
+
+.discover {
+    padding: 31px 0 25px;
+    background: #fafafa;
+}
+
+.discover-content {
+    float: right;
+    width: 50%;
+    padding: 77px 97px 50px 15px;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.discover-content h2 {
+    font-size: 72px;
+    line-height: 72px;
+    font-weight: bold;
+    margin-bottom: 29px;
+}
+
+.discover-button {
+    padding-top: 68px;
+    margin: 0 -10px;
+    clear: both;
+}
+
+.button-download {
+    height: 62px;
+    float: left;
+    font: 500 11px/13px "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    padding-left: 61px;
+    padding-right: 0;
+    width: 180px;
+    text-align: left;
+    margin: 0 10px 20px;
+    position: relative;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.button-download:after {
+    content: "";
+    position: absolute;
+    left: 23px;
+    top: 14px;
+    width: 32px;
+    height: 32px;
+    background-position: -100px 0;
+}
+
+.button-download.android:after {
+    background-position: -150px 0
+}
+
+.button-download-title {
+    padding: 11px 0 1px;
+    display: block;
+    font-size: 11px;
+    line-height: 13px;
+    text-align: left;
+}
+
+.button-download-subtitle {
+    display: block;
+    font-size: 21px;
+    line-height: 23px;
+    text-align: left;
+}
+
+.discover-img {
+    float: left;
+    width: 50%;
+}
+
+.discover-img img {
+    display: block
+}
+
+.discover-img-inside {
+    margin: 0 -40px
+}
+
+/* sidebar --------------------------  */
+
+/* media --------------------------  */
+
+/* ===[ Responsive all mobile sizes ]=== */
+
+@media (max-width: 979px) { 
+  .newsletter-form {
+      min-width: 0
+  }
+
+  .newsletter-title {
+      font-size: 36px;
+      line-height: 48px;
+  }
+
+  .header-img {
+      display: none
+  }
+
+  .header-wrapper {
+      padding-top: 0;
+      max-width: none;
+  }
+
+  header {
+      text-align: center;
+      font-size: 19px;
+      line-height: 28px;
+  }
+
+  header h1 {
+      font-size: 46px;
+      line-height: 52px;
+  }
+
+  header .buttons-wrapper .button {
+      margin-bottom: 20px
+  }
+
+  .promo-column {
+      width: auto;
+      max-width: 290px;
+      margin-left: auto;
+      margin-right: auto;
+      float: none;
+      text-align: center;
+  }
+
+  .promo-column img {
+      margin-left: auto;
+      margin-right: auto;
+  }
+
+  .simple-content {
+      float: none;
+      width: auto;
+      padding-top: 0;
+  }
+
+  .simple-content h3 {
+      font-size: 36px;
+      line-height: 46px;
+      text-align: center;
+  }
+
+  .simple-content ul {
+      max-width: 310px;
+      margin-left: auto;
+      margin-right: auto;
+  }
+
+  .simple-img {
+      float: none;
+      width: auto;
+      max-width: none;
+      margin-left: -80px;
+      margin-right: -80px;
+  }
+
+  .comments .box {
+      padding-left: 0;
+      padding-right: 0;
+  }
+
+  .comments .tab-prev,
+  .comments .tab-next {
+      display: none
+  }
+
+  .social-list li {
+      float: none;
+      text-align: center;
+      padding-top: 20px;
+  }
+
+  .social-list li:first-child {
+      padding-top: 0
+  }
+
+  .social-list li a {
+      margin-left: auto;
+      margin-right: auto;
+  }
+
+  .video-title {
+      font-size: 36px;
+      line-height: 46px;
+  }
+
+  .discover-content {
+      float: none;
+      width: auto;
+      padding-left: 0;
+      padding-right: 0;
+      text-align: center;
+  }
+
+  .discover-content h2 {
+      font-size: 60px;
+      line-height: 60px;
+  }
+
+  .discover-img {
+      float: none;
+      width: auto;
+  }
+
+  .discover-img img {
+      margin: 0 auto
+  }
+
+  .discover-button {
+      text-align: center
+  }
+
+  .discover-button .button-download {
+      float: none;
+      display: inline-block;
+  }
+
+  .comments .tabs li {
+      width: 18px;
+      height: 18px;
+      margin: 0 14px;
+  }
+}
+
+/* ===[ Responsive just mobile portrait ]=== */
+
+@media (max-width: 479px) { 
+  header .buttons-wrapper .button.button-stripe {
+      margin-left: 0
+  }
+
+  .discover-content h2 {
+      font-size: 36px;
+      line-height: 46px;
+  }
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2), only screen and (min--moz-device-pixel-ratio: 2), only screen and (-o-min-device-pixel-ratio: 2 / 1), only screen and (min-device-pixel-ratio: 2), only screen and (min-resolution: 192dpi), only screen and (min-resolution: 2dppx) { 
+  .comments .tab-prev,
+  .comments .tab-next,
+  .button-download:after,
+  .comments .tab-prev,
+  .comments .tab-next,
+  .button-download:after {
+      background: url(../images/sprite@2x.png) 0 0 no-repeat;
+      -moz-background-size: 200px 50px;
+      -webkit-background-size: 200px 50px;
+      -o-background-size: 200px 50px;
+      background-size: 200px 50px;
+  }
+}
+
+
+/**
+ * iPhone 5 Template.
+ *
+ *    *.iphone-5-template
+ *      *.iphone-5-template-body
+ */
+
+.iphone-5-template {
+  display: block;
+  width: 388px;
+  height: 801px;
+  margin: -4px -6px -3px -6px; /* line up iphone edges with box by default */
+  background: url(../images/iphone-5-portrait.png) top left no-repeat transparent;
+  position: absolute;
+  right: 0;
+  margin-top: -65px;
+  transform: scale(0.7);
+}
+
+
+
+/**
+ * The glare. By default, `::after` should put it on top of its contents.
+ */
+
+/**
+ * Screen content.
+ */
+
+.iphone-5-template-body {
+  position: absolute;
+  width: 320px;
+  height: 568px;
+  top: 118px;
+  left: 34px;
+  overflow: hidden;
+  color: #fff;
+}
+
+
+/**
+ * Orientation.
+ */
+
+.iphone-5-template[data-orientation="landscape"] {
+  width: 806px;
+  height: 387px;
+  background-image: url(../images/iphone-5-landscape.png);
+}
+
+.iphone-5-template[data-orientation="landscape"]::after {
+  background-image: url(../images/iphone-5-landscape-glare.png);
+}
+
+.iphone-5-template[data-orientation="landscape"] .iphone-5-template-body {
+  width: 568px;
+  height: 320px;
+  top: 34px;
+  left: 118px;
+}
+
+
+/**
+ * Variations.
+ */
+
+.iphone-5-template[data-variation="no-shadow"] {
+  height: 798px;
+  margin-bottom: 0;
+  background-image: url(../images/iphone-5-portrait-no-shadow.png);
+}
+
+.iphone-5-template[data-variation="reflection"] {
+  height: 906px;
+  margin-bottom: -108px; /* account for shadow and reflection */
+  background-image: url(../images/iphone-5-portrait-reflection.png);
+}
+
+.iphone-5-template[data-variation="no-shadow"][data-orientation="landscape"] {
+  height: 381px;
+  margin-bottom: 0;
+  background-image: url(../images/iphone-5-landscape-no-shadow.png);
+}
+
+.iphone-5-template[data-variation="reflection"][data-orientation="landscape"] {
+  height: 481px;
+  margin-bottom: -108px; /* account for shadow and reflection */
+  background-image: url(../images/iphone-5-landscape-reflection.png);
+}
+
+iframe {
+    transform: scale(1.2);
+    width: 266px !important;
+    height: 473px !important;
+    top: 166px !important;
+    left: 62px !important;
+    border: 0;
+}
+
+
+@media (max-width: 767px) {
+  .iphone-5-template { display: none; }
+}
