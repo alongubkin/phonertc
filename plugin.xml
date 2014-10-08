@@ -190,4 +190,16 @@ In order to install PhoneRTC on iOS, please follow these steps:
         <source-file src="libs/android/libjingle_peerconnection.jar" target-dir="libs"/>
 		<source-file src="libs/android/armeabi-v7a/libjingle_peerconnection_so.so" target-dir="libs/armeabi-v7a"/>
     </platform>
+
+    <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="PhoneRTCPlugin">
+                <param name="browser-package" value="PhoneRTCPlugin" />
+            </feature>
+        </config-file>
+
+        <js-module src="src/browser/PhoneRTCProxy.js" name="PhoneRTCProxy">
+            <runs />
+        </js-module>    
+    </platform>
 </plugin>
