@@ -155,6 +155,10 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func addRemoteVideoTrack(videoTrack: RTCVideoTrack) {
+        if self.videoConfig == nil {
+            return
+        }
+        
         // add a small video view as it will be resized
         // and re-positioned in refreshVideoContainer
         let videoView = createVideoView(VideoLayoutParams(
