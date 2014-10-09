@@ -169,7 +169,9 @@ In order to install PhoneRTC on iOS, please follow these steps:
         <source-file src="src/android/com/dooble/phonertc/Session.java" target-dir="src/com/dooble/phonertc" />
 		<source-file src="src/android/com/dooble/phonertc/SessionConfig.java" target-dir="src/com/dooble/phonertc" />
         <source-file src="src/android/com/dooble/phonertc/VideoGLView.java" target-dir="src/com/dooble/phonertc" />
-    
+    	<source-file src="src/android/com/dooble/phonertc/VideoConfig.java" target-dir="src/com/dooble/phonertc" />
+    	<source-file src="src/android/com/dooble/phonertc/VideoTrackRendererPair.java" target-dir="src/com/dooble/phonertc" />
+    	
         <config-file target="res/xml/config.xml" parent="/*">
 			<feature name="PhoneRTCPlugin">
 				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
