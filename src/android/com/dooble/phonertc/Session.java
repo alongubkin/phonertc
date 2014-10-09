@@ -40,15 +40,12 @@ public class Session {
 	private Object _queuedRemoteCandidatesLocker = new Object();
 	
 	private MediaStream _localStream;
-	private MediaStream _remoteStream;
 	
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] _quit = new Boolean[] { false };
 	
 	private final SDPObserver _sdpObserver = new SDPObserver();
 	private final PCObserver _pcObserver = new PCObserver();
-
-	VideoRenderer.Callbacks _videoRenderer;
 	
 	public Session(PhoneRTCPlugin plugin, CallbackContext callbackContext, SessionConfig config) {
 		_plugin = plugin;
@@ -56,7 +53,7 @@ public class Session {
 		_config = config;
 	}
 	
-	public void initialize() {
+	public void call() {
 		_queuedRemoteCandidates = new LinkedList<IceCandidate>();
 		_quit[0] = false;
 
@@ -72,7 +69,7 @@ public class Session {
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
 				"OfferToReceiveAudio", "true"));
 		_sdpMediaConstraints.mandatory.add(new MediaConstraints.KeyValuePair(
-				"OfferToReceiveVideo", _plugin.getLocalVideoTrack() != null ? "true" : "false"));
+				"OfferToReceiveVideo", _plugin.getVideoConfig() == null ? "false" : "true"));
 		
 		// Initialize PeerConnection
 		MediaConstraints pcMediaConstraints = new MediaConstraints();
@@ -84,22 +81,17 @@ public class Session {
 		
 		// Initialize local stream
 		_localStream = _plugin.getPeerConnectionFactory().createLocalMediaStream("ARDAMS");
-		_localStream.addTrack(_plugin.getLocalAudioTrack());
+		
+		if (_config.isAudioStreamEnabled() && _plugin.getLocalAudioTrack() != null) {
+			_localStream.addTrack(_plugin.getLocalAudioTrack());
+		}
 		 
-		if (_plugin.getLocalVideoTrack() != null) {
+		if (_config.isVideoStreamEnabled() && _plugin.getLocalVideoTrack() != null) {
 			_localStream.addTrack(_plugin.getLocalVideoTrack());
 		}
 		
 		_peerConnection.addStream(_localStream, new MediaConstraints());
-	
-		/*
-		try {
-			_videoRenderer = VideoRendererGui.create(0, 0, 100, 100);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
+
 		// Create offer if initiator
 		if (_config.isInitiator()) {
 			_peerConnection.createOffer(_sdpObserver, _sdpMediaConstraints);
@@ -267,17 +259,16 @@ public class Session {
 
 		@Override
 		public void onAddStream(final MediaStream stream) {
-			_remoteStream = stream;
-			
 			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					/*
-					VideoTrack videoTrack = stream.videoTracks.get(0);
+					if (stream.videoTracks.size() > 0) {
+						VideoTrack videoTrack = stream.videoTracks.get(0);
 					
-					if (videoTrack != null) {
-						videoTrack.addRenderer(new VideoRenderer(_videoRenderer));
-					}*/
-
+						if (videoTrack != null) {
+							_plugin.addRemoteVideoTrack(videoTrack);
+						}
+					}
+					
 					try {
 						JSONObject data = new JSONObject();
 						data.put("type", "__answered");

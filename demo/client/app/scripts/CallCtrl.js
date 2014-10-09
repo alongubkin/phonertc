@@ -73,9 +73,7 @@ angular.module('phonertcdemo')
     };
 
     $scope.updateVideoPosition = function () {
-      if (cordova.platformId !== 'android') {
-        $rootScope.$broadcast('videoView.updatePosition');
-      }
+      $rootScope.$broadcast('videoView.updatePosition');
     }
 
     function onMessageReceive (name, message) {

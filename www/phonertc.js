@@ -157,12 +157,10 @@ function setVideoView(config) {
   }
 };
 
-if (cordova.platformId !== 'android') {
-  document.addEventListener('touchmove', function () {
-    if (videoViewConfig) {
-      setVideoView(videoViewConfig);
-    }
-  });
-}
+document.addEventListener('touchmove', function () {
+  if (videoViewConfig) {
+    setVideoView(videoViewConfig);
+  }
+});
 
 exports.setVideoView = setVideoView;
