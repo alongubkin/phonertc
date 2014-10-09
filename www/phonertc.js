@@ -43,9 +43,9 @@ function Session(config) {
   }
 
   function onSendMessage(data) {
-    if (data.type === '__answered' && options.answerCallback) {
+    if (data.type === '__answered') {
       callEvent('answer');
-    } else if (data.type === '__disconnected' && options.disconnectCallback) {
+    } else if (data.type === '__disconnected') {
       callEvent('disconnect');
     } else {
       callEvent('sendMessage', data);

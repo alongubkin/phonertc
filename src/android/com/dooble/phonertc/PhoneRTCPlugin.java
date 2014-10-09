@@ -233,18 +233,40 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	}
 
 	private void refreshVideoView() {
-		for (VideoTrackRendererPair pair : _remoteVideos) {
-			if (pair.getVideoRenderer() != null) {
-				pair.getVideoTrack().removeRenderer(pair.getVideoRenderer());
-			}
-			
-			pair.setVideoRenderer(new VideoRenderer(
-					VideoRendererGui.create(0, 0, 100, 100, 
-							VideoRendererGui.ScalingType.SCALE_FILL)));
-			
-			pair.getVideoTrack().addRenderer(pair.getVideoRenderer());
-		}
+		int n = _remoteVideos.size();
 		
+		if (n > 0) {			
+			int totalArea = _videoConfig.getContainer().getWidth() * _videoConfig.getContainer().getHeight();
+			int videoSize = (int)Math.sqrt((float)totalArea / n);
+			
+			int videosInRow = (int)((float)_videoConfig.getContainer().getWidth() / videoSize);
+			int rows = (int)Math.ceil((float)n / videosInRow);
+			
+			int videoIndex = 0;
+			
+			int videoSizeAsPercentage = getPercentage(videoSize, _videoConfig.getContainer().getWidth());
+			
+			for (int row = 0; row < rows; row++) {
+				int y = getPercentage(row, rows);
+				
+				for (int video = 0; video < videosInRow; video++) {
+					VideoTrackRendererPair pair = _remoteVideos.get(videoIndex++);
+					
+					if (pair.getVideoRenderer() != null) {
+						pair.getVideoTrack().removeRenderer(pair.getVideoRenderer());
+					}
+					
+					int x = getPercentage(video, videosInRow);
+					
+					pair.setVideoRenderer(new VideoRenderer(
+							VideoRendererGui.create(x, y, videoSizeAsPercentage, videoSizeAsPercentage, 
+									VideoRendererGui.ScalingType.SCALE_FILL)));
+				
+					pair.getVideoTrack().addRenderer(pair.getVideoRenderer());
+				}
+			}
+		}
+			
 		if (_videoConfig.getLocal() != null && _localVideo != null) {
 			if (_localVideo.getVideoRenderer() != null) {
 				_localVideo.getVideoTrack().removeRenderer(_localVideo.getVideoRenderer());
