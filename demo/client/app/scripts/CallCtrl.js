@@ -1,6 +1,6 @@
 angular.module('phonertcdemo')
 
-  .controller('CallCtrl', function ($scope, $state, $rootScope, $stateParams, signaling) {
+  .controller('CallCtrl', function ($scope, $state, $rootScope, $timeout, $stateParams, signaling) {
     var duplicateMessages = [];
     var callStarted = false;
 
@@ -63,7 +63,8 @@ angular.module('phonertcdemo')
     $scope.answer = function () {
       if ($scope.callInProgress) { return; }
       $scope.callInProgress = true;
-      
+      $timeout($scope.updateVideoPosition, 1000);
+
       call(false);
 
       setTimeout(function () {
@@ -87,6 +88,7 @@ angular.module('phonertcdemo')
         case 'answer':
           $scope.$apply(function () {
             $scope.callInProgress = true;
+            $timeout($scope.updateVideoPosition, 1000);
           });
 
           call(true);
