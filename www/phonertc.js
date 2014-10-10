@@ -126,7 +126,7 @@ Session.prototype.call = function () {
   if (!this.__sessionKey) {
     this.__pendingActions.push(call);
   } else {
-    call();
+    call.call(this);
   }
 };
 
