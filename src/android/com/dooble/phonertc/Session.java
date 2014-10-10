@@ -8,25 +8,18 @@ import org.apache.cordova.CallbackContext;
 import org.apache.cordova.PluginResult;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.webrtc.AudioTrack;
 import org.webrtc.DataChannel;
 import org.webrtc.IceCandidate;
 import org.webrtc.MediaConstraints;
 import org.webrtc.MediaStream;
 import org.webrtc.PeerConnection;
-import org.webrtc.PeerConnectionFactory;
 import org.webrtc.SdpObserver;
 import org.webrtc.SessionDescription;
-import org.webrtc.VideoRenderer;
 import org.webrtc.PeerConnection.IceConnectionState;
 import org.webrtc.PeerConnection.IceGatheringState;
-import org.webrtc.VideoRenderer.I420Frame;
-import org.webrtc.VideoRendererGui;
 import org.webrtc.VideoTrack;
 
-import android.app.Activity;
 import android.util.Log;
-import android.webkit.WebView;
 
 public class Session {
 	PhoneRTCPlugin _plugin;

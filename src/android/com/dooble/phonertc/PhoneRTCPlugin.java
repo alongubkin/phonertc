@@ -1,7 +1,10 @@
 package com.dooble.phonertc;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import android.app.Activity;
 import android.graphics.Point;
@@ -12,6 +15,7 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.webrtc.AudioSource;
 import org.webrtc.AudioTrack;
 import org.webrtc.MediaConstraints;
@@ -30,7 +34,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private VideoSource _videoSource;
 	
 	private PeerConnectionFactory _peerConnectionFactory;
-	private Session _session; // TODO: Map<String, Session>
+	private Map<String, Session> _sessions;
 	
 	private VideoConfig _videoConfig;
 	private VideoGLView _videoView;
@@ -39,6 +43,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	
 	public PhoneRTCPlugin() {
 		_remoteVideos = new ArrayList<VideoTrackRendererPair>();
+		_sessions = new HashMap<String, Session>();
 	}
 	
 	@Override
@@ -47,12 +52,11 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		final CallbackContext _callbackContext = callbackContext;
 		
-		if (action.equals("createSessionObject")) {		
+		if (action.equals("session.create")) {		
 			final SessionConfig config = SessionConfig.fromJSON(args.getJSONObject(0));
 			
-			PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
-			result.setKeepCallback(true);
-			_callbackContext.sendPluginResult(result);
+			final String sessionKey = UUID.randomUUID().toString();
+			_callbackContext.sendPluginResult(getSessionKeyPluginResult(sessionKey));
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
@@ -71,34 +75,44 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 						initializeLocalVideoTrack();
 					}
 					
-					_session = new Session(PhoneRTCPlugin.this, _callbackContext, config);
+					_sessions.put(sessionKey, new Session(PhoneRTCPlugin.this, 
+							_callbackContext, config));
 				}
 			});
 			
 			return true;
-		} else if (action.equals("call")) {
+		} else if (action.equals("session.call")) {
+			JSONObject container = args.getJSONObject(0);
+			final String sessionKey = container.getString("sessionKey");
+			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					_session.call();
+					_sessions.get(sessionKey).call();
 				}
 			});
 			
 			return true;
-		} else if (action.equals("receiveMessage")) {
-			final String message = args.getString(0);
+		} else if (action.equals("session.receiveMessage")) {
+			JSONObject container = args.getJSONObject(0);
+			final String sessionKey = container.getString("sessionKey");
+			final String message = container.getString("message");
 
 			cordova.getThreadPool().execute(new Runnable() {
 				public void run() {
-					_session.receiveMessage(message);
+					_sessions.get(sessionKey).receiveMessage(message);
 				}
 			});
 
 			return true;
-		} else if (action.equals("disconnect")) {			
+		} else if (action.equals("session.disconnect")) {	
+			JSONObject container = args.getJSONObject(0);
+			final String sessionKey = container.getString("sessionKey");
+			
 			cordova.getThreadPool().execute(new Runnable() {
 				@Override
 				public void run() {
-					_session.disconnect();
+					_sessions.get(sessionKey).disconnect();
+					_sessions.remove(sessionKey);
 				}
 			});
 			
@@ -140,7 +154,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 						if (_videoConfig.getLocal() != null && _localVideo == null) {
 							initializeLocalVideoTrack();
 						}
-					} else {
+					} else {						
 						_videoView.setLayoutParams(params);
 					}
 				}
@@ -280,5 +294,16 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 											VideoRendererGui.ScalingType.SCALE_FILL)));
 			
 		}
+	}
+	
+	PluginResult getSessionKeyPluginResult(String sessionKey) throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("type", "__set_session_key");
+		json.put("sessionKey", sessionKey);
+		
+		PluginResult result = new PluginResult(PluginResult.Status.OK, json);
+		result.setKeepCallback(true);
+		
+		return result;
 	}
 }
