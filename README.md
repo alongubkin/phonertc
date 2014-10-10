@@ -15,3 +15,5 @@ WebRTC for Cordova apps!
  
 * Read the [Installation](https://github.com/alongubkin/phonertc/wiki/Installation) page for instructions on how to install PhoneRTC and the required servers
 * Read the [Getting Started guide](https://github.com/alongubkin/phonertc/wiki/GettingStarted) and the [FAQ](https://github.com/alongubkin/phonertc/wiki/F.A.Q)
+
+[![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=32QXU3V7GM7PC)
