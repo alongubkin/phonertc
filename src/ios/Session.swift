@@ -8,12 +8,17 @@ class Session {
     var pcObserver: PCObserver!
     var queuedRemoteCandidates: [RTCICECandidate]?
     var peerConnectionFactory: RTCPeerConnectionFactory
+    var callbackId: String
     
-    init(plugin: PhoneRTCPlugin, peerConnectionFactory: RTCPeerConnectionFactory, config: SessionConfig) {
+    init(plugin: PhoneRTCPlugin,
+         peerConnectionFactory: RTCPeerConnectionFactory,
+         config: SessionConfig,
+         callbackId: String) {
         self.plugin = plugin
         self.queuedRemoteCandidates = []
         self.config = config
         self.peerConnectionFactory = peerConnectionFactory
+        self.callbackId = callbackId
         
         // initialize basic media constraints
         self.constraints = RTCMediaConstraints(
@@ -184,6 +189,10 @@ class Session {
         }
         
         return nsString.substringWithRange(result!.rangeAtIndex(1))
+    }
+    
+    func sendMessage(message: NSData) {
+        self.plugin.sendMessage(self.callbackId, message: message)
     }
 }
 

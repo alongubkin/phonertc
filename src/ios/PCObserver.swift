@@ -17,7 +17,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
             }
         }
         
-        self.session.plugin.sendMessage(
+        self.session.sendMessage(
             "{\"type\": \"__answered\"}".dataUsingEncoding(NSUTF8StringEncoding)!)
     }
     
@@ -55,7 +55,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
             options: NSJSONWritingOptions.allZeros,
             error: &jsonError)
             
-        self.session.plugin.sendMessage(data!)
+        self.session.sendMessage(data!)
     }
     
     func peerConnection(peerConnection: RTCPeerConnection!,

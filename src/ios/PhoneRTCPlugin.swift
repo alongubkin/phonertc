@@ -3,20 +3,17 @@ import AVFoundation
 
 @objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
-    var session: Session? // TODO: Map<String, Session>
+    var sessions: [String: Session] = [:]
     var peerConnectionFactory: RTCPeerConnectionFactory
-    var callbackId : String?
     
     var videoConfig: VideoConfig?
     var videoCapturer: RTCVideoCapturer?
     var videoSource: RTCVideoSource?
     var localVideoTrack: RTCVideoTrack?
     var localVideoView: RTCEAGLVideoView?
-    var remoteVideoViews: [RTCEAGLVideoView]
+    var remoteVideoViews: [RTCEAGLVideoView] = []
     
     override init(webView: UIWebView) {
-        remoteVideoViews = []
-
         peerConnectionFactory = RTCPeerConnectionFactory()
         RTCPeerConnectionFactory.initializeSSL()
         
@@ -24,35 +21,51 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        self.callbackId = command.callbackId
+        let sessionKey = NSUUID().UUIDString
         
         // create session config from the JS params
         let config = SessionConfig(data: command.arguments[0])
         
         // make sure the OK callback is permanent as we
         // use it to send messages to the JS
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK)
-        pluginResult.setKeepCallbackAsBool(true);
-        commandDelegate.sendPluginResult(pluginResult, callbackId:command.callbackId)
+        let message: AnyObject = [
+            "type": "__set_session_key",
+            "sessionKey": sessionKey
+        ]
+        
+        let data = NSJSONSerialization.dataWithJSONObject(message,
+            options: NSJSONWritingOptions.allZeros,
+            error: nil)
+       
+        sendMessage(command.callbackId, message: data!)
         
         // create a session object and initialize it
-        session = Session(
+        let session = Session(
             plugin: self,
             peerConnectionFactory: peerConnectionFactory,
-            config: config
+            config: config,
+            callbackId: command.callbackId
         )
+        
+        sessions[sessionKey] = session
     }
     
-    func call(comamnd: CDVInvokedUrlCommand) {
+    func call(command: CDVInvokedUrlCommand) {
+        let container: AnyObject = command.arguments[0]
+        let sessionKey = container.objectForKey("sessionKey")! as String
+   
         dispatch_async(dispatch_get_main_queue()) {
-            self.session!.call()
+            self.sessions[sessionKey]!.call()
         }
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
-        let message = command.arguments[0] as String
+        let container: AnyObject = command.arguments[0]
+        let sessionKey = container.objectForKey("sessionKey")! as String
+        let message = container.objectForKey("message")! as String
+        
         dispatch_async(dispatch_get_main_queue()) {
-            self.session!.receiveMessage(message)
+            self.sessions[sessionKey]!.receiveMessage(message)
         }
     }
     
@@ -107,7 +120,7 @@ class PhoneRTCPlugin : CDVPlugin {
         }
     }
     
-    func sendMessage(message: NSData) {
+    func sendMessage(callbackId: String, message: NSData) {
         let json = NSJSONSerialization.JSONObjectWithData(message,
             options: NSJSONReadingOptions.MutableLeaves,
             error: nil) as NSDictionary
@@ -115,7 +128,7 @@ class PhoneRTCPlugin : CDVPlugin {
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
         pluginResult.setKeepCallbackAsBool(true);
         
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:self.callbackId)
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)
     }
     
     func createVideoView(params: VideoLayoutParams? = nil) -> RTCEAGLVideoView {
