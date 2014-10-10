@@ -22,6 +22,7 @@ function Session(config) {
   var self = this;
   self.events = {};
   self.config = config;
+  self.__pendingActions = [];
 
   // make all config properties accessible from this object
   Object.keys(config).forEach(function (prop) {
@@ -43,9 +44,16 @@ function Session(config) {
   }
 
   function onSendMessage(data) {
-    if (data.type === '__answered' && options.answerCallback) {
+    if (data.type === '__set_session_key') {
+      self.__sessionKey = data.sessionKey;
+
+      // execute pending actions
+      self.__pendingActions.forEach(function (action) {
+        action.call(self);
+      });
+    } else if (data.type === '__answered') {
       callEvent('answer');
-    } else if (data.type === '__disconnected' && options.disconnectCallback) {
+    } else if (data.type === '__disconnected') {
       callEvent('disconnect');
     } else {
       callEvent('sendMessage', data);
@@ -109,15 +117,30 @@ Session.prototype.off = function (eventName, fn) {
 };
 
 Session.prototype.call = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'call', []);
+  function call() {
+    exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
+      sessionKey: this.__sessionKey 
+    }]);
+  }
+
+  if (!this.__sessionKey) {
+    this.__pendingActions.push(call);
+  } else {
+    call.call(this);
+  }
 };
 
 Session.prototype.receiveMessage = function (data) {
-  exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [JSON.stringify(data)]);
+  exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
+    sessionKey: this.__sessionKey,
+    message: JSON.stringify(data)
+  }]);
 };
 
 Session.prototype.close = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'disconnect', []);
+  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
+    sessionKey: this.__sessionKey 
+  }]);
 };
 
 exports.Session = Session;
@@ -127,7 +150,6 @@ function getLayoutParams(videoElement) {
 
   if (cordova.platformId === 'android') {
     return {
-      devicePixelRatio: window.devicePixelRatio || 2,
       position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
       size: [videoElement.offsetWidth, videoElement.offsetHeight]
     };
@@ -142,20 +164,27 @@ function getLayoutParams(videoElement) {
 function setVideoView(config) {
   videoViewConfig = config;
 
-  if (config.container) {
-    config.containerParams = getLayoutParams(config.container);
+  var container = config.container;
+
+  if (container) {
+    config.containerParams = getLayoutParams(container);
+    delete config.container;
   }
 
+  config.devicePixelRatio = window.devicePixelRatio || 2;
+
   exec(null, null, 'PhoneRTCPlugin', 'setVideoView', [config]);
+
+  if (container) {
+    config.container = container;
+  }
 };
 
-if (cordova.platformId !== 'android') {
-  document.addEventListener('touchmove', function () {
-    if (videoViewConfig) {
-      setVideoView(videoViewConfig);
-    }
-  });
-}
+document.addEventListener('touchmove', function () {
+  if (videoViewConfig) {
+    setVideoView(videoViewConfig);
+  }
+});
 
 exports.setVideoView = setVideoView;
 });
