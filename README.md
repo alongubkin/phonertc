@@ -7,8 +7,8 @@ WebRTC for Cordova apps!
 * Completely Open Source
 * Android, iOS and Browser support
 * Simple JavaScript API
-* Video & Voice call
-* Multi-party calls
+* Video & Voice calls
+* Multi-party/Group calls
 * Use your own servers without relying on any third-parties
 * Use with [AudioToggle](https://github.com/alongubkin/audiotoggle) to switch between speaker and earpiece
 
