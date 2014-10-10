@@ -60,7 +60,7 @@ function Session(config) {
     }
   }
 
-  exec(onSendMessage, null, 'PhoneRTCPlugin', 'session.create', [config]);
+  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSessionObject', [config]);
 };
 
 Session.prototype.on = function (eventName, fn) {
@@ -118,7 +118,7 @@ Session.prototype.off = function (eventName, fn) {
 
 Session.prototype.call = function () {
   function call() {
-    exec(null, null, 'PhoneRTCPlugin', 'session.call', [{ 
+    exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
       sessionKey: this.__sessionKey 
     }]);
   }
@@ -131,14 +131,14 @@ Session.prototype.call = function () {
 };
 
 Session.prototype.receiveMessage = function (data) {
-  exec(null, null, 'PhoneRTCPlugin', 'session.receiveMessage', [{
+  exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
     sessionKey: this.__sessionKey,
     message: JSON.stringify(data)
   }]);
 };
 
 Session.prototype.close = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'session.disconnect', [{ 
+  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
     sessionKey: this.__sessionKey 
   }]);
 };

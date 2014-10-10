@@ -52,7 +52,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 		final CallbackContext _callbackContext = callbackContext;
 		
-		if (action.equals("session.create")) {		
+		if (action.equals("createSessionObject")) {		
 			final SessionConfig config = SessionConfig.fromJSON(args.getJSONObject(0));
 			
 			final String sessionKey = UUID.randomUUID().toString();
@@ -81,7 +81,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			});
 			
 			return true;
-		} else if (action.equals("session.call")) {
+		} else if (action.equals("call")) {
 			JSONObject container = args.getJSONObject(0);
 			final String sessionKey = container.getString("sessionKey");
 			
@@ -92,7 +92,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			});
 			
 			return true;
-		} else if (action.equals("session.receiveMessage")) {
+		} else if (action.equals("receiveMessage")) {
 			JSONObject container = args.getJSONObject(0);
 			final String sessionKey = container.getString("sessionKey");
 			final String message = container.getString("message");
@@ -104,7 +104,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			});
 
 			return true;
-		} else if (action.equals("session.disconnect")) {	
+		} else if (action.equals("disconnect")) {	
 			JSONObject container = args.getJSONObject(0);
 			final String sessionKey = container.getString("sessionKey");
 			
