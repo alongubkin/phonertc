@@ -13,7 +13,7 @@
 
 .calling-container {
 	text-align: center;
-	margin-top: 100px;
+	margin-top: 20px;
 }
 
 .calling-container p {
@@ -27,4 +27,7 @@
 	height: 300px; 
 	background-color: #000; 
 	margin-bottom: 20px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-top: 20px;
 }
