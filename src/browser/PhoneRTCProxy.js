@@ -327,7 +327,14 @@ function scaleToFill(event) {
       targetRatio / actualRatio ; 
 
     if (lastScaleType !== scaleType || lastAdjustmentRatio !== adjustmentRatio) {
-      element.style.webkitTransform = scaleType + '(' + adjustmentRatio + ')'; 
+      var transform = scaleType + '(' + adjustmentRatio + ')';
+      
+      element.style.webkitTransform = transform;
+      element.style.MozTransform = transform;
+      element.style.msTransform = transform;
+      element.style.OTransform = transform;
+      element.style.transform = transform;
+
       lastScaleType = scaleType;
       lastAdjustmentRatio = adjustmentRatio;
     }
