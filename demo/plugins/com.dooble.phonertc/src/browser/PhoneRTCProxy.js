@@ -1,7 +1,11 @@
 cordova.define("com.dooble.phonertc.PhoneRTCProxy", function(require, exports, module) { var PeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 var IceCandidate = window.mozRTCIceCandidate || window.RTCIceCandidate;
 var SessionDescription = window.mozRTCSessionDescription || window.RTCSessionDescription;
+var MediaStream = window.webkitMediaStream || window.mozMediaStream || window.MediaStream;
+
 navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+
+var localVideoTrack, localAudioTrack;
 
 function Session(config, sendMessageCallback) {
   var self = this;
@@ -103,7 +107,22 @@ function Session(config, sendMessageCallback) {
 
 Session.prototype.call = function () {
   var self = this;
-  navigator.getUserMedia(self.config.streams, function (stream) {
+  
+  function getStream() {
+    var stream = new MediaStream();
+    
+    if (self.config.streams.audio) {
+      stream.addTrack(localAudioTrack);
+    }
+
+    if (self.config.streams.video) {
+      stream.addTrack(localVideoTrack);
+    }
+
+    return stream;
+  }
+
+  function call() {
     // create the peer connection
     self.peerConnection = new PeerConnection({
       iceServers: [
@@ -122,7 +141,7 @@ Session.prototype.call = function () {
     self.peerConnection.onaddstream = self.onRemoteStreamAdded;
 
     // attach the stream to the peer connection
-    self.peerConnection.addStream(stream);
+    self.peerConnection.addStream(getStream());
 
     // if initiator - create offer
     if (self.config.isInitiator) {
@@ -138,9 +157,32 @@ Session.prototype.call = function () {
         console.log(error);
       }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
     }
-  }, function (error) {
-    console.log(error);
-  });
+  }
+
+  var missingStreams = { 
+    video: self.config.streams.video && !localVideoTrack, 
+    audio: self.config.streams.audio && !localAudioTrack 
+  };
+
+  if (missingStreams.audio || missingStreams.video) {
+    navigator.getUserMedia(missingStreams, function (stream) {
+      if (missingStreams.audio) {
+        console.log('missing audio stream; retrieving');
+        localAudioTrack = stream.getAudioTracks()[0];
+      }
+
+      if (missingStreams.video) {
+        console.log('missing video stream; retrieving');
+        localVideoTrack = stream.getVideoTracks()[0];
+      }
+
+      call();
+    }, function (error) {
+      console.log(error);
+    });
+  } else {
+    call();
+  } 
 };
 
 Session.prototype.receiveMessage = function (message) {
@@ -228,12 +270,23 @@ module.exports = {
 
         refreshLocalVideoView();
 
-        navigator.getUserMedia({ audio: false, video: true }, function (stream) {
+        if (!localVideoTrack) {
+          navigator.getUserMedia({ audio: true, video: true }, function (stream) {
+            localAudioTrack = stream.getAudioTracks()[0];
+            localVideoTrack = stream.getVideoTracks()[0];
+
+            localVideoView.src = URL.createObjectURL(stream);
+            localVideoView.load();
+          }, function (error) {
+            console.log(error);
+          }); 
+        } else {
+          var stream = new MediaStream();
+          stream.addTrack(localVideoTrack);
+
           localVideoView.src = URL.createObjectURL(stream);
-          localVideoView.load();
-        }, function (error) {
-          console.log(error);
-        });
+          localVideoView.load();         
+        }
 
         document.body.appendChild(localVideoView);
       } else {    
@@ -241,6 +294,20 @@ module.exports = {
         refreshVideoContainer();
       }
     }
+  },
+  hideVideoView: function (success, error, options) {
+    console.log('PhoneRTCProxy: hideVideoView');
+    localVideoView.style.display = 'none';
+    remoteVideoViews.forEach(function (remoteVideoView) {
+      remoteVideoView.style.display = 'none';
+    });
+  },
+  showVideoView: function (success, error, options) {
+    console.log('PhoneRTCProxy: showVideoView');
+    localVideoView.style.display = '';
+    remoteVideoViews.forEach(function (remoteVideoView) {
+      remoteVideoView.style.display = '';
+    });
   }
 };
 
@@ -267,6 +334,10 @@ function addRemoteStream(stream) {
   refreshVideoContainer();
 }
 
+function getCenter(videoCount, videoSize, containerSize) {
+  return Math.round((containerSize - videoSize * videoCount) / 2); 
+}
+
 function refreshVideoContainer() {
   var n = remoteVideoViews.length;
 
@@ -274,19 +345,26 @@ function refreshVideoContainer() {
     return;
   }
 
-  var totalArea = videoConfig.containerParams.size[0] * videoConfig.containerParams.size[1];
-  var videoSize = Math.sqrt(totalArea / n);
+  var rows = n < 9 ? 2 : 3;
+  var videosInRow = n === 2 ? 2 : Math.ceil(n/rows);    
 
-  var videosInRow = videoConfig.containerParams.size[0] / videoSize;
-  var rows = Math.ceil(n / videosInRow);
+  var videoSize = videoConfig.containerParams.size[0] / videosInRow;
+  var actualRows = Math.ceil(n / videosInRow);
 
-  var x = videoConfig.containerParams.position[0];
-  var y = videoConfig.containerParams.position[1];
+  var y = getCenter(actualRows, 
+                    videoSize,
+                    videoConfig.containerParams.size[1])
+          + videoConfig.containerParams.position[1];
 
   var videoViewIndex = 0;
 
-  for (var row = 0; row < rows; row++) {
-    for (var video = 0; video < videosInRow; video++) {
+  for (var row = 0; row < rows && videoViewIndex < n; row++) {
+    var x = videoConfig.containerParams.position[0] + 
+      getCenter(row < rows - 1 || n % rows === 0 ? videosInRow : n - (Math.min(n, videoViewIndex + videosInRow) - 1), 
+                videoSize,
+                videoConfig.containerParams.size[0]);
+
+    for (var video = 0; video < videosInRow && videoViewIndex < n; video++) {
       var videoView = remoteVideoViews[videoViewIndex++];
       videoView.style.width = videoSize + 'px';
       videoView.style.height = videoSize + 'px';
@@ -328,7 +406,7 @@ function scaleToFill(event) {
 
     if (lastScaleType !== scaleType || lastAdjustmentRatio !== adjustmentRatio) {
       var transform = scaleType + '(' + adjustmentRatio + ')';
-      
+
       element.style.webkitTransform = transform;
       element.style.MozTransform = transform;
       element.style.msTransform = transform;
@@ -344,5 +422,6 @@ function scaleToFill(event) {
 
   refreshTransform();
 }
+
 require("cordova/exec/proxy").add("PhoneRTCPlugin", module.exports);
 });

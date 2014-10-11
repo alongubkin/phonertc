@@ -187,4 +187,14 @@ document.addEventListener('touchmove', function () {
 });
 
 exports.setVideoView = setVideoView;
+
+exports.hideVideoView = function () {
+  console.log('phonertc.js: hideVideoView');
+  exec(null, null, 'PhoneRTCPlugin', 'hideVideoView', []);
+};
+
+exports.showVideoView = function () {
+  console.log('phonertc.js: showVideoView');
+  exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
+};
 });
