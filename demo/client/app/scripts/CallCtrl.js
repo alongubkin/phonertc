@@ -90,9 +90,21 @@ angular.module('phonertcdemo')
       $rootScope.$broadcast('videoView.updatePosition');
     };
 
+    $scope.openSelectContactModal = function () {
+      cordova.plugins.phonertc.hideVideoView();
+      $scope.selectContactModal.show();
+    };
+
+    $scope.closeSelectContactModal = function () {
+      cordova.plugins.phonertc.showVideoView();
+      $scope.selectContactModal.hide();      
+    };
+
     $scope.addContact = function (newContact) {
       $scope.hideFromContactList.push(newContact);
       signaling.emit('sendMessage', newContact, { type: 'call' });
+
+      cordova.plugins.phonertc.showVideoView();
       $scope.selectContactModal.hide();
     };
 
