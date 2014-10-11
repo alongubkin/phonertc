@@ -205,8 +205,7 @@ class PhoneRTCPlugin : CDVPlugin {
         
         let videoSize = Int(Float(self.videoConfig!.container.width) / Float(videosInRow))
         let actualRows = Int(ceil(Float(n) / Float(videosInRow)))
-        println("rows: \(rows), videosInRow: \(videosInRow), videoSize: \(videoSize), actualRows: \(actualRows)")
-        
+ 
         var y = getCenter(actualRows,
             videoSize: videoSize,
             containerSize: self.videoConfig!.container.height)
