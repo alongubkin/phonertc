@@ -11,6 +11,7 @@ angular.module('phonertcdemo')
     $scope.allContacts = ContactsService.onlineUsers;
     $scope.contacts = {};
     $scope.hideFromContactList = [$scope.contactName];
+    $scope.muted = false;
 
     $ionicModal.fromTemplateUrl('templates/select_contact.html', {
       scope: $scope,
@@ -112,6 +113,16 @@ angular.module('phonertcdemo')
       return function (item) {
         return $scope.hideFromContactList.indexOf(item) === -1;
       };
+    };
+
+    $scope.toggleMute = function () {
+      $scope.muted = !$scope.muted;
+
+      Object.keys($scope.contacts).forEach(function (contact) {
+        var session = $scope.contacts[contact];
+        session.streams.audio = !$scope.muted;
+        session.renegotiate();
+      });
     };
 
     function onMessageReceive (name, message) {
