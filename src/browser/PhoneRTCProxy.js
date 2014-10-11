@@ -332,7 +332,7 @@ function refreshVideoContainer() {
   }
 
   var rows = n < 9 ? 2 : 3;
-  var videosInRow = n === 2 ? 2 : Math.ceil(n/rows);
+  var videosInRow = n === 2 ? 2 : Math.ceil(n/rows);    
 
   var videoSize = videoConfig.containerParams.size[0] / videosInRow;
   var actualRows = Math.ceil(n / videosInRow);
@@ -351,7 +351,7 @@ function refreshVideoContainer() {
                 videoConfig.containerParams.size[0]);
 
     for (var video = 0; video < videosInRow && videoViewIndex < n; video++) {
-      var videoView = remoteVideoViews[videoViewIndex];
+      var videoView = remoteVideoViews[videoViewIndex++];
       videoView.style.width = videoSize + 'px';
       videoView.style.height = videoSize + 'px';
 
@@ -359,7 +359,6 @@ function refreshVideoContainer() {
       videoView.style.top = y + 'px';
 
       x += videoSize;
-      videoViewIndex++;
     }
 
     y += videoSize;
