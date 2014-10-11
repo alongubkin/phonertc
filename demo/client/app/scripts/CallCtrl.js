@@ -152,8 +152,9 @@ angular.module('phonertcdemo')
           
           break;
 
-        case 'add_to_group':            
+        case 'add_to_group':
           message.contacts.forEach(function (contact) {
+            $scope.hideFromContactList.push(contact);
             call(message.isInitiator, contact);
 
             if (!message.isInitiator) {
