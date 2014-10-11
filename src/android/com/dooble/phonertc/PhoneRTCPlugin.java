@@ -40,6 +40,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private VideoGLView _videoView;
 	private List<VideoTrackRendererPair> _remoteVideos;
 	private VideoTrackRendererPair _localVideo;
+	private WebView.LayoutParams _videoParams;
 	
 	public PhoneRTCPlugin() {
 		_remoteVideos = new ArrayList<VideoTrackRendererPair>();
@@ -133,29 +134,21 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 								"Failed to initializeAndroidGlobals");
 						_peerConnectionFactory = new PeerConnectionFactory();
 					}
-					
-					@SuppressWarnings("deprecation")
-					WebView.LayoutParams params = new WebView.LayoutParams(
+
+					_videoParams = new WebView.LayoutParams(
 							_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(), 
 							_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio(), 
 							_videoConfig.getContainer().getX() * _videoConfig.getDevicePixelRatio(), 
 							_videoConfig.getContainer().getY() * _videoConfig.getDevicePixelRatio());
 				
 					if (_videoView == null) {
-						Point size = new Point();
-						size.set(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(), 
-								_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio());
-				
-						_videoView = new VideoGLView(cordova.getActivity(), size);
-						VideoRendererGui.setView(_videoView);
-					
-						webView.addView(_videoView, params);
-					
+						createVideoView();
+						
 						if (_videoConfig.getLocal() != null && _localVideo == null) {
 							initializeLocalVideoTrack();
 						}
 					} else {						
-						_videoView.setLayoutParams(params);
+						_videoView.setLayoutParams(_videoParams);
 					}
 				}
 			});
@@ -246,54 +239,86 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		refreshVideoView();
 	}
 
+	private void createVideoView() {
+		Point size = new Point();
+		size.set(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(), 
+				_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio());
+
+		_videoView = new VideoGLView(cordova.getActivity(), size);
+		VideoRendererGui.setView(_videoView);
+	
+		webView.addView(_videoView, _videoParams);
+	}
+	
 	private void refreshVideoView() {
 		int n = _remoteVideos.size();
 		
-		if (n > 0) {			
-			int totalArea = _videoConfig.getContainer().getWidth() * _videoConfig.getContainer().getHeight();
-			int videoSize = (int)Math.sqrt((float)totalArea / n);
+		for (VideoTrackRendererPair pair : _remoteVideos) {
+			if (pair.getVideoRenderer() != null) {
+				pair.getVideoTrack().removeRenderer(pair.getVideoRenderer());
+			}
 			
-			int videosInRow = (int)((float)_videoConfig.getContainer().getWidth() / videoSize);
-			int rows = (int)Math.ceil((float)n / videosInRow);
+			pair.setVideoRenderer(null);
+		}
+		
+		if (_localVideo != null && _localVideo.getVideoRenderer() != null) {
+			_localVideo.getVideoTrack().removeRenderer(_localVideo.getVideoRenderer());
+			_localVideo.setVideoRenderer(null);
+		}
+		
+		if (_videoView != null) {
+			webView.removeView(_videoView);
+			createVideoView();
+		}
+		
+		if (n > 0) {			
+			int rows = n < 9 ? 2 : 3;
+			int videosInRow = n == 2 ? 2 : (int)Math.ceil((float)n / rows);
+			
+			int videoSize = (int)((float)_videoConfig.getContainer().getWidth() / videosInRow);
+			int actualRows = (int)Math.ceil((float)n / videosInRow);
+			
+			int y = getCenter(actualRows, videoSize, _videoConfig.getContainer().getHeight());
 			
 			int videoIndex = 0;
-			
 			int videoSizeAsPercentage = getPercentage(videoSize, _videoConfig.getContainer().getWidth());
 			
-			for (int row = 0; row < rows; row++) {
-				int y = getPercentage(row, rows);
+			for (int row = 0; row < rows && videoIndex < n; row++) {
+				int x = getCenter(row < row - 1 || n % rows == 0 ? 
+									videosInRow : n - (Math.min(n, videoIndex + videosInRow) - 1),
+								videoSize,
+								_videoConfig.getContainer().getWidth());
 				
-				for (int video = 0; video < videosInRow; video++) {
+				for (int video = 0; video < videosInRow && videoIndex < n; video++) {
 					VideoTrackRendererPair pair = _remoteVideos.get(videoIndex++);
-					
-					if (pair.getVideoRenderer() != null) {
-						pair.getVideoTrack().removeRenderer(pair.getVideoRenderer());
-					}
-					
-					int x = getPercentage(video, videosInRow);
-					
+
 					pair.setVideoRenderer(new VideoRenderer(
 							VideoRendererGui.create(x, y, videoSizeAsPercentage, videoSizeAsPercentage, 
 									VideoRendererGui.ScalingType.SCALE_FILL)));
 				
 					pair.getVideoTrack().addRenderer(pair.getVideoRenderer());
+					
+					x += videoSizeAsPercentage;
 				}
+				
+				y += getPercentage(videoSize, _videoConfig.getContainer().getHeight());
 			}
 		}
 			
 		if (_videoConfig.getLocal() != null && _localVideo != null) {
-			if (_localVideo.getVideoRenderer() != null) {
-				_localVideo.getVideoTrack().removeRenderer(_localVideo.getVideoRenderer());
-			}
-			
+
 			_localVideo.getVideoTrack().addRenderer(new VideoRenderer(
-					VideoRendererGui.create(getPercentage(_videoConfig.getLocal().getX(), _videoConfig.getContainer().getX()), 
-											getPercentage(_videoConfig.getLocal().getY(), _videoConfig.getContainer().getY()), 
+					VideoRendererGui.create(getPercentage(_videoConfig.getLocal().getX(), _videoConfig.getContainer().getWidth()), 
+											getPercentage(_videoConfig.getLocal().getY(), _videoConfig.getContainer().getHeight()), 
 											getPercentage(_videoConfig.getLocal().getWidth(), _videoConfig.getContainer().getWidth()), 
 											getPercentage(_videoConfig.getLocal().getHeight(), _videoConfig.getContainer().getHeight()), 
 											VideoRendererGui.ScalingType.SCALE_FILL)));
 			
 		}
+	}
+	
+	int getCenter(int videoCount, int videoSize, int containerSize) {
+		return getPercentage((int)Math.round((containerSize - videoSize * videoCount) / 2.0), containerSize);
 	}
 	
 	PluginResult getSessionKeyPluginResult(String sessionKey) throws JSONException {
