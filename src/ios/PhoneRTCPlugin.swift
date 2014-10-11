@@ -120,6 +120,26 @@ class PhoneRTCPlugin : CDVPlugin {
         }
     }
     
+    func hideVideoView(command: CDVInvokedUrlCommand) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.localVideoView!.hidden = true;
+            
+            for remoteVideoView in self.remoteVideoViews {
+                remoteVideoView.hidden = true;
+            }
+        }
+    }
+    
+    func showVideoView(command: CDVInvokedUrlCommand) {
+        dispatch_async(dispatch_get_main_queue()) {
+            self.localVideoView!.hidden = false;
+            
+            for remoteVideoView in self.remoteVideoViews {
+                remoteVideoView.hidden = false;
+            }
+        }
+    }
+    
     func sendMessage(callbackId: String, message: NSData) {
         let json = NSJSONSerialization.JSONObjectWithData(message,
             options: NSJSONReadingOptions.MutableLeaves,

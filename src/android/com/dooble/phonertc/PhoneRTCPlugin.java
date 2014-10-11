@@ -8,6 +8,7 @@ import java.util.UUID;
 
 import android.app.Activity;
 import android.graphics.Point;
+import android.view.View;
 import android.webkit.WebView;
 
 import org.apache.cordova.CallbackContext;
@@ -154,6 +155,18 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			});
 			
 			return true;
+		} else if (action.equals("hideVideoView")) {
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					_videoView.setVisibility(View.GONE);
+				}
+			});
+		} else if (action.equals("showVideoView")) {
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					_videoView.setVisibility(View.VISIBLE);
+				}
+			});		
 		}
 
 		callbackContext.error("Invalid action: " + action);
@@ -306,7 +319,6 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		}
 			
 		if (_videoConfig.getLocal() != null && _localVideo != null) {
-
 			_localVideo.getVideoTrack().addRenderer(new VideoRenderer(
 					VideoRendererGui.create(getPercentage(_videoConfig.getLocal().getX(), _videoConfig.getContainer().getWidth()), 
 											getPercentage(_videoConfig.getLocal().getY(), _videoConfig.getContainer().getHeight()), 

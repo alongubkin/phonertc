@@ -187,3 +187,11 @@ document.addEventListener('touchmove', function () {
 });
 
 exports.setVideoView = setVideoView;
+
+exports.hideVideoView = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'hideVideoView', []);
+};
+
+exports.showVideoView = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
+};

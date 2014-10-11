@@ -294,6 +294,18 @@ module.exports = {
         refreshVideoContainer();
       }
     }
+  },
+  hideVideoView: function (success, error, options) {
+    localVideoView.style.display = 'none';
+    remoteVideoViews.forEach(function (remoteVideoView) {
+      remoteVideoView.style.display = 'none';
+    });
+  },
+  showVideoView: function (success, error, options) {
+    localVideoView.style.display = '';
+    remoteVideoViews.forEach(function (remoteVideoView) {
+      remoteVideoView.style.display = '';
+    });
   }
 };
 
@@ -408,4 +420,5 @@ function scaleToFill(event) {
 
   refreshTransform();
 }
+
 require("cordova/exec/proxy").add("PhoneRTCPlugin", module.exports);
