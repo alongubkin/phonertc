@@ -123,6 +123,21 @@ Session.prototype.createOrUpdateStream = function () {
   this.peerConnection.addStream(this.localStream);
 };
 
+Session.prototype.sendOffer = function () {
+  var self = this;
+  self.peerConnection.createOffer(function (sdp) {
+    self.peerConnection.setLocalDescription(sdp, function () {
+      console.log('Set session description success.');
+    }, function (error) {
+      console.log(error);
+    });
+
+    self.sendMessage(sdp);
+  }, function (error) {
+    console.log(error);
+  }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
+}
+
 Session.prototype.call = function () {
   var self = this;
 
@@ -149,17 +164,7 @@ Session.prototype.call = function () {
 
     // if initiator - create offer
     if (self.config.isInitiator) {
-      self.peerConnection.createOffer(function (sdp) {
-        self.peerConnection.setLocalDescription(sdp, function () {
-          console.log('Set session description success.');
-        }, function (error) {
-          console.log(error);
-        });
-
-        self.sendMessage(sdp);
-      }, function (error) {
-        console.log(error);
-      }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
+      self.sendOffer.call(self);
     }
   }
 
@@ -256,6 +261,7 @@ module.exports = {
     var session = sessions[options[0].sessionKey];
     session.config = options[0].config;
     session.createOrUpdateStream();
+    // session.sendOffer();
   },
   disconnect: function (success, error, options) {
     sessions[options[0].sessionKey].disconnect();
