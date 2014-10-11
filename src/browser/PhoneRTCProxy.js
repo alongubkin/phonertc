@@ -106,21 +106,21 @@ function Session(config, sendMessageCallback) {
 }
 
 Session.prototype.createOrUpdateStream = function () {
-  if (self.localStream) {
-    self.peerConnection.remomveStream(self.localStream);
+  if (this.localStream) {
+    this.peerConnection.removeStream(this.localStream);
   }
 
-  self.localStream = new MediaStream();
+  this.localStream = new MediaStream();
   
-  if (self.config.streams.audio) {
-    self.localStream.addTrack(localAudioTrack);
+  if (this.config.streams.audio) {
+    this.localStream.addTrack(localAudioTrack);
   }
 
-  if (self.config.streams.video) {
-    self.localStream.addTrack(localVideoTrack);
+  if (this.config.streams.video) {
+    this.localStream.addTrack(localVideoTrack);
   }
 
-  self.peerConnection.addStream(self.localStream);
+  this.peerConnection.addStream(this.localStream);
 };
 
 Session.prototype.call = function () {
@@ -145,7 +145,7 @@ Session.prototype.call = function () {
     self.peerConnection.onaddstream = self.onRemoteStreamAdded;
 
     // attach the stream to the peer connection
-    self.createOrUpdateStream();
+    self.createOrUpdateStream.call(self);
 
     // if initiator - create offer
     if (self.config.isInitiator) {
