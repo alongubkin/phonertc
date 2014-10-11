@@ -1,16 +1,27 @@
 angular.module('phonertcdemo')
 
-  .controller('CallCtrl', function ($scope, $state, $rootScope, $timeout, $stateParams, signaling) {
+  .controller('CallCtrl', function ($scope, $state, $rootScope, $timeout, $ionicModal, $stateParams, signaling, ContactsService) {
     var duplicateMessages = [];
-    var callStarted = false;
 
     $scope.callInProgress = false;
+
     $scope.isCalling = $stateParams.isCalling === 'true';
     $scope.contactName = $stateParams.contactName;
-    
-    var session;
 
-    function call(isInitiator) {
+    $scope.allContacts = ContactsService.onlineUsers;
+    $scope.contacts = {};
+    $scope.hideFromContactList = [$scope.contactName];
+
+    $ionicModal.fromTemplateUrl('templates/select_contact.html', {
+      scope: $scope,
+      animation: 'slide-in-up'
+    }).then(function(modal) {
+      $scope.selectContactModal = modal;
+    });
+
+    function call(isInitiator, contactName) {
+      console.log(new Date().toString() + ': calling to ' + contactName + ', isInitiator: ' + isInitiator);
+
       var config = { 
         isInitiator: isInitiator,
         turn: {
@@ -24,66 +35,74 @@ angular.module('phonertcdemo')
         }
       };
 
-      session = new cordova.plugins.phonertc.Session(config);
+      var session = new cordova.plugins.phonertc.Session(config);
       
       session.on('sendMessage', function (data) { 
-        callStarted = true;
-        signaling.emit('sendMessage', $scope.contactName, { 
+        signaling.emit('sendMessage', contactName, { 
           type: 'phonertc_handshake',
           data: JSON.stringify(data)
         });
       });
 
       session.on('answer', function () {
-        alert('Answered!');
-        callStarted = true;
+        console.log('Answered!');
       });
 
       session.on('disconnect', function () {
-        signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
+        signaling.emit('sendMessage', contactName, { type: 'ignore' });
         $state.go('app.contacts');
       });
 
       session.call();
+
+      $scope.contacts[contactName] = session; 
     }
 
     if ($scope.isCalling) {
-      signaling.emit('sendMessage', $scope.contactName, { type: 'call' });
+      signaling.emit('sendMessage', $stateParams.contactName, { type: 'call' });
     }
 
     $scope.ignore = function () {
-      if (callStarted) { 
-        session.disconnect();
+      var contactNames = Object.keys($scope.contacts);
+      if (contactNames.length > 0) { 
+        $scope.contacts[contactNames[0]].disconnect();
       } else {
-        signaling.emit('sendMessage', $scope.contactName, { type: 'ignore' });
+        signaling.emit('sendMessage', $stateParams.contactName, { type: 'ignore' });
         $state.go('app.contacts');
       }
     };
 
     $scope.answer = function () {
       if ($scope.callInProgress) { return; }
+
       $scope.callInProgress = true;
       $timeout($scope.updateVideoPosition, 1000);
 
-      call(false);
+      call(false, $stateParams.contactName);
 
       setTimeout(function () {
         console.log('sending answer');
-        signaling.emit('sendMessage', $scope.contactName, { type: 'answer' });
+        signaling.emit('sendMessage', $stateParams.contactName, { type: 'answer' });
       }, 3500);
     };
 
     $scope.updateVideoPosition = function () {
       $rootScope.$broadcast('videoView.updatePosition');
-    }
+    };
+
+    $scope.addContact = function (newContact) {
+      $scope.hideFromContactList.push(newContact);
+      signaling.emit('sendMessage', newContact, { type: 'call' });
+      $scope.selectContactModal.hide();
+    };
+
+    $scope.hideCurrentUsers = function () {
+      return function (item) {
+        return $scope.hideFromContactList.indexOf(item) === -1;
+      };
+    };
 
     function onMessageReceive (name, message) {
-      console.log('messageReceived', name, $scope.contactName, message);
-
-      if (name !== $scope.contactName) {
-        return;
-      }
-
       switch (message.type) {
         case 'answer':
           $scope.$apply(function () {
@@ -91,12 +110,34 @@ angular.module('phonertcdemo')
             $timeout($scope.updateVideoPosition, 1000);
           });
 
-          call(true);
+          var existingContacts = Object.keys($scope.contacts);
+          if (existingContacts.length !== 0) {
+            signaling.emit('sendMessage', name, {
+              type: 'add_to_group',
+              contacts: existingContacts,
+              isInitiator: false
+            });
+          }
+
+          call(true, name);
           break;
 
         case 'ignore':
-          if (callStarted) {
-            session.disconnect();
+          var len = Object.keys($scope.contacts).length;
+          if (len > 0) { 
+            if ($scope.contacts[name]) {
+              $scope.contacts[name].disconnect();
+              delete $scope.contacts[name];
+            }
+
+            var i = $scope.hideFromContactList.indexOf(name);
+            if (i > -1) {
+              $scope.hideFromContactList.splice(i, 1);
+            }
+
+            if (Object.keys($scope.contacts).length === 0) {
+              $state.go('app.contacts');
+            }
           } else {
             $state.go('app.contacts');
           }
@@ -105,12 +146,27 @@ angular.module('phonertcdemo')
 
         case 'phonertc_handshake':
           if (duplicateMessages.indexOf(message.data) === -1) {
-            session.receiveMessage(JSON.parse(message.data));
+            $scope.contacts[name].receiveMessage(JSON.parse(message.data));
             duplicateMessages.push(message.data);
-          } else {
-            console.log('-----> prevented duplicate message');
           }
           
+          break;
+
+        case 'add_to_group':            
+          message.contacts.forEach(function (contact) {
+            call(message.isInitiator, contact);
+
+            if (!message.isInitiator) {
+              $timeout(function () {
+                signaling.emit('sendMessage', contact, { 
+                  type: 'add_to_group',
+                  contacts: [ContactsService.currentName],
+                  isInitiator: true
+                });
+              }, 5000);
+            }
+          });
+
           break;
       } 
     }
@@ -118,7 +174,6 @@ angular.module('phonertcdemo')
     signaling.on('messageReceived', onMessageReceive);
 
     $scope.$on('$destroy', function() { 
-      console.log('remove listener');
       signaling.removeListener('messageReceived', onMessageReceive);
     });
   });

@@ -9,8 +9,8 @@ angular.module('phonertcdemo')
           cordova.plugins.phonertc.setVideoView({
             container: element[0],
             local: { 
-              position: [0, 0],
-              size: [100, 100]
+              position: [240, 240],
+              size: [50, 50]
             }
           });
         }

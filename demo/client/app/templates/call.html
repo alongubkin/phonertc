@@ -1,4 +1,8 @@
 <ion-view title="Call" hide-back-button="true">
+  <ion-nav-buttons side="right">
+    <button class="button button-icon icon ion-plus-round" 
+            ng-click="selectContactModal.show()"></button>
+  </ion-nav-buttons>
   <ion-content on-scroll="updateVideoPosition()" on-scroll-complete="updateVideoPosition()">
     <div class="calling-container" ng-if="isCalling && !callInProgress">
       <p>Calling to <span class="balanced">{{ contactName }}</span>...</p>

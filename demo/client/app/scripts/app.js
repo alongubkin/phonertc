@@ -50,6 +50,8 @@ angular.module('phonertcdemo', ['ionic',
     signaling.on('messageReceived', function (name, message) {
       switch (message.type) {
         case 'call':
+          if ($state.current.name === 'app.call') { return; }
+          
           $state.go('app.call', { isCalling: false, contactName: name });
           break;
       }
