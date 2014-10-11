@@ -9,6 +9,7 @@ class Session {
     var queuedRemoteCandidates: [RTCICECandidate]?
     var peerConnectionFactory: RTCPeerConnectionFactory
     var callbackId: String
+    var stream: RTCMediaStream?
     
     init(plugin: PhoneRTCPlugin,
          peerConnectionFactory: RTCPeerConnectionFactory,
@@ -56,10 +57,30 @@ class Session {
                 delegate: self.pcObserver)
         
         // create a media stream and add audio and/or video tracks
-        var mediaStream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
+        createOrUpdateStream()
+        
+        // create offer if initiator
+        if self.config.isInitiator {
+            self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
+                constraints: constraints)
+        }
+    }
+    
+    func createOrUpdateStream() {
+        if self.stream != nil {
+            self.peerConnection.removeStream(self.stream)
+            self.stream = nil
+        }
+        
+        self.stream = peerConnectionFactory.mediaStreamWithLabel("ARDAMS")
         
         if self.config.streams.audio {
-            mediaStream.addAudioTrack(peerConnectionFactory.audioTrackWithID("ARDAMSa0"))
+            // init local audio track if needed
+            if self.plugin.localAudioTrack == nil {
+                self.plugin.initLocalAudioTrack()
+            }
+            
+            self.stream!.addAudioTrack(self.plugin.localAudioTrack!)
         }
         
         if self.config.streams.video {
@@ -68,16 +89,10 @@ class Session {
                 self.plugin.initLocalVideoTrack()
             }
             
-            mediaStream.addVideoTrack(self.plugin.localVideoTrack!)
+            self.stream!.addVideoTrack(self.plugin.localVideoTrack!)
         }
         
-        self.peerConnection.addStream(mediaStream, constraints: self.constraints)
-        
-        // create offer if initiator
-        if self.config.isInitiator {
-            self.peerConnection.createOfferWithDelegate(SessionDescriptionDelegate(session: self),
-                constraints: constraints)
-        }
+        self.peerConnection.addStream(self.stream, constraints: self.constraints)
     }
     
     func receiveMessage(message: String) {
@@ -126,7 +141,7 @@ class Session {
             println("Invalid message \(message)")
         }
     }
-    
+
     func disconnect() {
         
     }

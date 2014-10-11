@@ -105,22 +105,26 @@ function Session(config, sendMessageCallback) {
   };
 }
 
+Session.prototype.createOrUpdateStream = function () {
+  if (self.localStream) {
+    self.peerConnection.remomveStream(self.localStream);
+  }
+
+  self.localStream = new MediaStream();
+  
+  if (self.config.streams.audio) {
+    self.localStream.addTrack(localAudioTrack);
+  }
+
+  if (self.config.streams.video) {
+    self.localStream.addTrack(localVideoTrack);
+  }
+
+  self.peerConnection.addStream(self.localStream);
+};
+
 Session.prototype.call = function () {
   var self = this;
-  
-  function getStream() {
-    var stream = new MediaStream();
-    
-    if (self.config.streams.audio) {
-      stream.addTrack(localAudioTrack);
-    }
-
-    if (self.config.streams.video) {
-      stream.addTrack(localVideoTrack);
-    }
-
-    return stream;
-  }
 
   function call() {
     // create the peer connection
@@ -141,7 +145,7 @@ Session.prototype.call = function () {
     self.peerConnection.onaddstream = self.onRemoteStreamAdded;
 
     // attach the stream to the peer connection
-    self.peerConnection.addStream(getStream());
+    self.createOrUpdateStream();
 
     // if initiator - create offer
     if (self.config.isInitiator) {
@@ -247,6 +251,11 @@ module.exports = {
   receiveMessage: function (success, error, options) {
     sessions[options[0].sessionKey]
       .receiveMessage(JSON.parse(options[0].message));
+  },
+  renegotiate: function (success, error, options) {
+    var session = sessions[options[0].sessionKey];
+    session.config = options[0].config;
+    session.createOrUpdateStream();
   },
   disconnect: function (success, error, options) {
     sessions[options[0].sessionKey].disconnect();

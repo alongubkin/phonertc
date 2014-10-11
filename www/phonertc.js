@@ -137,6 +137,13 @@ Session.prototype.receiveMessage = function (data) {
   }]);
 };
 
+Session.prototype.renegotiate = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
+    config: this.config,
+    sessionKey: this.__sessionKey
+  }]);
+};
+
 Session.prototype.close = function () {
   exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
     sessionKey: this.__sessionKey 

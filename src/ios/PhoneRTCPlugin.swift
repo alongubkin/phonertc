@@ -9,9 +9,11 @@ class PhoneRTCPlugin : CDVPlugin {
     var videoConfig: VideoConfig?
     var videoCapturer: RTCVideoCapturer?
     var videoSource: RTCVideoSource?
-    var localVideoTrack: RTCVideoTrack?
     var localVideoView: RTCEAGLVideoView?
     var remoteVideoViews: [RTCEAGLVideoView] = []
+    
+    var localVideoTrack: RTCVideoTrack?
+    var localAudioTrack: RTCAudioTrack?
     
     override init(webView: UIWebView) {
         peerConnectionFactory = RTCPeerConnectionFactory()
@@ -66,6 +68,18 @@ class PhoneRTCPlugin : CDVPlugin {
         
         dispatch_async(dispatch_get_main_queue()) {
             self.sessions[sessionKey]!.receiveMessage(message)
+        }
+    }
+    
+    func renegotiate(command: CDVInvokedUrlCommand) {
+        let container: AnyObject = command.arguments[0]
+        let sessionKey = container.objectForKey("sessionKey")! as String
+        let config: AnyObject = container.objectForKey("config")!
+        
+        dispatch_async(dispatch_get_main_queue()) {
+            let session = self.sessions[sessionKey]!
+            session.config = SessionConfig(data: config)
+            session.createOrUpdateStream()
         }
     }
     
@@ -173,6 +187,10 @@ class PhoneRTCPlugin : CDVPlugin {
         self.webView.bringSubviewToFront(view)
         
         return view
+    }
+    
+    func initLocalAudioTrack() {
+        localAudioTrack = peerConnectionFactory.audioTrackWithID("ARDAMSa0")
     }
     
     func initLocalVideoTrack() {

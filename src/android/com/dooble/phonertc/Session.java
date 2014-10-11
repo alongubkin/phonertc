@@ -73,17 +73,7 @@ public class Session {
 				.createPeerConnection(iceServers, pcMediaConstraints, _pcObserver);
 		
 		// Initialize local stream
-		_localStream = _plugin.getPeerConnectionFactory().createLocalMediaStream("ARDAMS");
-		
-		if (_config.isAudioStreamEnabled() && _plugin.getLocalAudioTrack() != null) {
-			_localStream.addTrack(_plugin.getLocalAudioTrack());
-		}
-		 
-		if (_config.isVideoStreamEnabled() && _plugin.getLocalVideoTrack() != null) {
-			_localStream.addTrack(_plugin.getLocalVideoTrack());
-		}
-		
-		_peerConnection.addStream(_localStream, new MediaConstraints());
+		createOrUpdateStream();
 
 		// Create offer if initiator
 		if (_config.isInitiator()) {
@@ -137,6 +127,25 @@ public class Session {
 		} catch (JSONException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public void createOrUpdateStream() {
+		if (_localStream != null) {
+			_peerConnection.removeStream(_localStream);
+			_localStream = null;
+		}
+		
+		_localStream = _plugin.getPeerConnectionFactory().createLocalMediaStream("ARDAMS");
+		
+		if (_config.isAudioStreamEnabled() && _plugin.getLocalAudioTrack() != null) {
+			_localStream.addTrack(_plugin.getLocalAudioTrack());
+		}
+		 
+		if (_config.isVideoStreamEnabled() && _plugin.getLocalVideoTrack() != null) {
+			_localStream.addTrack(_plugin.getLocalVideoTrack());
+		}
+		
+		_peerConnection.addStream(_localStream, new MediaConstraints());
 	}
 	
 	void sendMessage(JSONObject data) {
@@ -227,6 +236,10 @@ public class Session {
 		} catch (JSONException e) {
 
 		}
+	}
+	
+	public void setConfig(SessionConfig config) {
+		_config = config;
 	}
 
 	private class PCObserver implements PeerConnection.Observer {
