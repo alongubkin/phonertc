@@ -200,19 +200,28 @@ class PhoneRTCPlugin : CDVPlugin {
             return
         }
         
-        let totalArea = self.videoConfig!.container.width * self.videoConfig!.container.height
-        let videoSize = sqrt(Float(totalArea) / Float(n))
+        let rows = n < 9 ? 2 : 3
+        let videosInRow = n == 2 ? 2 : Int(ceil(Float(n) / Float(rows)))
         
-        let videosInRow = Int(Float(self.videoConfig!.container.width) / videoSize)
-        let rows = Int(ceil(Float(n) / Float(videosInRow)))
+        let videoSize = Int(Float(self.videoConfig!.container.width) / Float(videosInRow))
+        let actualRows = Int(ceil(Float(n) / Float(videosInRow)))
+        println("rows: \(rows), videosInRow: \(videosInRow), videoSize: \(videoSize), actualRows: \(actualRows)")
         
-        var x = self.videoConfig!.container.x
-        var y = self.videoConfig!.container.y
-        
+        var y = getCenter(actualRows,
+            videoSize: videoSize,
+            containerSize: self.videoConfig!.container.height)
+                + self.videoConfig!.container.y
+      
         var videoViewIndex = 0
         
-        for var row = 0; row < rows; row++ {
-            for var video = 0; video < videosInRow; video++ {
+        for var row = 0; row < rows && videoViewIndex < n; row++ {
+            var x = getCenter(row < row - 1 || n % rows == 0 ?
+                                videosInRow : n - (min(n, videoViewIndex + videosInRow) - 1),
+                videoSize: videoSize,
+                containerSize: self.videoConfig!.container.width)
+                    + self.videoConfig!.container.x
+            
+            for var video = 0; video < videosInRow && videoViewIndex < n; video++ {
                 let videoView = self.remoteVideoViews[videoViewIndex++]
                 videoView.frame = CGRectMake(
                     CGFloat(x),
@@ -226,5 +235,9 @@ class PhoneRTCPlugin : CDVPlugin {
             
             y += Int(videoSize)
         }
+    }
+    
+    func getCenter(videoCount: Int, videoSize: Int, containerSize: Int) -> Int {
+        return lroundf(Float(containerSize - videoSize * videoCount) / 2.0)
     }
 }

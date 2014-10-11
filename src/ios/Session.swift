@@ -36,10 +36,22 @@ class Session {
     }
     
     func call() {
+        // create a list of ICE servers
+        var iceServers: [RTCICEServer] = []
+        iceServers.append(RTCICEServer(
+            URI: NSURL.URLWithString("stun:stun.l.google.com:19302"),
+            username: "",
+            password: ""))
+        
+        iceServers.append(RTCICEServer(
+            URI: NSURL.URLWithString(self.config.turn.host),
+            username: self.config.turn.username,
+            password: self.config.turn.password))
+        
         // initialize a PeerConnection
         self.pcObserver = PCObserver(session: self)
         self.peerConnection =
-            peerConnectionFactory.peerConnectionWithICEServers([],
+            peerConnectionFactory.peerConnectionWithICEServers(iceServers,
                 constraints: self.constraints,
                 delegate: self.pcObserver)
         
