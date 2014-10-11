@@ -332,13 +332,7 @@ function refreshVideoContainer() {
   }
 
   var rows = n < 9 ? 2 : 3;
-  var videosInRow;
-
-  if (n === 2) {
-    videosInRow = 2;
-  } else {
-    videosInRow = Math.ceil(n/rows);
-  }
+  var videosInRow = n === 2 ? 2 : Math.ceil(n/rows);
 
   var videoSize = videoConfig.containerParams.size[0] / videosInRow;
   var actualRows = Math.ceil(n / videosInRow);
