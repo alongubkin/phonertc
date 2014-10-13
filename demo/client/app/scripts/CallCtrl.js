@@ -12,7 +12,7 @@ angular.module('phonertcdemo')
     $scope.contacts = {};
     $scope.hideFromContactList = [$scope.contactName];
     $scope.muted = false;
-
+    
     $ionicModal.fromTemplateUrl('templates/select_contact.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -71,6 +71,13 @@ angular.module('phonertcdemo')
         signaling.emit('sendMessage', $stateParams.contactName, { type: 'ignore' });
         $state.go('app.contacts');
       }
+    };
+
+    $scope.end = function () {
+      Object.keys($scope.contacts).forEach(function (contact) {
+        $scope.contacts[contact].close();
+        delete $scope.contacts[contact];
+      });
     };
 
     $scope.answer = function () {
@@ -149,7 +156,7 @@ angular.module('phonertcdemo')
           var len = Object.keys($scope.contacts).length;
           if (len > 0) { 
             if ($scope.contacts[name]) {
-              $scope.contacts[name].disconnect();
+              $scope.contacts[name].close();
               delete $scope.contacts[name];
             }
 

@@ -46,7 +46,8 @@ class PhoneRTCPlugin : CDVPlugin {
             plugin: self,
             peerConnectionFactory: peerConnectionFactory,
             config: config,
-            callbackId: command.callbackId
+            callbackId: command.callbackId,
+            sessionKey: sessionKey
         )
         
         sessions[sessionKey] = session
@@ -66,7 +67,7 @@ class PhoneRTCPlugin : CDVPlugin {
         let sessionKey = container.objectForKey("sessionKey")! as String
         let message = container.objectForKey("message")! as String
         
-        dispatch_async(dispatch_get_main_queue()) {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
             self.sessions[sessionKey]!.receiveMessage(message)
         }
     }
@@ -80,6 +81,15 @@ class PhoneRTCPlugin : CDVPlugin {
             let session = self.sessions[sessionKey]!
             session.config = SessionConfig(data: config)
             session.createOrUpdateStream()
+        }
+    }
+    
+    func disconnect(command: CDVInvokedUrlCommand) {
+        let container: AnyObject = command.arguments[0]
+        let sessionKey = container.objectForKey("sessionKey")! as String
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+            self.sessions[sessionKey]!.disconnect(true)
         }
     }
     
@@ -107,6 +117,7 @@ class PhoneRTCPlugin : CDVPlugin {
                     // remove the local video view if it exists and
                     // the new config doesn't have the `local` property
                     if self.localVideoView != nil {
+                        self.localVideoView!.hidden = true
                         self.localVideoView!.removeFromSuperview()
                         self.localVideoView = nil
                     }
@@ -125,7 +136,7 @@ class PhoneRTCPlugin : CDVPlugin {
                     } else {
                         // otherwise, create the local video view
                         self.localVideoView = self.createVideoView(params: params)
-                        self.localVideoView?.videoTrack = self.localVideoTrack!
+                        self.localVideoView!.videoTrack = self.localVideoTrack!
                     }
                 }
                 
@@ -231,6 +242,20 @@ class PhoneRTCPlugin : CDVPlugin {
         }
     }
     
+    func removeRemoteVideoTrack(videoTrack: RTCVideoTrack) {
+        for var i = 0; i < self.remoteVideoViews.count; i++ {
+            let videoView = self.remoteVideoViews[i]
+            if videoView.videoTrack == videoTrack {
+                videoView.hidden = true
+                videoView.removeFromSuperview()
+                self.remoteVideoViews.removeAtIndex(i)
+                return
+            }
+        }
+        
+        self.refreshVideoContainer()
+    }
+    
     func refreshVideoContainer() {
         let n = self.remoteVideoViews.count
         
@@ -276,5 +301,26 @@ class PhoneRTCPlugin : CDVPlugin {
     
     func getCenter(videoCount: Int, videoSize: Int, containerSize: Int) -> Int {
         return lroundf(Float(containerSize - videoSize * videoCount) / 2.0)
+    }
+    
+    func onSessionDisconnect(sessionKey: String) {
+        self.sessions.removeValueForKey(sessionKey)
+        
+        if self.sessions.count == 0 {
+            dispatch_sync(dispatch_get_main_queue()) {
+                if self.localVideoView != nil {
+                    self.localVideoView!.hidden = true
+                    self.localVideoView!.removeFromSuperview()
+                
+                    self.localVideoView = nil
+                }
+            }
+            
+            self.localVideoTrack = nil
+            self.localAudioTrack = nil
+            
+            self.videoSource = nil
+            self.videoCapturer = nil
+        }
     }
 }

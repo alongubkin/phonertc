@@ -28,7 +28,13 @@
     </div>
 
     <div class="calling-container" ng-if="callInProgress">
-      <p>Call in progress...</p>
+      <p>
+        Call in progress...
+      </p>
+
+      <button class="button button-assertive" ng-click="end()">
+        End
+      </button>
     </div>
 
     <video-view></video-view>

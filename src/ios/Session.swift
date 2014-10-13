@@ -10,17 +10,21 @@ class Session {
     var peerConnectionFactory: RTCPeerConnectionFactory
     var callbackId: String
     var stream: RTCMediaStream?
+    var videoTrack: RTCVideoTrack?
+    var sessionKey: String
     
     init(plugin: PhoneRTCPlugin,
          peerConnectionFactory: RTCPeerConnectionFactory,
          config: SessionConfig,
-         callbackId: String) {
+         callbackId: String,
+         sessionKey: String) {
         self.plugin = plugin
         self.queuedRemoteCandidates = []
         self.config = config
         self.peerConnectionFactory = peerConnectionFactory
         self.callbackId = callbackId
-        
+        self.sessionKey = sessionKey
+            
         // initialize basic media constraints
         self.constraints = RTCMediaConstraints(
             mandatoryConstraints: [
@@ -135,19 +139,54 @@ class Session {
             )
             
         case "bye":
-            self.disconnect()
+            self.disconnect(false)
             
         default:
             println("Invalid message \(message)")
         }
     }
 
-    func disconnect() {
+    func disconnect(sendByeMessage: Bool) {
+        if self.videoTrack != nil {
+            self.removeVideoTrack(self.videoTrack!)
+        }
         
+        if sendByeMessage {
+            let json: AnyObject = [
+                "type": "bye"
+            ]
+            
+            let data = NSJSONSerialization.dataWithJSONObject(json,
+                options: NSJSONWritingOptions.allZeros,
+                error: nil)
+            
+            self.sendMessage(data!)
+        }
+        
+        self.peerConnection.close()
+        self.peerConnection = nil
+        self.queuedRemoteCandidates = nil
+        
+        let json: AnyObject = [
+            "type": "__disconnected"
+        ]
+        
+        let data = NSJSONSerialization.dataWithJSONObject(json,
+            options: NSJSONWritingOptions.allZeros,
+            error: nil)
+        
+        self.sendMessage(data!)
+        
+        self.plugin.onSessionDisconnect(self.sessionKey)
     }
     
     func addVideoTrack(videoTrack: RTCVideoTrack) {
+        self.videoTrack = videoTrack
         self.plugin.addRemoteVideoTrack(videoTrack)
+    }
+    
+    func removeVideoTrack(videoTrack: RTCVideoTrack) {
+        self.plugin.removeRemoteVideoTrack(videoTrack)
     }
     
     func preferISAC(sdpDescription: String) -> String {

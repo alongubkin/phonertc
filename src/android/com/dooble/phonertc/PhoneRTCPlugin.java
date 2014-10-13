@@ -61,14 +61,14 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			_callbackContext.sendPluginResult(getSessionKeyPluginResult(sessionKey));
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
-				public void run() {
+				public void run() {					
 					if (_peerConnectionFactory == null) {
 						abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, 
 								VideoRendererGui.getEGLContext()),
 								"Failed to initializeAndroidGlobals");
 						_peerConnectionFactory = new PeerConnectionFactory();
 					}
-			
+					
 					if (config.isAudioStreamEnabled() && _audioTrack == null) {
 						initializeLocalAudioTrack();
 					}
@@ -78,7 +78,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					}
 					
 					_sessions.put(sessionKey, new Session(PhoneRTCPlugin.this, 
-							_callbackContext, config));
+							_callbackContext, config, sessionKey));
 				}
 			});
 			
@@ -89,7 +89,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					_sessions.get(sessionKey).call();
+					if (_sessions.containsKey(sessionKey)) {
+						_sessions.get(sessionKey).call();
+					}
 				}
 			});
 			
@@ -126,8 +128,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			cordova.getThreadPool().execute(new Runnable() {
 				@Override
 				public void run() {
-					_sessions.get(sessionKey).disconnect();
-					_sessions.remove(sessionKey);
+					_sessions.get(sessionKey).disconnect(true);
 				}
 			});
 			
@@ -190,9 +191,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		_videoCapturer = getVideoCapturer();
 		_videoSource = _peerConnectionFactory.createVideoSource(_videoCapturer, 
 				new MediaConstraints());
-		
 		_localVideo = new VideoTrackRendererPair(_peerConnectionFactory.createVideoTrack("ARDAMSv0", _videoSource), null);
-		refreshVideoView();
+		refreshVideoView(); 
 	}
 	
 	int getPercentage(int localValue, int containerValue) {
@@ -265,6 +265,21 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		refreshVideoView();
 	}
 
+	public void removeRemoteVideoTrack(VideoTrack videoTrack) {
+		for (VideoTrackRendererPair pair : _remoteVideos) { 
+			if (pair.getVideoTrack() == videoTrack) {
+				if (pair.getVideoRenderer() != null) {
+					pair.getVideoTrack().removeRenderer(pair.getVideoRenderer());
+				}
+				
+				_remoteVideos.remove(pair);
+				return;
+			}
+		}
+		
+		refreshVideoView();
+	}
+	
 	private void createVideoView() {
 		Point size = new Point();
 		size.set(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(), 
@@ -356,4 +371,52 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		
 		return result;
 	}
+	
+	public void onSessionDisconnect(String sessionKey) {
+		_sessions.remove(sessionKey);
+		
+		if (_sessions.size() == 0) {
+			cordova.getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					if (_audioTrack != null) {
+						_audioTrack = null;
+					}
+			
+					if (_localVideo != null ) {
+						if (_localVideo.getVideoTrack() != null && _localVideo.getVideoRenderer() != null) {
+							_localVideo.getVideoTrack().removeRenderer(_localVideo.getVideoRenderer());
+						}
+						
+						_localVideo = null;	
+					}
+			
+					if (_videoView != null) {
+						_videoView.setVisibility(View.GONE);
+						webView.removeView(_videoView);
+					}
+
+					if (_audioSource != null) {
+						_audioSource = null;
+					}
+			
+					if (_videoSource != null) {
+						_videoSource.dispose();
+						_videoSource = null;
+					}
+			
+					if (_videoCapturer != null) {
+						_videoCapturer.dispose();
+						_videoCapturer = null;
+					}
+			
+					// if (_peerConnectionFactory != null) {
+					//  _peerConnectionFactory.dispose();
+					//	_peerConnectionFactory = null;
+					//}
+					
+					_remoteVideos.clear();
+				}
+			});
+		}
+	} 
 }

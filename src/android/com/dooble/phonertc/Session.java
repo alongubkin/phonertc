@@ -25,6 +25,7 @@ public class Session {
 	PhoneRTCPlugin _plugin;
 	CallbackContext _callbackContext;
 	SessionConfig _config;
+	String _sessionKey;
 	
 	MediaConstraints _sdpMediaConstraints;
 	PeerConnection _peerConnection;
@@ -33,6 +34,7 @@ public class Session {
 	private Object _queuedRemoteCandidatesLocker = new Object();
 	
 	private MediaStream _localStream;
+	private VideoTrack _videoTrack;
 	
 	// Synchronize on quit[0] to avoid teardown-related crashes.
 	private final Boolean[] _quit = new Boolean[] { false };
@@ -40,10 +42,11 @@ public class Session {
 	private final SDPObserver _sdpObserver = new SDPObserver();
 	private final PCObserver _pcObserver = new PCObserver();
 	
-	public Session(PhoneRTCPlugin plugin, CallbackContext callbackContext, SessionConfig config) {
+	public Session(PhoneRTCPlugin plugin, CallbackContext callbackContext, SessionConfig config, String sessionKey) {
 		_plugin = plugin;
 		_callbackContext = callbackContext;
 		_config = config;
+		_sessionKey = sessionKey;
 	}
 	
 	public void call() {
@@ -118,7 +121,7 @@ public class Session {
 
 				_plugin.getActivity().runOnUiThread(new Runnable() {
 					public void run() {
-						disconnect();
+						disconnect(false);
 					}
 				});
 			} else {
@@ -203,39 +206,39 @@ public class Session {
 		return newSdpDescription.toString();
 	}
 
-	public void disconnect() {
-		synchronized (_quit[0]) {
-			if (_quit[0]) {
-				return;
-			}
-			
-			_quit[0] = true;
-			
-			if (_peerConnection != null) {
-				_peerConnection.dispose();
-				_peerConnection = null;
-			}
-
+	public void disconnect(boolean sendByeMessage) {
+	    synchronized (_quit[0]) {
+	        if (_quit[0]) {
+	        	return;
+	        }
+	        
+	        _quit[0] = true;
+	        
+	        if (_videoTrack != null) {
+	        	_plugin.removeRemoteVideoTrack(_videoTrack);
+	        }
+	        
+	        if (sendByeMessage) {
+				try {
+					JSONObject data = new JSONObject();
+					data.put("type", "bye");
+					sendMessage(data);
+				} catch (JSONException e) {}
+	        }
+	        
+	        if (_peerConnection != null) {
+	        	_peerConnection.dispose();
+	        	_peerConnection = null;
+	        }
+	        
 			try {
-				JSONObject json = new JSONObject();
-				json.put("type", "bye");
-				sendMessage(json);
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+				JSONObject data = new JSONObject();
+				data.put("type", "__disconnected");
+				sendMessage(data);
+			} catch (JSONException e) {} 
 			
-			// TODO: cleanup video
-
-		}
-
-		try {
-			JSONObject data = new JSONObject();
-			data.put("type", "__disconnected");
-			sendMessage(data);
-		} catch (JSONException e) {
-
-		}
+	        _plugin.onSessionDisconnect(_sessionKey);
+	    }
 	}
 	
 	public void setConfig(SessionConfig config) {
@@ -268,10 +271,10 @@ public class Session {
 			_plugin.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (stream.videoTracks.size() > 0) {
-						VideoTrack videoTrack = stream.videoTracks.get(0);
+						_videoTrack = stream.videoTracks.get(0);
 					
-						if (videoTrack != null) {
-							_plugin.addRemoteVideoTrack(videoTrack);
+						if (_videoTrack != null) {
+							_plugin.addRemoteVideoTrack(_videoTrack);
 						}
 					}
 					
@@ -317,8 +320,7 @@ public class Session {
 		}
 
 		@Override
-		public void onRemoveStream(MediaStream arg0) {
-			// TODO Auto-generated method stub
+		public void onRemoveStream(MediaStream stream) {
 
 		}
 
