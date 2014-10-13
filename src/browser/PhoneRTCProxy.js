@@ -138,6 +138,22 @@ Session.prototype.sendOffer = function () {
   }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
 }
 
+Session.prototype.sendAnswer = function () {
+  var self = this;
+  self.setRemote(message);
+  self.peerConnection.createAnswer(function (sdp) {
+    self.peerConnection.setLocalDescription(sdp, function () {
+      console.log('Set session description success.');
+    }, function (error) {
+      console.log(error);
+    });
+
+    self.sendMessage(sdp);
+  }, function (error) {
+    console.log(error);
+  }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
+}
+
 Session.prototype.call = function () {
   var self = this;
 
@@ -197,18 +213,7 @@ Session.prototype.call = function () {
 Session.prototype.receiveMessage = function (message) {
   var self = this;
   if (message.type === 'offer') {
-    self.setRemote(message);
-    self.peerConnection.createAnswer(function (sdp) {
-      self.peerConnection.setLocalDescription(sdp, function () {
-        console.log('Set session description success.');
-      }, function (error) {
-        console.log(error);
-      });
-
-      self.sendMessage(sdp);
-    }, function (error) {
-      console.log(error);
-    }, { mandatory: { OfferToReceiveAudio: true, OfferToReceiveVideo: !!videoConfig }});
+    self.sendAnswer.call(self);
   } else if (message.type === 'answer') {
     self.setRemote(message);
   } else if (message.type === 'candidate') {
@@ -225,6 +230,14 @@ Session.prototype.receiveMessage = function (message) {
      
   } else if (message.type === 'bye') {
     console.log('disconnect');
+  }
+};
+
+Session.prototype.renegotiate = function () {
+  if (this.config.isInitiator) {
+    this.sendOffer();
+  } else {
+    this.sendAnswer();
   }
 };
 
@@ -258,10 +271,11 @@ module.exports = {
       .receiveMessage(JSON.parse(options[0].message));
   },
   renegotiate: function (success, error, options) {
-    var session = sessions[options[0].sessionKey];
-    session.config = options[0].config;
-    session.createOrUpdateStream();
-    // session.sendOffer();
+    console.log('Renegotiation is currently only supported in iOS and Android.')
+    // var session = sessions[options[0].sessionKey];
+    // session.config = options[0].config;
+    // session.createOrUpdateStream();
+    // session.renegotiate();
   },
   disconnect: function (success, error, options) {
     sessions[options[0].sessionKey].disconnect();
