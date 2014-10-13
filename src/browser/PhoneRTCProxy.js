@@ -5,10 +5,12 @@ var MediaStream = window.webkitMediaStream || window.mozMediaStream || window.Me
 
 navigator.getUserMedia = navigator.getUserMedia || navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
 
+var localStreams = [];
 var localVideoTrack, localAudioTrack;
 
-function Session(config, sendMessageCallback) {
+function Session(sessionKey, config, sendMessageCallback) {
   var self = this;
+  self.sessionKey = sessionKey;
   self.config = config;
   self.sendMessage = sendMessageCallback;
 
@@ -24,7 +26,7 @@ function Session(config, sendMessageCallback) {
   };
 
   self.onRemoteStreamAdded = function (event) {
-    addRemoteStream(event.stream);
+    self.videoView = addRemoteStream(event.stream);
   };
 
   self.setRemote = function (message) {
@@ -140,7 +142,6 @@ Session.prototype.sendOffer = function () {
 
 Session.prototype.sendAnswer = function () {
   var self = this;
-  self.setRemote(message);
   self.peerConnection.createAnswer(function (sdp) {
     self.peerConnection.setLocalDescription(sdp, function () {
       console.log('Set session description success.');
@@ -191,6 +192,8 @@ Session.prototype.call = function () {
 
   if (missingStreams.audio || missingStreams.video) {
     navigator.getUserMedia(missingStreams, function (stream) {
+      localStreams.push(stream);
+
       if (missingStreams.audio) {
         console.log('missing audio stream; retrieving');
         localAudioTrack = stream.getAudioTracks()[0];
@@ -213,6 +216,7 @@ Session.prototype.call = function () {
 Session.prototype.receiveMessage = function (message) {
   var self = this;
   if (message.type === 'offer') {
+    self.setRemote(message);
     self.sendAnswer.call(self);
   } else if (message.type === 'answer') {
     self.setRemote(message);
@@ -229,7 +233,7 @@ Session.prototype.receiveMessage = function (message) {
     });
      
   } else if (message.type === 'bye') {
-    console.log('disconnect');
+    this.disconnect(false);
   }
 };
 
@@ -241,8 +245,21 @@ Session.prototype.renegotiate = function () {
   }
 };
 
-Session.prototype.disconnect = function () {
-  // TODO
+Session.prototype.disconnect = function (sendByeMessage) {
+  if (this.videoView) {
+    removeRemoteStream(this.videoView);
+  }
+
+  if (sendByeMessage) {
+    this.sendMessage({ type: 'bye' });
+  }
+
+  this.peerConnection.close();
+  this.peerConnection = null;
+
+  this.sendMessage({ type: '__disconnected' });
+
+  onSessionDisconnect(this.sessionKey);
 };
 
 
@@ -254,7 +271,7 @@ var remoteVideoViews = [];
 module.exports = {
   createSessionObject: function (success, error, options) {
     var sessionKey = uuid();
-    var session = new Session(options[0], success);
+    var session = new Session(sessionKey, options[0], success);
 
     session.sendMessage({
       type: '__set_session_key',
@@ -278,7 +295,7 @@ module.exports = {
     // session.renegotiate();
   },
   disconnect: function (success, error, options) {
-    sessions[options[0].sessionKey].disconnect();
+    sessions[options[0].sessionKey].disconnect(true);
   },
   setVideoView: function (success, error, options) {
     videoConfig = options[0];
@@ -301,6 +318,8 @@ module.exports = {
 
         if (!localVideoTrack) {
           navigator.getUserMedia({ audio: true, video: true }, function (stream) {
+            localStreams.push(stream);
+
             localAudioTrack = stream.getAudioTracks()[0];
             localVideoTrack = stream.getVideoTracks()[0];
 
@@ -357,6 +376,14 @@ function addRemoteStream(stream) {
 
   remoteVideoViews.push(videoView);
   document.body.appendChild(videoView);
+
+  refreshVideoContainer();
+  return videoView;
+}
+
+function removeRemoteStream(videoView) {
+  document.body.removeChild(videoView);
+  remoteVideoViews.splice(videoView, 1);
 
   refreshVideoContainer();
 }
@@ -448,6 +475,25 @@ function scaleToFill(event) {
   }
 
   refreshTransform();
+}
+
+function onSessionDisconnect(sessionKey) {
+  delete sessions[sessionKey];
+
+  if (Object.keys(sessions).length === 0) {
+    if (localVideoView) {
+      document.body.removeChild(localVideoView);
+      localVideoView = null;
+    }
+
+    localStreams.forEach(function (stream) {
+      stream.stop();
+    });
+
+    localStreams = [];
+    localVideoTrack = null;
+    localAudioTrack = null;
+  }
 }
 
 require("cordova/exec/proxy").add("PhoneRTCPlugin", module.exports);
