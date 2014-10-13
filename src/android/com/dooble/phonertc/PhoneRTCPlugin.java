@@ -106,10 +106,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			});
 
 			return true;
-		} else if (action.equals("renegotiate")) {
+		} else if (action.equals("renegotiate")) { 
 			JSONObject container = args.getJSONObject(0);
 			final String sessionKey = container.getString("sessionKey");
-			final SessionConfig config = SessionConfig.fromJSON(container.getJSONObject("message"));	
+			final SessionConfig config = SessionConfig.fromJSON(container.getJSONObject("config"));	
 			
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
