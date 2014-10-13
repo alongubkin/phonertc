@@ -27,6 +27,7 @@ function Session(sessionKey, config, sendMessageCallback) {
 
   self.onRemoteStreamAdded = function (event) {
     self.videoView = addRemoteStream(event.stream);
+    self.sendMessage({ type: '__answered' });
   };
 
   self.setRemote = function (message) {
