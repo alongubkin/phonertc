@@ -97,7 +97,7 @@ angular.module('phonertcdemo')
       setTimeout(function () {
         console.log('sending answer');
         signaling.emit('sendMessage', $stateParams.contactName, { type: 'answer' });
-      }, 3500);
+      }, 1500);
     };
 
     $scope.updateVideoPosition = function () {
@@ -200,7 +200,7 @@ angular.module('phonertcdemo')
                   contacts: [ContactsService.currentName],
                   isInitiator: true
                 });
-              }, 5000);
+              }, 1500);
             }
           });
 
