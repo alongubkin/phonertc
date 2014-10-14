@@ -33,7 +33,7 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 options: NSJSONWritingOptions.allZeros,
                 error: &jsonError)
             
-            self.session.sendMessage(data!)
+            self.session.plugin.sendMessage(data!)
         }
     }
     

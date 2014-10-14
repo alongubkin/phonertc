@@ -12,7 +12,7 @@ angular.module('phonertcdemo')
     $scope.contacts = {};
     $scope.hideFromContactList = [$scope.contactName];
     $scope.muted = false;
-    
+
     $ionicModal.fromTemplateUrl('templates/select_contact.html', {
       scope: $scope,
       animation: 'slide-in-up'
@@ -50,8 +50,14 @@ angular.module('phonertcdemo')
       });
 
       session.on('disconnect', function () {
-        signaling.emit('sendMessage', contactName, { type: 'ignore' });
-        $state.go('app.contacts');
+        if ($scope.contacts[contactName]) {
+          delete $scope.contacts[contactName];
+        }
+
+        if (Object.keys($scope.contacts).length === 0) {
+          signaling.emit('sendMessage', contactName, { type: 'ignore' });
+          $state.go('app.contacts');
+        }
       });
 
       session.call();

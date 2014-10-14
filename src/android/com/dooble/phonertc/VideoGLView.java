@@ -21,4 +21,11 @@ public class VideoGLView extends GLSurfaceView {
     // Go big or go home!
     setMeasuredDimension(screenDimensions.x, screenDimensions.y);
   }
+
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+    setSystemUiVisibility(SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+        SYSTEM_UI_FLAG_FULLSCREEN | SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+  }
 }

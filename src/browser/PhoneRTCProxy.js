@@ -33,7 +33,7 @@ function Session(sessionKey, config, sendMessageCallback) {
   self.setRemote = function (message) {
     message.sdp = self.addCodecParam(message.sdp, 'opus/48000', 'stereo=1');
 
-    self.peerConnection.setRemoteDescription(new SessionDescription(message), function () {
+    this.peerConnection.setRemoteDescription(new SessionDescription(message), function () {
       console.log('setRemote success');
     }, function (error) { 
       console.log(error); 
@@ -247,6 +247,7 @@ Session.prototype.renegotiate = function () {
 };
 
 Session.prototype.disconnect = function (sendByeMessage) {
+  console.log(this.videoView);
   if (this.videoView) {
     removeRemoteStream(this.videoView);
   }
@@ -296,7 +297,10 @@ module.exports = {
     // session.renegotiate();
   },
   disconnect: function (success, error, options) {
-    sessions[options[0].sessionKey].disconnect(true);
+    var session = sessions[options[0].sessionKey];
+    if (session) {
+      session.disconnect(true);
+    }
   },
   setVideoView: function (success, error, options) {
     videoConfig = options[0];
@@ -383,8 +387,10 @@ function addRemoteStream(stream) {
 }
 
 function removeRemoteStream(videoView) {
+  console.log(remoteVideoViews);
   document.body.removeChild(videoView);
   remoteVideoViews.splice(videoView, 1);
+  console.log(remoteVideoViews);
 
   refreshVideoContainer();
 }
