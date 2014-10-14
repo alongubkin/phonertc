@@ -55,12 +55,6 @@
 // of frames.
 - (instancetype)initWithDelegate:(id<RTCVideoRendererDelegate>)delegate;
 
-#if TARGET_OS_IPHONE
-// DEPRECATED. See https://code.google.com/p/webrtc/issues/detail?id=3341 for
-// details.
-- (instancetype)initWithView:(UIView*)view;
-#endif
-
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 // Disallow init and don't add to documentation
 - (id)init __attribute__((

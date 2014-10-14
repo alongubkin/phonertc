@@ -1,103 +1,204 @@
 var exec = require('cordova/exec');
+var videoViewConfig;
 
-var videoElements;
-
-exports.updateVideoPosition = function updateVideoPosition () {
-  // This function should listen for scrolling and update the position of the elements to cordova exec
-  if (videoElements) {
-    var video = {
-      localVideo: getLayoutParams(videoElements.localVideo),
-      remoteVideo: getLayoutParams(videoElements.remoteVideo)
+function Session(config) { 
+  // make sure that the config object is valid
+  if (typeof config !== 'object') {
+    throw {
+      name: 'PhoneRTC Error',
+      message: 'The first argument must be an object.'
     };
-    // Update Video Element positioning
-    exec(
-      null,
-      null,
-      'PhoneRTCPlugin',
-      'updateVideoPosition',
-      [video]);
+  }
+
+  if (typeof config.isInitiator === 'undefined' ||
+      typeof config.turn === 'undefined' ||
+      typeof config.streams === 'undefined') {
+    throw {
+      name: 'PhoneRTC Error',
+      message: 'isInitiator, turn and streams are required parameters.'
+    };
+  }
+
+  var self = this;
+  self.events = {};
+  self.config = config;
+  self.__pendingActions = [];
+
+  // make all config properties accessible from this object
+  Object.keys(config).forEach(function (prop) {
+    Object.defineProperty(self, prop, {
+      get: function () { return self.config[prop]; },
+      set: function (value) { self.config[prop] = value; }
+    });
+  });
+
+  function callEvent(eventName) {
+    if (!self.events[eventName]) {
+      return;
+    }
+
+    var args = Array.prototype.slice.call(arguments, 1);
+    self.events[eventName].forEach(function (callback) {
+      callback.apply(self, args);
+    });
+  }
+
+  function onSendMessage(data) {
+    if (data.type === '__set_session_key') {
+      self.__sessionKey = data.sessionKey;
+
+      // execute pending actions
+      self.__pendingActions.forEach(function (action) {
+        action.call(self);
+      });
+    } else if (data.type === '__answered') {
+      callEvent('answer');
+    } else if (data.type === '__disconnected') {
+      callEvent('disconnect');
+    } else {
+      callEvent('sendMessage', data);
+    }
+  }
+
+  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSessionObject', [config]);
+};
+
+Session.prototype.on = function (eventName, fn) {
+  // make sure that the second argument is a function
+  if (typeof fn !== 'function') {
+    throw {
+      name: 'PhoneRTC Error',
+      message: 'The second argument must be a function.'
+    };
+  }
+
+  // create the event if it doesn't exist
+  if (!this.events[eventName]) {
+    this.events[eventName] = [];
+  } else {
+    // make sure that this callback doesn't exist already
+    for (var i = 0, len = this.events[eventName].length; i < len; i++) {
+      if (this.events[eventName][i] === fn) {
+        throw {
+          name: 'PhoneRTC Error',
+          message: 'This callback function was already added.'
+        };
+      }
+    }
+  }
+
+  // add the event
+  this.events[eventName].push(fn);
+};
+
+Session.prototype.off = function (eventName, fn) {
+  // make sure that the second argument is a function
+  if (typeof fn !== 'function') {
+    throw {
+      name: 'PhoneRTC Error',
+      message: 'The second argument must be a function.'
+    };
+  }
+
+  if (!this.events[eventName]) {
+    return;
+  }
+
+  var indexesToRemove = [];
+  for (var i = 0, len = this.events[eventName].length; i < len; i++) {
+    if (this.events[eventName][i] === fn) {
+      indexesToRemove.push(i);
+    }
+  }
+
+  indexesToRemove.forEach(function (index) {
+    this.events.splice(index, 1);
+  })
+};
+
+Session.prototype.call = function () {
+  function call() {
+    exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
+      sessionKey: this.__sessionKey 
+    }]);
+  }
+
+  if (!this.__sessionKey) {
+    this.__pendingActions.push(call);
+  } else {
+    call.call(this);
   }
 };
 
-if (cordova.platformId !== 'android') {
-  document.addEventListener("touchmove", exports.updateVideoPosition);
-}
+Session.prototype.receiveMessage = function (data) {
+  exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
+    sessionKey: this.__sessionKey,
+    message: JSON.stringify(data)
+  }]);
+};
 
-function getLayoutParams (videoElement) {
+Session.prototype.renegotiate = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
+    config: this.config,
+    sessionKey: this.__sessionKey
+  }]);
+};
+
+Session.prototype.close = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
+    sessionKey: this.__sessionKey 
+  }]);
+};
+
+exports.Session = Session;
+
+function getLayoutParams(videoElement) {
   var boundingRect = videoElement.getBoundingClientRect();
+
   if (cordova.platformId === 'android') {
     return {
-      devicePixelRatio: window.devicePixelRatio || 2,
-      // get these values by doing a lookup on the dom
-      x : boundingRect.left + window.scrollX,
-      y : boundingRect.top + window.scrollY,
-      width : videoElement.offsetWidth,
-      height : videoElement.offsetHeight
+      position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
+      size: [videoElement.offsetWidth, videoElement.offsetHeight]
     };
   }
+
   return {
-      // get these values by doing a lookup on the dom
-      x : boundingRect.left,
-      y : boundingRect.top,
-      width : videoElement.offsetWidth,
-      height : videoElement.offsetHeight
-    };
+    position: [boundingRect.left, boundingRect.top],
+    size: [videoElement.offsetWidth, videoElement.offsetHeight]
+  };
 }
 
-exports.call = function (options) {
-  // options should contain a video option if video is enabled
-  // sets the initial video options a dom listener needs to be added to watch for movements.
-  var video;
-  if (options.video) {
-    videoElements = {
-      localVideo: options.video.localVideo,
-      remoteVideo: options.video.remoteVideo
-    };
-    video = {
-      localVideo: getLayoutParams(videoElements.localVideo),
-      remoteVideo: getLayoutParams(videoElements.remoteVideo)
-    };
+function setVideoView(config) {
+  videoViewConfig = config;
+
+  var container = config.container;
+
+  if (container) {
+    config.containerParams = getLayoutParams(container);
+    delete config.container;
   }
 
-  exec(
-    function (data) {
-      if (data.type === '__answered' && options.answerCallback) {
-        options.answerCallback();
-      } else if (data.type === '__disconnected' && options.disconnectCallback) {
-        options.disconnectCallback();
-      } else {
-        options.sendMessageCallback(data);
-      }
-    },
-    null,
-    'PhoneRTCPlugin',
-    'call',
-    [options.isInitator, options.turn.host, options.turn.username, options.turn.password, video]);
+  config.devicePixelRatio = window.devicePixelRatio || 2;
+
+  exec(null, null, 'PhoneRTCPlugin', 'setVideoView', [config]);
+
+  if (container) {
+    config.container = container;
+  }
 };
 
-exports.setEnabledMedium = function (mediumType, enabled) {
-  exec(
-    function () {},
-    null,
-    'PhoneRTCPlugin',
-    'setEnabledMedium',
-    [mediumType, enabled]);
-}
+document.addEventListener('touchmove', function () {
+  if (videoViewConfig) {
+    setVideoView(videoViewConfig);
+  }
+});
 
-exports.receiveMessage = function (data) {
-  exec(
-    null,
-    null,
-    'PhoneRTCPlugin',
-    'receiveMessage',
-    [JSON.stringify(data)]);
+exports.setVideoView = setVideoView;
+
+exports.hideVideoView = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'hideVideoView', []);
 };
 
-exports.disconnect = function () {
-  exec(
-    null,
-    null,
-    'PhoneRTCPlugin',
-    'disconnect',
-    []);
+exports.showVideoView = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
 };

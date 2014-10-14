@@ -1,0 +1,16 @@
+{
+  "name": "phonertcdemo-server",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alon Gubkin",
+  "license": "Apache",
+  "dependencies": {
+    "express": "^4.9.0",
+    "lodash-node": "^2.4.1",
+    "socket.io": "^1.1.0"
+  }
+}

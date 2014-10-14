@@ -1,0 +1,14 @@
+<ion-view title="Contacts" hide-back-button="true">
+  <ion-content>
+    <ul class="list">
+      <li class="item item-button-right" ng-repeat="contact in contacts">
+        <i class="icon ion-record" style="color: green"></i>
+        {{ contact }}
+        <button class="button button-positive" 
+                ui-sref="app.call({ isCalling: true, contactName: contact })">
+          <i class="icon ion-ios7-telephone"></i>
+        </button>
+      </li>
+    </ul>
+  </ion-content>
+</ion-view>

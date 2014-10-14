@@ -1,0 +1,21 @@
+<ion-modal-view>
+  <ion-header-bar class="bar-positive">
+    <h1 class="title">Add Contact to Call</h1>
+      <button class="button button-clear" ng-click="closeSelectContactModal()">
+        Close
+      </button>
+  </ion-header-bar>
+  <ion-content>
+    <ul class="list">
+      <li class="item item-button-right"
+          ng-repeat="contact in allContacts | filter:hideCurrentUsers()">
+        <i class="icon ion-record" style="color: green"></i>
+        {{ contact }}
+        <button class="button button-positive" 
+                ng-click="addContact(contact)">
+          <i class="icon ion-ios7-telephone"></i>
+        </button>
+      </li>
+    </ul>
+  </ion-content>
+</ion-modal-view>

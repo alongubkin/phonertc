@@ -1,0 +1,15 @@
+<ion-view title="PhoneRTC">
+  <i class="icon ion-loading-c progress-bar-icon" ng-if="loading"></i>
+    
+  <ion-content>
+    <div class="list" ng-hide="loading">
+      <label class="item item-input">
+        <input type="text" placeholder="Name" ng-model="data.name">
+      </label>
+    </div>
+
+    <div class="padding" ng-hide="loading">
+      <button class="button button-block button-positive" ng-click="login()">Login</button>
+    </div>
+  </ion-content>
+</ion-view>
