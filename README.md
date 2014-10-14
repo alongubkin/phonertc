@@ -2,6 +2,8 @@
 
 WebRTC for Cordova apps!
 
+[![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=912276)](https://www.bountysource.com/trackers/912276-phonertc?utm_source=912276&utm_medium=shield&utm_campaign=TRACKER_BADGE)
+
 ### Features
 
 * Completely Open Source
