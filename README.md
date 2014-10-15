@@ -13,5 +13,6 @@ WebRTC for Cordova apps!
 
 Want to learn more? [See the wiki.](https://github.com/alongubkin/phonertc/wiki)
 
+Use the [phonertc](http://stackoverflow.com/questions/tagged/phonertc) tag in StackOverflow for Q/A.
 
 [![Donate](https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=32QXU3V7GM7PC)
