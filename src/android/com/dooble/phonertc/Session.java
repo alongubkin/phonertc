@@ -139,11 +139,10 @@ public class Session {
 		}
 		
 		_localStream = _plugin.getPeerConnectionFactory().createLocalMediaStream("ARDAMS");
-		/*
+		
 		if (_config.isAudioStreamEnabled() && _plugin.getLocalAudioTrack() != null) {
 			_localStream.addTrack(_plugin.getLocalAudioTrack());
 		}
-		*/
 		 
 		if (_config.isVideoStreamEnabled() && _plugin.getLocalVideoTrack() != null) {
 			_localStream.addTrack(_plugin.getLocalVideoTrack());
