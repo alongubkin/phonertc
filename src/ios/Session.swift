@@ -44,12 +44,12 @@ class Session {
         // create a list of ICE servers
         var iceServers: [RTCICEServer] = []
         iceServers.append(RTCICEServer(
-            URI: NSURL.URLWithString("stun:stun.l.google.com:19302"),
+            URI: NSURL(string: "stun:stun.l.google.com:19302"),
             username: "",
             password: ""))
         
         iceServers.append(RTCICEServer(
-            URI: NSURL.URLWithString(self.config.turn.host),
+            URI: NSURL(string: self.config.turn.host),
             username: self.config.turn.username,
             password: self.config.turn.password))
         
@@ -197,8 +197,8 @@ class Session {
         
         let origSDP = sdpDescription.stringByReplacingOccurrencesOfString("\r\n", withString: "\n")
         var lines = origSDP.componentsSeparatedByString("\n")
-        let isac16kRegex = NSRegularExpression.regularExpressionWithPattern(
-            "^a=rtpmap:(\\d+) ISAC/16000[\r]?$",
+        let isac16kRegex = NSRegularExpression(
+            pattern: "^a=rtpmap:(\\d+) ISAC/16000[\r]?$",
             options: NSRegularExpressionOptions.allZeros,
             error: nil)
         
