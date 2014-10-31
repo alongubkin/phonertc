@@ -426,7 +426,14 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 						_videoCapturer.dispose();
 						_videoCapturer = null;
 					}
-				
+                    
+                    if (_audioSource != null) {
+                        _audioSource.dispose();
+                        _audioSource = null;
+                        
+                        _audioTrack = null;
+                    }
+                    
 					// if (_peerConnectionFactory != null) {
 					// 	_peerConnectionFactory.dispose();
 					// 	_peerConnectionFactory = null;
