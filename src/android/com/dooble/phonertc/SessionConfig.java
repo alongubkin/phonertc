@@ -66,7 +66,7 @@ public class SessionConfig {
 		JSONObject turn = json.getJSONObject("turn");
 		config.setTurnServerHost(turn.getString("host"));
 		config.setTurnServerUsername(turn.getString("username"));
-		config.setTurnServerPassword(turn.getString("username"));
+		config.setTurnServerPassword(turn.getString("password"));
 
 		JSONObject streams = json.getJSONObject("streams");
 		config.setAudioStreamEnabled(streams.getBoolean("audio"));
