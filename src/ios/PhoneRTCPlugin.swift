@@ -23,25 +23,28 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        let sessionKey = NSUUID().UUIDString
-        
         // create session config from the JS params
-        let config = SessionConfig(data: command.arguments[0])
-        
-        // make sure the OK callback is permanent as we
-        // use it to send messages to the JS
-        let message: AnyObject = [
-            "type": "__set_session_key",
-            "sessionKey": sessionKey
-        ]
-        
-        let data = NSJSONSerialization.dataWithJSONObject(message,
-            options: NSJSONWritingOptions.allZeros,
-            error: nil)
-       
-        sendMessage(command.callbackId, message: data!)
-        
-        // create a session object and initialize it
+        let container: AnyObject = command.arguments[0]
+        // If the session id is provided then use the provided session id
+        // otherwise generate a random guid for the session id.
+        var sessionKey: String
+        if let key = container.objectForKey("sessionKey") as? String {
+            sessionKey = key
+        } else {
+            sessionKey = NSUUID().UUIDString
+            // make sure the OK callback is permanent as we
+            // use it to send messages to the JS
+            let message: AnyObject = [
+                "type": "__set_session_key",
+                "sessionKey": sessionKey
+            ]
+            let data = NSJSONSerialization.dataWithJSONObject(message,
+                options: NSJSONWritingOptions.allZeros,
+                error: nil)
+            sendMessage(command.callbackId, message: data!)
+        }
+        // create a session and initialize it
+        let config = SessionConfig(data: container)
         let session = Session(
             plugin: self,
             peerConnectionFactory: peerConnectionFactory,
@@ -49,48 +52,60 @@ class PhoneRTCPlugin : CDVPlugin {
             callbackId: command.callbackId,
             sessionKey: sessionKey
         )
-        
         sessions[sessionKey] = session
     }
     
     func call(command: CDVInvokedUrlCommand) {
         let container: AnyObject = command.arguments[0]
-        let sessionKey = container.objectForKey("sessionKey")! as String
-   
-        dispatch_async(dispatch_get_main_queue()) {
-            self.sessions[sessionKey]!.call()
+        if let sessionKey = self.getSessionKey(container) {
+            dispatch_async(dispatch_get_main_queue()) {
+                self.sessions[sessionKey]!.call()
+            }
+        }
+    }
+    
+    func getSessionKey(data: AnyObject) -> String? {
+        if let sessionKey = data.objectForKey("sessionKey") as? String {
+            return sessionKey
+        } else {
+            var error : NSError?
+            let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
+                data.dataUsingEncoding(NSUTF8StringEncoding)!,
+                options: NSJSONReadingOptions.allZeros,
+                error: &error)
+            return object?.objectForKey("sessionKey")! as? String
         }
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
         let container: AnyObject = command.arguments[0]
-        let sessionKey = container.objectForKey("sessionKey")! as String
-        let message = container.objectForKey("message")! as String
-        
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            self.sessions[sessionKey]!.receiveMessage(message)
+        if let sessionKey = self.getSessionKey(container) {
+            let message = container.objectForKey("message")! as String
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                self.sessions[sessionKey]!.receiveMessage(message)
+            }
         }
     }
     
     func renegotiate(command: CDVInvokedUrlCommand) {
         let container: AnyObject = command.arguments[0]
-        let sessionKey = container.objectForKey("sessionKey")! as String
-        let config: AnyObject = container.objectForKey("config")!
-        
-        dispatch_async(dispatch_get_main_queue()) {
-            let session = self.sessions[sessionKey]!
-            session.config = SessionConfig(data: config)
-            session.createOrUpdateStream()
+        if let sessionKey = self.getSessionKey(container) {
+            let config: AnyObject = container.objectForKey("config")!
+            dispatch_async(dispatch_get_main_queue()) {
+                let session = self.sessions[sessionKey]!
+                session.config = SessionConfig(data: config)
+                session.createOrUpdateStream()
+            }
         }
     }
     
     func disconnect(command: CDVInvokedUrlCommand) {
         let container: AnyObject = command.arguments[0]
-        let sessionKey = container.objectForKey("sessionKey")! as String
-
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-            if (self.sessions[sessionKey] != nil) {
-                self.sessions[sessionKey]!.disconnect(true)
+        if let sessionKey = self.getSessionKey(container) {
+            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                if (self.sessions[sessionKey] != nil) {
+                    self.sessions[sessionKey]!.disconnect(true)
+                }
             }
         }
     }
