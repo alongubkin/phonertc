@@ -18,68 +18,41 @@ class PhoneRTCPlugin : CDVPlugin {
     override init(webView: UIWebView) {
         peerConnectionFactory = RTCPeerConnectionFactory()
         RTCPeerConnectionFactory.initializeSSL()
-        
         super.init(webView: webView)
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        // create session config from the JS params
-        let container: AnyObject = command.arguments[0]
-        // If the session id is provided then use the provided session id
-        // otherwise generate a random guid for the session id.
+        let input: AnyObject = command.argumentAtIndex(0)
+        // Assert that a sessionKey has been provided.
         var sessionKey: String
-        if let key = container.objectForKey("sessionKey") as? String {
+        if let key = input.objectForKey("sessionKey") as? String {
             sessionKey = key
         } else {
-            sessionKey = NSUUID().UUIDString
-            // make sure the OK callback is permanent as we
-            // use it to send messages to the JS
-            let message: AnyObject = [
-                "type": "__set_session_key",
-                "sessionKey": sessionKey
-            ]
-            let data = NSJSONSerialization.dataWithJSONObject(message,
-                options: NSJSONWritingOptions.allZeros,
-                error: nil)
-            sendMessage(command.callbackId, message: data!)
+            println("A sessionKey is required to create a new sesssion.")
+            return
         }
         // create a session and initialize it
-        let config = SessionConfig(data: container)
-        let session = Session(
-            plugin: self,
-            peerConnectionFactory: peerConnectionFactory,
-            config: config,
-            callbackId: command.callbackId,
-            sessionKey: sessionKey
-        )
+        let config = SessionConfig(data: input)
+        let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
+            config: config, callbackId: command.callbackId,
+            sessionKey: sessionKey)
         sessions[sessionKey] = session
+        println("Created a session with a sessionKey of \(sessionKey)")
     }
     
     func call(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.arguments[0]
+        let container: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = self.getSessionKey(container) {
             dispatch_async(dispatch_get_main_queue()) {
-                self.sessions[sessionKey]!.call()
-            }
-        }
-    }
-    
-    func getSessionKey(data: AnyObject) -> String? {
-        if let sessionKey = data.objectForKey("sessionKey") as? String {
-            return sessionKey
-        } else {
-            if let message = data.objectForKey("message") as? String {
-                var error : NSError?
-                let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
-                    message.dataUsingEncoding(NSUTF8StringEncoding)!,
-                    options: NSJSONReadingOptions.allZeros,
-                    error: &error)
-                if let sessionKey = object!.objectForKey("sessionKey") as? String {
-                    return sessionKey
+                if let session = self.sessions[sessionKey] {
+                    session.call()
+                } else {
+                    println("There is no session with a session key of \(sessionKey)")
                 }
             }
+        } else {
+            println("A valid sessionKey is required.")
         }
-        return nil
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
@@ -185,6 +158,30 @@ class PhoneRTCPlugin : CDVPlugin {
                 remoteVideoView.hidden = false;
             } 
         }
+    }
+    
+    func getSessionKey(data: AnyObject) -> String? {
+        if let sessionKey = data.objectForKey("sessionKey") as? String {
+            return sessionKey
+        } else {
+            if let message = data.objectForKey("message") as? String {
+                var error : NSError?
+                let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
+                    message.dataUsingEncoding(NSUTF8StringEncoding)!,
+                    options: NSJSONReadingOptions.allZeros,
+                    error: &error)
+                if object != nil {
+                    if let sessionKey = object!.objectForKey("sessionKey") as? String {
+                        return sessionKey
+                    }
+                } else {
+                    if(error != nil) {
+                        println("Please provide a valid JavaScript object as an argument.\n\(error!.localizedDescription)")
+                    }
+                }
+            }
+        }
+        return nil
     }
     
     func sendMessage(callbackId: String, message: NSData) {
