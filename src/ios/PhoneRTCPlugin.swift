@@ -68,13 +68,18 @@ class PhoneRTCPlugin : CDVPlugin {
         if let sessionKey = data.objectForKey("sessionKey") as? String {
             return sessionKey
         } else {
-            var error : NSError?
-            let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
-                data.dataUsingEncoding(NSUTF8StringEncoding)!,
-                options: NSJSONReadingOptions.allZeros,
-                error: &error)
-            return object?.objectForKey("sessionKey")! as? String
+            if let message = data.objectForKey("message") as? String {
+                var error : NSError?
+                let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
+                    message.dataUsingEncoding(NSUTF8StringEncoding)!,
+                    options: NSJSONReadingOptions.allZeros,
+                    error: &error)
+                if let sessionKey = object!.objectForKey("sessionKey") as? String {
+                    return sessionKey
+                }
+            }
         }
+        return nil
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
