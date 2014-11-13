@@ -148,7 +148,7 @@ public class Session {
 			_localStream.addTrack(_plugin.getLocalVideoTrack());
 		}
 		
-		_peerConnection.addStream(_localStream, new MediaConstraints());
+		_peerConnection.addStream(_localStream);
 	}
 	
 	void sendMessage(JSONObject data) {
@@ -301,11 +301,7 @@ public class Session {
 
 		}
 
-		@Override
-		public void onError() {
-			// TODO Auto-generated method stub
 
-		}
 
 		@Override
 		public void onIceConnectionChange(IceConnectionState arg0) {
