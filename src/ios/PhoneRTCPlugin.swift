@@ -22,79 +22,75 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        let input: AnyObject = command.argumentAtIndex(0)
-        // Assert that a sessionKey has been provided.
-        var sessionKey: String
-        if let key = input.objectForKey("sessionKey") as? String {
-            sessionKey = key
-        } else {
-            println("A sessionKey is required to create a new sesssion.")
-            return
+        let args: AnyObject = command.argumentAtIndex(0)
+        if let sessionKey = args.objectForKey("sessionKey") as? String {
+            // create a session and initialize it.
+            let config = SessionConfig(data: args)
+            let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
+                config: config, callbackId: command.callbackId,
+                sessionKey: sessionKey)
+            sessions[sessionKey] = session
         }
-        // create a session and initialize it
-        let config = SessionConfig(data: input)
-        let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
-            config: config, callbackId: command.callbackId,
-            sessionKey: sessionKey)
-        sessions[sessionKey] = session
-        println("Created a session with a sessionKey of \(sessionKey)")
     }
     
     func call(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = self.getSessionKey(container) {
+        let args: AnyObject = command.argumentAtIndex(0)
+        if let sessionKey = args.objectForKey("sessionKey") as? String {
             dispatch_async(dispatch_get_main_queue()) {
                 if let session = self.sessions[sessionKey] {
                     session.call()
-                } else {
-                    println("There is no session with a session key of \(sessionKey)")
                 }
             }
-        } else {
-            println("A valid sessionKey is required.")
         }
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = self.getSessionKey(container) {
-            if let message = container.objectForKey("message") as? String {
+        let args: AnyObject = command.argumentAtIndex(0)
+        if let sessionKey = args.objectForKey("sessionKey") as? String {
+            if let message = args.objectForKey("message") as? String {
                 if let session = self.sessions[sessionKey] {
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                         session.receiveMessage(message)
                     }
-                } else {
-                    println("There is no session with a session key of \(sessionKey)")
                 }
-            } else {
-                println("Please provide a valid message.")
             }
-        } else {
-            println("A valid sessionKey is required.")
         }
     }
     
     func renegotiate(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = self.getSessionKey(container) {
-            let config: AnyObject = container.objectForKey("config")!
-            dispatch_async(dispatch_get_main_queue()) {
-                let session = self.sessions[sessionKey]!
-                session.config = SessionConfig(data: config)
-                session.createOrUpdateStream()
+        let args: AnyObject = command.argumentAtIndex(0)
+        if let sessionKey = args.objectForKey("sessionKey") as? String {
+            if let config: AnyObject = args.objectForKey("config") {
+                dispatch_async(dispatch_get_main_queue()) {
+                    if let session = self.sessions[sessionKey] {
+                        session.config = SessionConfig(data: config)
+                        session.createOrUpdateStream()
+                    }
+                }
             }
         }
     }
     
     func disconnect(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = self.getSessionKey(container) {
+        let args: AnyObject = command.argumentAtIndex(0)
+        if let sessionKey = args.objectForKey("sessionKey") as? String {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 if (self.sessions[sessionKey] != nil) {
                     self.sessions[sessionKey]!.disconnect(true)
                 }
             }
         }
+    }
+
+    func sendMessage(callbackId: String, message: NSData) {
+        let json = NSJSONSerialization.JSONObjectWithData(message,
+            options: NSJSONReadingOptions.MutableLeaves,
+            error: nil) as NSDictionary
+        
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
+        pluginResult.setKeepCallbackAsBool(true);
+        
+        self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)
     }
     
     func setVideoView(command: CDVInvokedUrlCommand) {
@@ -167,41 +163,6 @@ class PhoneRTCPlugin : CDVPlugin {
                 remoteVideoView.hidden = false;
             } 
         }
-    }
-    
-    func getSessionKey(data: AnyObject) -> String? {
-        if let sessionKey = data.objectForKey("sessionKey") as? String {
-            return sessionKey
-        } else {
-            if let message = data.objectForKey("message") as? String {
-                var error : NSError?
-                let object : AnyObject? = NSJSONSerialization.JSONObjectWithData(
-                    message.dataUsingEncoding(NSUTF8StringEncoding)!,
-                    options: NSJSONReadingOptions.allZeros,
-                    error: &error)
-                if object != nil {
-                    if let sessionKey = object!.objectForKey("sessionKey") as? String {
-                        return sessionKey
-                    }
-                } else {
-                    if(error != nil) {
-                        println("Please provide a valid JavaScript object as an argument.\n\(error!.localizedDescription)")
-                    }
-                }
-            }
-        }
-        return nil
-    }
-    
-    func sendMessage(callbackId: String, message: NSData) {
-        let json = NSJSONSerialization.JSONObjectWithData(message,
-            options: NSJSONReadingOptions.MutableLeaves,
-            error: nil) as NSDictionary
-        
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
-        pluginResult.setKeepCallbackAsBool(true);
-        
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)
     }
     
     func createVideoView(params: VideoLayoutParams? = nil) -> RTCEAGLVideoView {

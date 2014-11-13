@@ -54,10 +54,8 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
                 if self.session.peerConnection.localDescription != nil {
                     self.drainRemoteCandidates()
                 } else {
-                    println("Creating Answer!")
                     self.session.peerConnection.createAnswerWithDelegate(self,
                         constraints: self.session.constraints)
-                    println("Answer has been created!")
                 }
             }
         }

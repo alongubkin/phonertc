@@ -1,6 +1,21 @@
 var exec = require('cordova/exec');
 var videoViewConfig;
 
+function createUUID() {
+  // http://www.ietf.org/rfc/rfc4122.txt
+  var s = [];
+  var hexDigits = "0123456789abcdef";
+  for (var i = 0; i < 36; i++) {
+      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+  }
+  s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+  s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+  s[8] = s[13] = s[18] = s[23] = "-";
+
+  var uuid = s.join("");
+  return uuid;
+}
+
 function Session(config) { 
   // make sure that the config object is valid
   if (typeof config !== 'object') {
@@ -22,7 +37,7 @@ function Session(config) {
   var self = this;
   self.events = {};
   self.config = config;
-  self.__pendingActions = [];
+  self.sessionKey = createUUID();
 
   // make all config properties accessible from this object
   Object.keys(config).forEach(function (prop) {
@@ -53,7 +68,7 @@ function Session(config) {
     }
   }
 
-  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSessionObject', [config]);
+  exec(onSendMessage, null, 'PhoneRTCPlugin', 'createSessionObject', [self.sessionKey, config]);
 };
 
 Session.prototype.on = function (eventName, fn) {
@@ -109,27 +124,29 @@ Session.prototype.off = function (eventName, fn) {
   })
 };
 
-Session.prototype.call = function (data) {
+Session.prototype.call = function () {
   exec(null, null, 'PhoneRTCPlugin', 'call', [{
-    message: JSON.stringify(data)
+    sessionKey: this.sessionKey
   }]);
 };
 
 Session.prototype.receiveMessage = function (data) {
   exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
+    sessionKey: this.sessionKey,
     message: JSON.stringify(data)
   }]);
 };
 
-Session.prototype.renegotiate = function (data) {
+Session.prototype.renegotiate = function () {
   exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
+    sessionKey: this.sessionKey,
     config: this.config
   }]);
 };
 
-Session.prototype.close = function (data) {
+Session.prototype.close = function () {
   exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
-    message: JSON.stringify(data) 
+    sessionKey: this.sessionKey
   }]);
 };
 
