@@ -22,7 +22,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        if let sessionKey = command.argumentAtIndex(0) {
+        if let sessionKey = command.argumentAtIndex(0) as? String {
             // create a session and initialize it.
             if let args = command.argumentAtIndex(1) {
                 let config = SessionConfig(data: args)
