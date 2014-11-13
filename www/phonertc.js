@@ -116,18 +116,11 @@ Session.prototype.off = function (eventName, fn) {
   })
 };
 
-Session.prototype.call = function () {
-  function call() {
-    exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
-      sessionKey: this.__sessionKey 
-    }]);
-  }
-
-  if (!this.__sessionKey) {
-    this.__pendingActions.push(call);
-  } else {
-    call.call(this);
-  }
+Session.prototype.call = function (data) {
+  exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
+    sessionKey: this.__sessionKey
+    message: JSON.stringify(data)
+  }]);
 };
 
 Session.prototype.receiveMessage = function (data) {
