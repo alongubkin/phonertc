@@ -44,14 +44,7 @@ function Session(config) {
   }
 
   function onSendMessage(data) {
-    if (data.type === '__set_session_key') {
-      self.__sessionKey = data.sessionKey;
-
-      // execute pending actions
-      self.__pendingActions.forEach(function (action) {
-        action.call(self);
-      });
-    } else if (data.type === '__answered') {
+    if (data.type === '__answered') {
       callEvent('answer');
     } else if (data.type === '__disconnected') {
       callEvent('disconnect');
@@ -117,29 +110,26 @@ Session.prototype.off = function (eventName, fn) {
 };
 
 Session.prototype.call = function (data) {
-  exec(null, null, 'PhoneRTCPlugin', 'call', [{ 
-    sessionKey: this.__sessionKey
+  exec(null, null, 'PhoneRTCPlugin', 'call', [{
     message: JSON.stringify(data)
   }]);
 };
 
 Session.prototype.receiveMessage = function (data) {
   exec(null, null, 'PhoneRTCPlugin', 'receiveMessage', [{
-    sessionKey: this.__sessionKey,
     message: JSON.stringify(data)
   }]);
 };
 
-Session.prototype.renegotiate = function () {
+Session.prototype.renegotiate = function (data) {
   exec(null, null, 'PhoneRTCPlugin', 'renegotiate', [{
-    config: this.config,
-    sessionKey: this.__sessionKey
+    config: this.config
   }]);
 };
 
-Session.prototype.close = function () {
+Session.prototype.close = function (data) {
   exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
-    sessionKey: this.__sessionKey 
+    message: JSON.stringify(data) 
   }]);
 };
 
