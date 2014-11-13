@@ -56,7 +56,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func receiveMessage(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.arguments[0]
+        let container: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = self.getSessionKey(container) {
             let message = container.objectForKey("message")! as String
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
@@ -66,7 +66,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func renegotiate(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.arguments[0]
+        let container: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = self.getSessionKey(container) {
             let config: AnyObject = container.objectForKey("config")!
             dispatch_async(dispatch_get_main_queue()) {
@@ -78,7 +78,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func disconnect(command: CDVInvokedUrlCommand) {
-        let container: AnyObject = command.arguments[0]
+        let container: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = self.getSessionKey(container) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
                 if (self.sessions[sessionKey] != nil) {
@@ -89,7 +89,7 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func setVideoView(command: CDVInvokedUrlCommand) {
-        let config: AnyObject = command.arguments[0]
+        let config: AnyObject = command.argumentAtIndex(0)
         
         dispatch_async(dispatch_get_main_queue()) {
             // create session config from the JS params
