@@ -58,10 +58,19 @@ class PhoneRTCPlugin : CDVPlugin {
     func receiveMessage(command: CDVInvokedUrlCommand) {
         let container: AnyObject = command.argumentAtIndex(0)
         if let sessionKey = self.getSessionKey(container) {
-            let message = container.objectForKey("message")! as String
-            dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
-                self.sessions[sessionKey]!.receiveMessage(message)
+            if let message = container.objectForKey("message") as? String {
+                if let session = self.sessions[sessionKey] {
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0)) {
+                        session.receiveMessage(message)
+                    }
+                } else {
+                    println("There is no session with a session key of \(sessionKey)")
+                }
+            } else {
+                println("Please provide a valid message.")
             }
+        } else {
+            println("A valid sessionKey is required.")
         }
     }
     
