@@ -22,14 +22,15 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {
-        let args: AnyObject = command.argumentAtIndex(0)
-        if let sessionKey = args.objectForKey("sessionKey") as? String {
+        if let sessionKey = command.argumentAtIndex(0) {
             // create a session and initialize it.
-            let config = SessionConfig(data: args)
-            let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
-                config: config, callbackId: command.callbackId,
-                sessionKey: sessionKey)
-            sessions[sessionKey] = session
+            if let args = command.argumentAtIndex(1) {
+                let config = SessionConfig(data: args)
+                let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
+                    config: config, callbackId: command.callbackId,
+                    sessionKey: sessionKey)
+                sessions[sessionKey] = session
+            }
         }
     }
     
