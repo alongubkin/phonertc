@@ -34,8 +34,7 @@ class Session {
             ],
             
             optionalConstraints: [
-                RTCPair(key: "internalSctpDataChannels", value: "true"),
-                RTCPair(key: "DtlsSrtpKeyAgreement", value: "true")
+                RTCPair(key: "internalSctpDataChannels", value: "true")
             ]
         )
     }
