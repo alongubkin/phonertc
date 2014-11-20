@@ -100,49 +100,37 @@ class Session {
     }
     
     func receiveMessage(message: String) {
+        // Parse the incoming JSON message.
         var error : NSError?
         let data : AnyObject? = NSJSONSerialization.JSONObjectWithData(
             message.dataUsingEncoding(NSUTF8StringEncoding)!,
             options: NSJSONReadingOptions.allZeros,
             error: &error)
-        
-        let type: String = data?.objectForKey("type") as NSString
-        
-        switch type {
-        case "candidate":
-            let mid: String = data?.objectForKey("id") as NSString
-            let sdpLineIndex: Int = (data?.objectForKey("label") as NSNumber).integerValue
-            let sdp: String = data?.objectForKey("candidate") as NSString
-
-            let candidate = RTCICECandidate(
-                mid: mid,
-                index: sdpLineIndex,
-                sdp: sdp
-            )
-            
-            if self.queuedRemoteCandidates != nil {
-                self.queuedRemoteCandidates?.append(candidate)
-            } else {
-                self.peerConnection.addICECandidate(candidate)
+        if let object: AnyObject = data {
+            // Log the message to console.
+            println("Received Message: \(object)")
+            // If the message has a type try to handle it.
+            if let type = object.objectForKey("type") as? String {
+                switch type {
+                    case "offer", "answer":
+                        if let sdpString = object.objectForKey("sdp") as? String {
+                            let sdp = RTCSessionDescription(type: type, sdp: self.preferISAC(sdpString))
+                            self.peerConnection.setRemoteDescriptionWithDelegate(SessionDescriptionDelegate(session: self),
+                                                                                 sessionDescription: sdp)
+                        }
+                    case "bye":
+                        self.disconnect(false)
+                    default:
+                        println("Invalid message \(message)")
+                }
             }
-            
-        case "offer", "answer":
-            let sdpString: String = data?.objectForKey("sdp") as NSString
-            let sdp = RTCSessionDescription(
-                type: type,
-                sdp: self.preferISAC(sdpString)
-            )
-            
-            self.peerConnection.setRemoteDescriptionWithDelegate(
-                SessionDescriptionDelegate(session: self),
-                sessionDescription: sdp
-            )
-            
-        case "bye":
-            self.disconnect(false)
-            
-        default:
-            println("Invalid message \(message)")
+        } else {
+            // If there was an error parsing then print it to console.
+            if let parseError = error {
+                println("There was an error parsing the client message: \(parseError.localizedDescription)")
+            }
+            // If there is no data then exit.
+            return
         }
     }
 
