@@ -124,8 +124,8 @@ Session.prototype.off = function (eventName, fn) {
   })
 };
 
-Session.prototype.call = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'call', [{
+Session.prototype.call = function (success, error) {
+  exec(success, error, 'PhoneRTCPlugin', 'call', [{
     sessionKey: this.sessionKey
   }]);
 };
