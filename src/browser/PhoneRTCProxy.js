@@ -272,8 +272,8 @@ var remoteVideoViews = [];
 
 module.exports = {
   createSessionObject: function (success, error, options) {
-    var sessionKey = uuid();
-    var session = new Session(sessionKey, options[0], success);
+    var sessionKey = options[0];
+    var session = new Session(sessionKey, options[1], success);
 
     session.sendMessage({
       type: '__set_session_key',
