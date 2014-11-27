@@ -124,12 +124,14 @@ In order to install PhoneRTC on iOS, please follow these steps:
 		<source-file src="libs/ios/libjingle_media.a" framework="true" />
 		<source-file src="libs/ios/libjingle_peerconnection_objc.a" framework="true" />
 		<source-file src="libs/ios/libjingle_peerconnection.a" framework="true" />
-		<source-file src="libs/ios/libjingle.a" framework="true" />
 		<source-file src="libs/ios/libjsoncpp.a" framework="true" />
 		<source-file src="libs/ios/libmedia_file.a" framework="true" />
 		<source-file src="libs/ios/libneteq.a" framework="true" />
 		<source-file src="libs/ios/libnss_static.a" framework="true" />
-		<source-file src="libs/ios/libopenmax_dl.a" framework="true" />
+		<source-file src="libs/ios/libmetrics_default.a" framework="true" />
+		<source-file src="libs/ios/librtc_p2p.a" framework="true" />
+		<source-file src="libs/ios/libwebrtc_vp9.a" framework="true" />
+		<source-file src="libs/ios/librtc_xmpp.a" framework="true" />
 		<source-file src="libs/ios/libopus.a" framework="true" />
 		<source-file src="libs/ios/libpaced_sender.a" framework="true" />
 		<source-file src="libs/ios/libPCM16B.a" framework="true" />
