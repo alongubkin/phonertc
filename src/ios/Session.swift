@@ -96,7 +96,7 @@ class Session {
             self.stream!.addVideoTrack(self.plugin.localVideoTrack!)
         }
         
-        self.peerConnection.addStream(self.stream, constraints: self.constraints)
+        self.peerConnection.addStream(self.stream)
     }
     
     func receiveMessage(message: String) {
@@ -112,6 +112,23 @@ class Session {
             // If the message has a type try to handle it.
             if let type = object.objectForKey("type") as? String {
                 switch type {
+                case "candidate":
+                    let mid: String = data?.objectForKey("id") as NSString
+                    let sdpLineIndex: Int = (data?.objectForKey("label") as NSNumber).integerValue
+                    let sdp: String = data?.objectForKey("candidate") as NSString
+                    
+                    let candidate = RTCICECandidate(
+                        mid: mid,
+                        index: sdpLineIndex,
+                        sdp: sdp
+                    )
+                    
+                    if self.queuedRemoteCandidates != nil {
+                        self.queuedRemoteCandidates?.append(candidate)
+                    } else {
+                        self.peerConnection.addICECandidate(candidate)
+                    }
+                    
                     case "offer", "answer":
                         if let sdpString = object.objectForKey("sdp") as? String {
                             let sdp = RTCSessionDescription(type: type, sdp: self.preferISAC(sdpString))

@@ -31,34 +31,13 @@
 #endif
 
 @class RTCI420Frame;
-@class RTCVideoRenderer;
 
-// RTCVideoRendererDelegate is a protocol for an object that must be
-// implemented to get messages when rendering.
-@protocol RTCVideoRendererDelegate<NSObject>
+@protocol RTCVideoRenderer<NSObject>
 
 // The size of the frame.
-- (void)renderer:(RTCVideoRenderer*)renderer didSetSize:(CGSize)size;
+- (void)setSize:(CGSize)size;
 
 // The frame to be displayed.
-- (void)renderer:(RTCVideoRenderer*)renderer
-    didReceiveFrame:(RTCI420Frame*)frame;
-
-@end
-
-// Interface for rendering VideoFrames from a VideoTrack
-@interface RTCVideoRenderer : NSObject
-
-@property(nonatomic, weak) id<RTCVideoRendererDelegate> delegate;
-
-// Initialize the renderer.  Requires a delegate which does the actual drawing
-// of frames.
-- (instancetype)initWithDelegate:(id<RTCVideoRendererDelegate>)delegate;
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-// Disallow init and don't add to documentation
-- (id)init __attribute__((
-    unavailable("init is not a supported initializer for this class.")));
-#endif /* DOXYGEN_SHOULD_SKIP_THIS */
+- (void)renderFrame:(RTCI420Frame*)frame;
 
 @end

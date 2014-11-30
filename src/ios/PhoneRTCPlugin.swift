@@ -10,7 +10,7 @@ class PhoneRTCPlugin : CDVPlugin {
     var videoCapturer: RTCVideoCapturer?
     var videoSource: RTCVideoSource?
     var localVideoView: RTCEAGLVideoView?
-    var remoteVideoViews: [RTCEAGLVideoView] = []
+    var remoteVideoViews: [VideoTrackViewPair] = []
     
     var localVideoTrack: RTCVideoTrack?
     var localAudioTrack: RTCAudioTrack?
@@ -137,7 +137,7 @@ class PhoneRTCPlugin : CDVPlugin {
                     } else {
                         // otherwise, create the local video view
                         self.localVideoView = self.createVideoView(params: params)
-                        self.localVideoView!.videoTrack = self.localVideoTrack!
+                        self.localVideoTrack!.addRenderer(self.localVideoView!)
                     }
                 }
                 
@@ -151,7 +151,7 @@ class PhoneRTCPlugin : CDVPlugin {
             self.localVideoView!.hidden = true;
             
             for remoteVideoView in self.remoteVideoViews {
-                remoteVideoView.hidden = true;
+                remoteVideoView.videoView.hidden = true;
             }
         }
     }
@@ -161,7 +161,7 @@ class PhoneRTCPlugin : CDVPlugin {
             self.localVideoView!.hidden = false;
             
             for remoteVideoView in self.remoteVideoViews {
-                remoteVideoView.hidden = false;
+                remoteVideoView.videoView.hidden = false;
             } 
         }
     }
@@ -222,8 +222,8 @@ class PhoneRTCPlugin : CDVPlugin {
         // resized and re-positioned in refreshVideoContainer
         let videoView = createVideoView()
         
-        videoView.videoTrack = videoTrack
-        self.remoteVideoViews.append(videoView)
+        videoTrack.addRenderer(videoView)
+        self.remoteVideoViews.append(VideoTrackViewPair(videoView: videoView, videoTrack: videoTrack))
         
         refreshVideoContainer()
         
@@ -235,10 +235,10 @@ class PhoneRTCPlugin : CDVPlugin {
     func removeRemoteVideoTrack(videoTrack: RTCVideoTrack) {
         dispatch_async(dispatch_get_main_queue()) {
             for var i = 0; i < self.remoteVideoViews.count; i++ {
-                let videoView = self.remoteVideoViews[i]
-                if videoView.videoTrack == videoTrack {
-                    videoView.hidden = true
-                    videoView.removeFromSuperview()
+                let pair = self.remoteVideoViews[i]
+                if pair.videoTrack == videoTrack {
+                    pair.videoView.hidden = true
+                    pair.videoView.removeFromSuperview()
                     self.remoteVideoViews.removeAtIndex(i)
                     self.refreshVideoContainer()
                     return
@@ -275,8 +275,8 @@ class PhoneRTCPlugin : CDVPlugin {
                     + self.videoConfig!.container.x
             
             for var video = 0; video < videosInRow && videoViewIndex < n; video++ {
-                let videoView = self.remoteVideoViews[videoViewIndex++]
-                videoView.frame = CGRectMake(
+                let pair = self.remoteVideoViews[videoViewIndex++]
+                pair.videoView.frame = CGRectMake(
                     CGFloat(x),
                     CGFloat(y),
                     CGFloat(videoSize),
@@ -314,4 +314,9 @@ class PhoneRTCPlugin : CDVPlugin {
             self.videoCapturer = nil
         }
     }
+}
+
+struct VideoTrackViewPair {
+    var videoView: RTCEAGLVideoView
+    var videoTrack: RTCVideoTrack
 }

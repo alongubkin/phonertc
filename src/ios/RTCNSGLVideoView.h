@@ -31,7 +31,7 @@
 
 #import <AppKit/NSOpenGLView.h>
 
-#import "RTCVideoTrack.h"
+#import "RTCVideoRenderer.h"
 
 @class RTCNSGLVideoView;
 @protocol RTCNSGLVideoViewDelegate
@@ -40,9 +40,8 @@
 
 @end
 
-@interface RTCNSGLVideoView : NSOpenGLView
+@interface RTCNSGLVideoView : NSOpenGLView <RTCVideoRenderer>
 
-@property(nonatomic, strong) RTCVideoTrack* videoTrack;
 @property(nonatomic, weak) id<RTCNSGLVideoViewDelegate> delegate;
 
 @end

@@ -64,8 +64,7 @@
 // Add a new MediaStream to be sent on this PeerConnection.
 // Note that a SessionDescription negotiation is needed before the
 // remote peer can receive the stream.
-- (BOOL)addStream:(RTCMediaStream *)stream
-      constraints:(RTCMediaConstraints *)constraints;
+- (BOOL)addStream:(RTCMediaStream *)stream;
 
 // Remove a MediaStream from this PeerConnection.
 // Note that a SessionDescription negotiation is need before the
