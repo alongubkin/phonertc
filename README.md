@@ -2,6 +2,9 @@
 
 WebRTC for Cordova apps!
 
+### iOS binary file!!!
+The binary file for ios must be downloaded separately from [googleDrive](https://drive.google.com/file/d/0B7wZxt3Z7oEpUzBzUnF6UkhVLWM/view?usp=sharing) and put in the libs/ios folder.
+
 ### Features
 
 * Completely Open Source
