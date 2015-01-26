@@ -93,7 +93,7 @@ In order to install PhoneRTC on iOS, please follow these steps:
 		<framework src="AudioToolbox.framework" />
 		<framework src="GLKit.framework" />
 
-		<source-file src="libs/ios/libWebRTC.a" framework="true" />
+		<source-file src="libs/ios/libPhoneRTC.a" framework="true" />
     </platform>
 
     <platform name="android">
