@@ -254,6 +254,10 @@ class PhoneRTCPlugin : CDVPlugin {
             return
         }
         
+        if n > 1 {
+            n = n - 1
+        }
+        
         let rows = n < 9 ? 2 : 3
         let videosInRow = n == 2 ? 2 : Int(ceil(Float(n) / Float(rows)))
         
