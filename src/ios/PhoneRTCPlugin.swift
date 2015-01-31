@@ -250,7 +250,7 @@ class PhoneRTCPlugin : CDVPlugin {
     func refreshVideoContainer() {
         var n = self.remoteVideoViews.count
         
-        if n == 0 {
+        if ( n == 0 || self.videoConfig!.isSafetyCam) {
             
             if self.localVideoView != nil {
                 self.localVideoView!.frame = CGRectMake(
@@ -315,7 +315,7 @@ class PhoneRTCPlugin : CDVPlugin {
                 
             }
             
-            for var video = startIndex; video < videosInRow && videoViewIndex < n; video++ {
+            for var video = 0; video < videosInRow && videoViewIndex < n; video++ {
                 let pair = self.remoteVideoViews[videoViewIndex++]
                 pair.videoView.frame = CGRectMake(
                     CGFloat(x),
