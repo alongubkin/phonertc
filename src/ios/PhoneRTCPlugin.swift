@@ -315,7 +315,7 @@ class PhoneRTCPlugin : CDVPlugin {
                 
             }
             
-            for var video = 0; video < videosInRow && videoViewIndex < n; video++ {
+            for var video = startIndex; video < videosInRow && videoViewIndex < n; video++ {
                 let pair = self.remoteVideoViews[videoViewIndex++]
                 pair.videoView.frame = CGRectMake(
                     CGFloat(x),
