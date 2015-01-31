@@ -248,10 +248,38 @@ class PhoneRTCPlugin : CDVPlugin {
     }
     
     func refreshVideoContainer() {
-        let n = self.remoteVideoViews.count
+        var n = self.remoteVideoViews.count
         
         if n == 0 {
+            
+            if self.localVideoView != nil {
+                self.localVideoView!.frame = CGRectMake(
+                    CGFloat(self.videoConfig!.container.x),
+                    CGFloat(self.videoConfig!.container.y),
+                    CGFloat(self.videoConfig!.container.width),
+                    CGFloat(self.videoConfig!.container.height)
+                )
+            }
             return
+            
+        } else {
+            
+            let params = self.videoConfig!.local!
+            
+            // if the local video view already exists, just
+            // change its position according to the new config.
+            if self.localVideoView != nil {
+                self.localVideoView!.frame = CGRectMake(
+                    CGFloat(params.x + self.videoConfig!.container.x),
+                    CGFloat(params.y + self.videoConfig!.container.y),
+                    CGFloat(params.width),
+                    CGFloat(params.height)
+                )
+            }
+        }
+        
+        if n > 1 {
+            n = n - 1
         }
         
         let rows = n < 9 ? 2 : 3
@@ -273,6 +301,19 @@ class PhoneRTCPlugin : CDVPlugin {
                 videoSize: videoSize,
                 containerSize: self.videoConfig!.container.width)
                     + self.videoConfig!.container.x
+            
+            var startIndex = 0
+            if n > 1 {
+                startIndex = 1
+                
+                self.remoteVideoViews[0].videoView.frame = CGRectMake(
+                    CGFloat(self.videoConfig!.container.x),
+                    CGFloat(self.videoConfig!.container.y),
+                    CGFloat(self.videoConfig!.container.width),
+                    CGFloat(self.videoConfig!.container.height)
+                )
+                
+            }
             
             for var video = 0; video < videosInRow && videoViewIndex < n; video++ {
                 let pair = self.remoteVideoViews[videoViewIndex++]
