@@ -37,10 +37,12 @@ struct StreamsConfig {
 class VideoConfig {
     var container: VideoLayoutParams
     var local: VideoLayoutParams?
+    var isSafetyCam: Bool
     
     init(data: AnyObject) {
         let containerParams: AnyObject = data.objectForKey("containerParams")!
         let localParams: AnyObject? = data.objectForKey("local")
+        self.isSafetyCam = data.objectForKey("isSafetyCam") as Bool
         
         self.container = VideoLayoutParams(data: containerParams)
         
