@@ -176,14 +176,13 @@ class PhoneRTCPlugin : CDVPlugin {
 
                 self.localVideoView = nil
             }
-
-            self.localVideoTrack = nil
-            self.localAudioTrack = nil
-
-            self.videoSource = nil
-            self.videoCapturer = nil
-
         }
+        
+        self.localVideoTrack = nil
+        self.localAudioTrack = nil
+        
+        self.videoSource = nil
+        self.videoCapturer = nil
     }
 
     func createVideoView(params: VideoLayoutParams? = nil) -> RTCEAGLVideoView {
