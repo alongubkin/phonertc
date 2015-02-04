@@ -16,7 +16,7 @@ function createUUID() {
   return uuid;
 }
 
-function Session(config) { 
+function Session(config) {
   // make sure that the config object is valid
   if (typeof config !== 'object') {
     throw {
@@ -145,7 +145,7 @@ Session.prototype.renegotiate = function () {
 };
 
 Session.prototype.close = function () {
-  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{ 
+  exec(null, null, 'PhoneRTCPlugin', 'disconnect', [{
     sessionKey: this.sessionKey
   }]);
 };
@@ -201,4 +201,9 @@ exports.hideVideoView = function () {
 
 exports.showVideoView = function () {
   exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
+};
+
+//az - Custom routine to reset call
+exports.reset = function () {
+  exec(null, null, 'PhoneRTCPlugin', 'reset', []);
 };
