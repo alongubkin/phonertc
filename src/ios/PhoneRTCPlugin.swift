@@ -112,6 +112,20 @@ class PhoneRTCPlugin : CDVPlugin {
             if self.videoConfig!.local != nil {
                 if self.localVideoTrack == nil {
                     self.initLocalVideoTrack()
+                } else {
+                    if self.localVideoView != nil {
+                        self.localVideoView!.hidden = true
+                        self.localVideoView!.removeFromSuperview()
+                        self.localVideoView = nil
+                    }
+                    
+                    self.localVideoTrack = nil
+                    
+                    self.videoSource = nil
+                    self.videoCapturer = nil
+                    
+                    self.initLocalVideoTrack()
+
                 }
 
                 if self.videoConfig!.local == nil {
