@@ -111,7 +111,7 @@ class PhoneRTCPlugin : CDVPlugin {
             // add local video view
             if self.videoConfig!.local != nil {
                 if self.localVideoTrack == nil {
-                    self.initLocalVideoTrack(videoConfig.rearFacingCamera)
+                    self.initLocalVideoTrack()
                 }
 
                 if self.videoConfig!.local == nil {
@@ -213,11 +213,11 @@ class PhoneRTCPlugin : CDVPlugin {
         localAudioTrack = peerConnectionFactory.audioTrackWithID("ARDAMSa0")
     }
 
-    func initLocalVideoTrack(rearFacingCamera: Bool) {
+    func initLocalVideoTrack() {
         var cameraID: String?
         var position: AVCaptureDevicePosition = AVCaptureDevicePosition.Front
         
-        if rearFacingCamera {
+        if (self.videoConfig?.rearFacingCamera == true) {
             position = AVCaptureDevicePosition.Back
         }
         
