@@ -111,7 +111,7 @@ class PhoneRTCPlugin : CDVPlugin {
             // add local video view
             if self.videoConfig!.local != nil {
                 if self.localVideoTrack == nil {
-                    self.initLocalVideoTrack(rearFacingCamera: videoConfig.rearFacingCamera)
+                    self.initLocalVideoTrack(videoConfig.rearFacingCamera)
                 }
 
                 if self.videoConfig!.local == nil {
