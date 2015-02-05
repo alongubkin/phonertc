@@ -111,7 +111,7 @@ class PhoneRTCPlugin : CDVPlugin {
             // add local video view
             if self.videoConfig!.local != nil {
                 if self.localVideoTrack == nil {
-                    self.initLocalVideoTrack()
+                    self.initLocalVideoTrack(rearFacingCamera: videoConfig.rearFacingCamera)
                 }
 
                 if self.videoConfig!.local == nil {
@@ -213,11 +213,16 @@ class PhoneRTCPlugin : CDVPlugin {
         localAudioTrack = peerConnectionFactory.audioTrackWithID("ARDAMSa0")
     }
 
-    func initLocalVideoTrack() {
+    func initLocalVideoTrack(rearFacingCamera: Bool) {
         var cameraID: String?
+        var position: AVCaptureDevicePosition = AVCaptureDevicePosition.Front
+        
+        if rearFacingCamera
+            AVCaptureDevicePosition = AVCaptureDevicePosition.Back
+        
         for captureDevice in AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo) {
-            // TODO: Make this camera option configurable
-            if captureDevice.position == AVCaptureDevicePosition.Front {
+            
+            if captureDevice.position == position {
                 cameraID = captureDevice.localizedName
             }
         }
