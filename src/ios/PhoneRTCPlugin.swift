@@ -218,7 +218,7 @@ class PhoneRTCPlugin : CDVPlugin {
         var position: AVCaptureDevicePosition = AVCaptureDevicePosition.Front
         
         if rearFacingCamera {
-            AVCaptureDevicePosition = AVCaptureDevicePosition.Back
+            position = AVCaptureDevicePosition.Back
         }
         
         for captureDevice in AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo) {
