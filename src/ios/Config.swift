@@ -38,11 +38,13 @@ class VideoConfig {
     var container: VideoLayoutParams
     var local: VideoLayoutParams?
     var isSafetyCam: Bool
+    var rearFacingCamera: Bool
     
     init(data: AnyObject) {
         let containerParams: AnyObject = data.objectForKey("containerParams")!
         let localParams: AnyObject? = data.objectForKey("local")
         self.isSafetyCam = data.objectForKey("isSafetyCam") as Bool
+        self.rearFacingCamera = data.objectForKey("rearFacingCamera") as Bool
         
         self.container = VideoLayoutParams(data: containerParams)
         
