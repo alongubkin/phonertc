@@ -6,19 +6,19 @@ class SessionConfig {
     var streams: StreamsConfig
     
     init(data: AnyObject) {
-        self.isInitiator = data.objectForKey("isInitiator") as Bool
+        self.isInitiator = data.objectForKey("isInitiator") as! Bool
         
         let turnObject: AnyObject = data.objectForKey("turn")!
         self.turn = TurnConfig(
-            host: turnObject.objectForKey("host") as String,
-            username: turnObject.objectForKey("username") as String,
-            password: turnObject.objectForKey("password") as String
+            host: turnObject.objectForKey("host") as! String,
+            username: turnObject.objectForKey("username") as! String,
+            password: turnObject.objectForKey("password") as! String
         )
         
         let streamsObject: AnyObject = data.objectForKey("streams")!
         self.streams = StreamsConfig(
-            audio: streamsObject.objectForKey("audio") as Bool,
-            video: streamsObject.objectForKey("video") as Bool
+            audio: streamsObject.objectForKey("audio") as! Bool,
+            video: streamsObject.objectForKey("video") as! Bool
         )
     }
 }
@@ -61,12 +61,12 @@ class VideoLayoutParams {
     }
     
     init(data: AnyObject) {
-        let position: [AnyObject] = data.objectForKey("position")! as [AnyObject]
-        self.x = position[0] as Int
-        self.y = position[1] as Int
+        let position: [AnyObject] = data.objectForKey("position")! as! [AnyObject]
+        self.x = position[0] as! Int
+        self.y = position[1] as! Int
         
-        let size: [AnyObject] = data.objectForKey("size")! as [AnyObject]
-        self.width = size[0] as Int
-        self.height = size[1] as Int
+        let size: [AnyObject] = data.objectForKey("size")! as! [AnyObject]
+        self.width = size[0] as! Int
+        self.height = size[1] as! Int
     }
 }

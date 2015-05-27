@@ -24,7 +24,7 @@ class PhoneRTCPlugin : CDVPlugin {
     func createSessionObject(command: CDVInvokedUrlCommand) {
         if let sessionKey = command.argumentAtIndex(0) as? String {
             // create a session and initialize it.
-            if let args = command.argumentAtIndex(1) {
+            if let args: AnyObject = command.argumentAtIndex(1) {
                 let config = SessionConfig(data: args)
                 let session = Session(plugin: self, peerConnectionFactory: peerConnectionFactory,
                     config: config, callbackId: command.callbackId,
@@ -86,9 +86,9 @@ class PhoneRTCPlugin : CDVPlugin {
     func sendMessage(callbackId: String, message: NSData) {
         let json = NSJSONSerialization.JSONObjectWithData(message,
             options: NSJSONReadingOptions.MutableLeaves,
-            error: nil) as NSDictionary
+            error: nil) as! NSDictionary
         
-        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json)
+        let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json as [NSObject : AnyObject])
         pluginResult.setKeepCallbackAsBool(true);
         
         self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)

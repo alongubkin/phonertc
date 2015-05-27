@@ -113,9 +113,9 @@ class Session {
             if let type = object.objectForKey("type") as? String {
                 switch type {
                 case "candidate":
-                    let mid: String = data?.objectForKey("id") as NSString
-                    let sdpLineIndex: Int = (data?.objectForKey("label") as NSNumber).integerValue
-                    let sdp: String = data?.objectForKey("candidate") as NSString
+                    let mid: String = data?.objectForKey("id") as! NSString as String
+                    let sdpLineIndex: Int = (data?.objectForKey("label") as! NSNumber).integerValue
+                    let sdp: String = data?.objectForKey("candidate") as! NSString as String
                     
                     let candidate = RTCICECandidate(
                         mid: mid,
