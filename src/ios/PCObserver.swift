@@ -13,7 +13,7 @@ class PCObserver : NSObject, RTCPeerConnectionDelegate {
             
         dispatch_async(dispatch_get_main_queue()) {
             if stream.videoTracks.count > 0 {
-                self.session.addVideoTrack(stream.videoTracks[0] as RTCVideoTrack)
+                self.session.addVideoTrack(stream.videoTracks[0] as! RTCVideoTrack)
             }
         }
         

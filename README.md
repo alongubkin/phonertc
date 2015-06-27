@@ -2,6 +2,9 @@
 
 WebRTC for Cordova apps!
 
+### iOS binary file!
+Binary file has been striped and is now included.
+
 ### Features
 
 * Completely Open Source
