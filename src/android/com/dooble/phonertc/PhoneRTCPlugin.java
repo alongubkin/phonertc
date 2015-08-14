@@ -195,13 +195,17 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 		} else if (action.equals("hideVideoView")) {
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					_videoView.setVisibility(View.GONE);
+					if (_videoView != null) {
+						_videoView.setVisibility(View.GONE);
+					}
 				}
 			});
 		} else if (action.equals("showVideoView")) {
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
-					_videoView.setVisibility(View.VISIBLE);
+					if (_videoView != null) {
+						_videoView.setVisibility(View.VISIBLE);
+					}
 				}
 			});		
 		}
