@@ -62,10 +62,11 @@ class SessionDescriptionDelegate : UIResponder, RTCSessionDescriptionDelegate {
     }
     
     func drainRemoteCandidates() {
-        for candidate in self.session.queuedRemoteCandidates! {
-            self.session.peerConnection.addICECandidate(candidate)
+        if self.session.queuedRemoteCandidates != nil {
+            for candidate in self.session.queuedRemoteCandidates! {
+                self.session.peerConnection.addICECandidate(candidate)
+            }
+            self.session.queuedRemoteCandidates = nil
         }
-        
-        self.session.queuedRemoteCandidates = nil
     }
 }
