@@ -120,7 +120,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 			cordova.getThreadPool().execute(new Runnable() {
 				public void run() {
-					_sessions.get(sessionKey).receiveMessage(message);
+					Session session = _sessions.get(sessionKey);
+					if (null != session) {
+						session.receiveMessage(message);
+					}
 				}
 			});
 
