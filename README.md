@@ -2,8 +2,7 @@
 
 WebRTC for Cordova apps!
 
-### iOS binary file!
-Binary file has been striped and is now included.
+**Important Note**: Use GitHub issues only for bugs and feature requests! For any other questions, use the [StackOverflow forum](http://stackoverflow.com/questions/tagged/phonertc).
 
 ### Features
 
