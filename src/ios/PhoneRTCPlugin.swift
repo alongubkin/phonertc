@@ -84,14 +84,13 @@ class PhoneRTCPlugin : CDVPlugin {
     }
 
     func sendMessage(callbackId: String, message: NSData) {
-        let json = NSJSONSerialization.JSONObjectWithData(message,
-            options: NSJSONReadingOptions.MutableLeaves,
-            error: nil) as! NSDictionary
+        let json = (try! NSJSONSerialization.JSONObjectWithData(message,
+            options: NSJSONReadingOptions.MutableLeaves)) as! NSDictionary
         
         let pluginResult = CDVPluginResult(status: CDVCommandStatus_OK, messageAsDictionary: json as [NSObject : AnyObject])
         pluginResult.setKeepCallbackAsBool(true);
         
-        self.commandDelegate.sendPluginResult(pluginResult, callbackId:callbackId)
+        self.commandDelegate!.sendPluginResult(pluginResult, callbackId:callbackId)
     }
     
     func setVideoView(command: CDVInvokedUrlCommand) {
@@ -136,7 +135,7 @@ class PhoneRTCPlugin : CDVPlugin {
                         )
                     } else {
                         // otherwise, create the local video view
-                        self.localVideoView = self.createVideoView(params: params)
+                        self.localVideoView = self.createVideoView(params)
                         self.localVideoTrack!.addRenderer(self.localVideoView!)
                     }
                 }
@@ -184,8 +183,8 @@ class PhoneRTCPlugin : CDVPlugin {
         
         view.userInteractionEnabled = false
         
-        self.webView.addSubview(view)
-        self.webView.bringSubviewToFront(view)
+        self.webView!.addSubview(view)
+        self.webView!.bringSubviewToFront(view)
         
         return view
     }
@@ -228,7 +227,7 @@ class PhoneRTCPlugin : CDVPlugin {
         refreshVideoContainer()
         
         if self.localVideoView != nil {
-            self.webView.bringSubviewToFront(self.localVideoView!)
+            self.webView!.bringSubviewToFront(self.localVideoView!)
         }
     }
     
