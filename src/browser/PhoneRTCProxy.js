@@ -487,7 +487,9 @@ function onSessionDisconnect(sessionKey) {
     }
 
     localStreams.forEach(function (stream) {
-      stream.stop();
+      stream.getTracks().forEach( function(track) { 
+        track.stop();
+      });
     });
 
     localStreams = [];
