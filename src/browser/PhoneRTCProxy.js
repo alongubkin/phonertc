@@ -381,7 +381,7 @@ function addRemoteStream(stream) {
 
 function removeRemoteStream(videoView) {
   console.log(remoteVideoViews);
-  document.body.removeChild(videoView);
+  videoView.parentNode.removeChild(videoView);
   remoteVideoViews.splice(videoView, 1);
   console.log(remoteVideoViews);
 
@@ -487,7 +487,9 @@ function onSessionDisconnect(sessionKey) {
     }
 
     localStreams.forEach(function (stream) {
-      stream.stop();
+      stream.getTracks().forEach( function(track) { 
+        track.stop();
+      });
     });
 
     localStreams = [];
