@@ -367,8 +367,14 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 				for (int video = 0; video < videosInRow && videoIndex < n; video++) {
 					VideoTrackRendererPair pair = _remoteVideos.get(videoIndex++);
 
-                    int widthPercentage = x + videoSizeAsPercentage > 100 ? (int)(videoSizeAsPercentage - x) : videoSizeAsPercentage;
-                    int heightPercentage = y + videoSizeAsPercentage > 100 ? (int)(videoSizeAsPercentage - y) : videoSizeAsPercentage;
+                    int widthPercentage = videoSizeAsPercentage;
+                    int heightPercentage = videoSizeAsPercentage;
+                    while((x + widthPercentage) > 100){
+                        widthPercentage--;
+                    }
+                    while((y + heightPercentage) > 100){
+                        heightPercentage--;
+                    }
 
 					pair.setVideoRenderer(new VideoRenderer(
 							VideoRendererGui.create(x, y, widthPercentage, heightPercentage,
