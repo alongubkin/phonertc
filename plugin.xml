@@ -12,10 +12,12 @@
 		<engine name="cordova" version=">=3.0.0" />
 	</engines>
 
+	<dependency id="cordova-plugin-compat" version="^1.0.0" />
+
 	<js-module src="www/phonertc.js" name="PhoneRTC">
         	<clobbers target="cordova.plugins.phonertc" />
 	</js-module>
-	
+
 	<platform name="ios">
 		<info>---------------------
 PhoneRTC Installation
