@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import android.Manifest;
 import android.app.Activity;
 import android.graphics.Point;
 import android.view.View;
@@ -28,6 +29,9 @@ import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
 import org.apache.cordova.PermissionHelper;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PermissionInfo;
 
 public class PhoneRTCPlugin extends CordovaPlugin {
 	private AudioSource _audioSource;
@@ -47,6 +51,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private boolean _shouldDispose = true;
 	private boolean _initializedAndroidGlobals = false;
 
+	public CallbackContext callbackContext;
+
+	protected final static String[] permissions = { Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE };
+
 	public PhoneRTCPlugin() {
 		_remoteVideos = new ArrayList<VideoTrackRendererPair>();
 		_sessions = new HashMap<String, Session>();
@@ -57,6 +65,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			CallbackContext callbackContext) throws JSONException {
 
 		final CallbackContext _callbackContext = callbackContext;
+		this.callbackContext = _callbackContext;
 
 		if (action.equals("createSessionObject")) {
 			final SessionConfig config = SessionConfig.fromJSON(args.getJSONObject(1));
@@ -213,6 +222,21 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					}
 				}
 			});
+		}
+		else if (action.equals("checkPermissions")){
+			if(PermissionHelper.hasPermission(this, permissions[0]) && PermissionHelper.hasPermission(this, permissions[1]) && PermissionHelper.hasPermission(this, permissions[2])) {
+				callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
+				return true;
+			}
+			else{
+				try {
+					PermissionHelper.requestPermissions(this, 0, permissions);
+					return true;
+				}
+				catch (Exception e) {
+					callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR));
+				}
+			}
 		}
 
 		callbackContext.error("Invalid action: " + action);
@@ -474,5 +498,20 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	public boolean shouldDispose() {
 		return _shouldDispose;
+	}
+
+
+	public void onRequestPermissionResult(int requestCode, String[] permissions,
+										  int[] grantResults) throws JSONException
+	{
+		for(int r:grantResults)
+		{
+			if(r == PackageManager.PERMISSION_DENIED)
+			{
+				this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.ERROR, 20));
+				return;
+			}
+		}
+		this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK));
 	}
 }

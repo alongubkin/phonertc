@@ -202,3 +202,7 @@ exports.hideVideoView = function () {
 exports.showVideoView = function () {
   exec(null, null, 'PhoneRTCPlugin', 'showVideoView', []);
 };
+
+exports.checkPermissions = function (success, fail) {
+  exec(success, fail, 'PhoneRTCPlugin', 'checkPermissions', []);
+};
