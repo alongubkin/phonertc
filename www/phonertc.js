@@ -158,13 +158,13 @@ function getLayoutParams(videoElement) {
   if (cordova.platformId === 'android') {
     return {
       position: [boundingRect.left + window.scrollX, boundingRect.top + window.scrollY],
-      size: [videoElement.offsetWidth, videoElement.offsetHeight]
+      size: [boundingRect.width, boundingRect.height]
     };
   }
 
   return {
     position: [boundingRect.left, boundingRect.top],
-    size: [videoElement.offsetWidth, videoElement.offsetHeight]
+    size: [boundingRect.width, boundingRect.height]
   };
 }
 

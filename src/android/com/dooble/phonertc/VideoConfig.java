@@ -8,7 +8,7 @@ public class VideoConfig {
 
 	private VideoLayoutParams _container;
 	private VideoLayoutParams _local;
-	private int _devicePixelRatio;
+	private float _devicePixelRatio;
 
 	public VideoLayoutParams getContainer() {
 		return _container;
@@ -29,7 +29,7 @@ public class VideoConfig {
 	public static VideoConfig fromJSON(JSONObject json) throws JSONException {
 		VideoConfig config = new VideoConfig();
 		config.setContainer(VideoLayoutParams.fromJSON(json.getJSONObject("containerParams")));
-		config.setDevicePixelRatio(json.getInt("devicePixelRatio"));
+		config.setDevicePixelRatio((float)json.getDouble("devicePixelRatio"));
 
 		if (json.has("local")) {
 			config.setLocal(VideoLayoutParams.fromJSON(json.getJSONObject("local")));
@@ -38,11 +38,11 @@ public class VideoConfig {
 		return config;
 	}
 
-	public int getDevicePixelRatio() {
+	public float getDevicePixelRatio() {
 		return _devicePixelRatio;
 	}
 
-	public void setDevicePixelRatio(int _devicePixelRatio) {
+	public void setDevicePixelRatio(float _devicePixelRatio) {
 		this._devicePixelRatio = _devicePixelRatio;
 	}
 

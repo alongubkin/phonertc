@@ -188,10 +188,10 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					}
 
 					_videoParams = new WebView.LayoutParams(
-							_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(),
-							_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio(),
-							_videoConfig.getContainer().getX() * _videoConfig.getDevicePixelRatio(),
-							_videoConfig.getContainer().getY() * _videoConfig.getDevicePixelRatio());
+							(int)(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio()),
+							(int)(_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio()),
+							(int)(_videoConfig.getContainer().getX() * _videoConfig.getDevicePixelRatio()),
+							(int)(_videoConfig.getContainer().getY() * _videoConfig.getDevicePixelRatio()));
 
 					if (_videoView == null) {
 						// createVideoView();
@@ -340,8 +340,8 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	private void createVideoView() {
 		Point size = new Point();
-		size.set(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio(),
-				_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio());
+		size.set((int)(_videoConfig.getContainer().getWidth() * _videoConfig.getDevicePixelRatio()),
+				(int)(_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio()));
 
 		_videoView = new VideoGLView(cordova.getActivity(), size);
 		VideoRendererGui.setView(_videoView, null);
@@ -395,16 +395,16 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
                     int widthPercentage = videoSizeAsPercentage;
                     int heightPercentage = videoSizeAsPercentage;
-                    while((x + widthPercentage) > 100){
-                        widthPercentage--;
+                    if((x + widthPercentage) > 100){
+                        widthPercentage = widthPercentage - x;
                     }
-                    while((y + heightPercentage) > 100){
-                        heightPercentage--;
+                    if((y + heightPercentage) > 100){
+						heightPercentage = heightPercentage - y;
                     }
 
 					pair.setVideoRenderer(new VideoRenderer(
 							VideoRendererGui.create(x, y, widthPercentage, heightPercentage,
-									RendererCommon.ScalingType.SCALE_ASPECT_FILL, true)));
+									RendererCommon.ScalingType.SCALE_ASPECT_BALANCED, true)));
 
 					pair.getVideoTrack().addRenderer(pair.getVideoRenderer());
 
