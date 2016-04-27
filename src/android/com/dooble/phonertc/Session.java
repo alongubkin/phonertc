@@ -338,6 +338,16 @@ public class Session {
 
 		}
 
+		@Override
+		public void onIceCandidatesRemoved(IceCandidate[] candidates) {
+
+		}
+
+		@Override
+		public void onIceConnectionReceivingChange(boolean receiving) {
+
+		}
+
 	}
 
 	private class SDPObserver implements SdpObserver {

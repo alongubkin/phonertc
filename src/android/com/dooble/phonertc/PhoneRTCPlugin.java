@@ -23,8 +23,10 @@ import org.webrtc.AudioTrack;
 import org.webrtc.MediaConstraints;
 import org.webrtc.PeerConnectionFactory;
 import org.webrtc.VideoCapturer;
+import org.webrtc.VideoCapturerAndroid;
 import org.webrtc.VideoRenderer;
 import org.webrtc.VideoRendererGui;
+import org.webrtc.RendererCommon;
 import org.webrtc.VideoSource;
 import org.webrtc.VideoTrack;
 
@@ -37,7 +39,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 	private AudioSource _audioSource;
 	private AudioTrack _audioTrack;
 
-	private VideoCapturer _videoCapturer;
+	private VideoCapturerAndroid _videoCapturer;
 	private VideoSource _videoSource;
 
 	private PeerConnectionFactory _peerConnectionFactory;
@@ -76,8 +78,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (!_initializedAndroidGlobals) {
-						abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true,
-								VideoRendererGui.getEGLContext()),
+						abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, true),
 								"Failed to initializeAndroidGlobals");
 						_initializedAndroidGlobals = true;
 					}
@@ -177,8 +178,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 			cordova.getActivity().runOnUiThread(new Runnable() {
 				public void run() {
 					if (!_initializedAndroidGlobals) {
-						abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true,
-								VideoRendererGui.getEGLContext()),
+						abortUnless(PeerConnectionFactory.initializeAndroidGlobals(cordova.getActivity(), true, true, true),
 								"Failed to initializeAndroidGlobals");
 						_initializedAndroidGlobals = true;
 					}
@@ -296,7 +296,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 	// Cycle through likely device names for the camera and return the first
 	// capturer that works, or crash if none do.
-	private VideoCapturer getVideoCapturer() {
+	private VideoCapturerAndroid getVideoCapturer() {
 		String[] cameraFacing = { "front", "back" };
 		int[] cameraIndex = { 0, 1 };
 		int[] cameraOrientation = { 0, 90, 180, 270 };
@@ -305,7 +305,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 				for (int orientation : cameraOrientation) {
 					String name = "Camera " + index + ", Facing " + facing +
 						", Orientation " + orientation;
-					VideoCapturer capturer = VideoCapturer.create(name);
+					VideoCapturerAndroid capturer = VideoCapturerAndroid.create(name, null);
 					if (capturer != null) {
 						// logAndToast("Using camera: " + name);
 						return capturer;
@@ -344,7 +344,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 				_videoConfig.getContainer().getHeight() * _videoConfig.getDevicePixelRatio());
 
 		_videoView = new VideoGLView(cordova.getActivity(), size);
-		VideoRendererGui.setView(_videoView);
+		VideoRendererGui.setView(_videoView, null);
 
 		((WebView) webView.getView()).addView(_videoView, _videoParams);
 	}
@@ -404,7 +404,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 
 					pair.setVideoRenderer(new VideoRenderer(
 							VideoRendererGui.create(x, y, widthPercentage, heightPercentage,
-									VideoRendererGui.ScalingType.SCALE_FILL, true)));
+									RendererCommon.ScalingType.SCALE_ASPECT_FILL, true)));
 
 					pair.getVideoTrack().addRenderer(pair.getVideoRenderer());
 
@@ -420,7 +420,7 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 												getPercentage(_videoConfig.getLocal().getY(), _videoConfig.getContainer().getHeight()),
 												getPercentage(_videoConfig.getLocal().getWidth(), _videoConfig.getContainer().getWidth()),
 												getPercentage(_videoConfig.getLocal().getHeight(), _videoConfig.getContainer().getHeight()),
-												VideoRendererGui.ScalingType.SCALE_FILL,
+								RendererCommon.ScalingType.SCALE_ASPECT_FILL,
 												true)));
 
 			}
@@ -473,7 +473,9 @@ public class PhoneRTCPlugin extends CordovaPlugin {
 					}
 
 					if (_videoCapturer != null) {
-						_videoCapturer.dispose();
+						try {
+							_videoCapturer.dispose();
+						}catch (Exception e){}
 						_videoCapturer = null;
 					}
 
