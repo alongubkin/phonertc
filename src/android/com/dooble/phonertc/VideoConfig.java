@@ -5,11 +5,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class VideoConfig {
-	
+
 	private VideoLayoutParams _container;
 	private VideoLayoutParams _local;
-	private int _devicePixelRatio;
-	
+	private float _devicePixelRatio;
+
 	public VideoLayoutParams getContainer() {
 		return _container;
 	}
@@ -17,7 +17,7 @@ public class VideoConfig {
 	public void setContainer(VideoLayoutParams _container) {
 		this._container = _container;
 	}
-	
+
 	public VideoLayoutParams getLocal() {
 		return _local;
 	}
@@ -25,24 +25,24 @@ public class VideoConfig {
 	public void setLocal(VideoLayoutParams _local) {
 		this._local = _local;
 	}
-	
+
 	public static VideoConfig fromJSON(JSONObject json) throws JSONException {
 		VideoConfig config = new VideoConfig();
 		config.setContainer(VideoLayoutParams.fromJSON(json.getJSONObject("containerParams")));
-		config.setDevicePixelRatio(json.getInt("devicePixelRatio"));
-		
+		config.setDevicePixelRatio((float)json.getDouble("devicePixelRatio"));
+
 		if (json.has("local")) {
 			config.setLocal(VideoLayoutParams.fromJSON(json.getJSONObject("local")));
 		}
-		
+
 		return config;
 	}
 
-	public int getDevicePixelRatio() {
+	public float getDevicePixelRatio() {
 		return _devicePixelRatio;
 	}
 
-	public void setDevicePixelRatio(int _devicePixelRatio) {
+	public void setDevicePixelRatio(float _devicePixelRatio) {
 		this._devicePixelRatio = _devicePixelRatio;
 	}
 
@@ -51,11 +51,11 @@ public class VideoConfig {
 		private int _y;
 		private int _width;
 		private int _height;
-		
+
 		public int getX() {
 			return _x;
 		}
-		
+
 		public void setX(int _x) {
 			this._x = _x;
 		}
@@ -83,18 +83,18 @@ public class VideoConfig {
 		public void setHeight(int _height) {
 			this._height = _height;
 		}
-		
+
 		public static VideoLayoutParams fromJSON(JSONObject json) throws JSONException {
 			VideoLayoutParams params = new VideoLayoutParams();
-			
+
 			JSONArray position = json.getJSONArray("position");
 			params.setX(position.getInt(0));
 			params.setY(position.getInt(1));
-			
+
 			JSONArray size = json.getJSONArray("size");
 			params.setWidth(size.getInt(0));
 			params.setHeight(size.getInt(1));
-			
+
 			return params;
 		}
 	}

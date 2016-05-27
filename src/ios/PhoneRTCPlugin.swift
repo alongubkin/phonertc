@@ -3,22 +3,24 @@ import AVFoundation
 
 @objc(PhoneRTCPlugin)
 class PhoneRTCPlugin : CDVPlugin {
-    var sessions: [String: Session] = [:]
-    var peerConnectionFactory: RTCPeerConnectionFactory
-    
+    var sessions: [String: Session]!
+    var peerConnectionFactory: RTCPeerConnectionFactory!
+
     var videoConfig: VideoConfig?
     var videoCapturer: RTCVideoCapturer?
     var videoSource: RTCVideoSource?
     var localVideoView: RTCEAGLVideoView?
-    var remoteVideoViews: [VideoTrackViewPair] = []
-    
+    var remoteVideoViews: [VideoTrackViewPair]!
+
     var localVideoTrack: RTCVideoTrack?
     var localAudioTrack: RTCAudioTrack?
-    
-    override init(webView: UIWebView) {
+
+    override func pluginInitialize() {
+        self.sessions = [:];
+        self.remoteVideoViews = [];
+
         peerConnectionFactory = RTCPeerConnectionFactory()
         RTCPeerConnectionFactory.initializeSSL()
-        super.init(webView: webView)
     }
     
     func createSessionObject(command: CDVInvokedUrlCommand) {

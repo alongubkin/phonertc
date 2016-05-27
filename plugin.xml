@@ -2,7 +2,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.dooble.phonertc"
-    version="2.0.1">
+    version="2.1.0">
 
 	<name>PhoneRTC</name>
 	<description></description>
@@ -12,10 +12,12 @@
 		<engine name="cordova" version=">=3.0.0" />
 	</engines>
 
+	<dependency id="cordova-plugin-compat" version="^1.0.0" />
+
 	<js-module src="www/phonertc.js" name="PhoneRTC">
         	<clobbers target="cordova.plugins.phonertc" />
 	</js-module>
-	
+
 	<platform name="ios">
 		<info>---------------------
 PhoneRTC Installation
@@ -79,21 +81,22 @@ In order to install PhoneRTC on iOS, please follow these steps:
 
 		<framework src="libc++.dylib" />
 		<framework src="libstdc++.dylib" />
-		<framework src="libsqlite3.0.dylib" />	
+		<framework src="libsqlite3.0.dylib" />
 		<framework src="OpenGLES.framework" />
 		<framework src="CoreVideo.framework" />
 		<framework src="CoreMedia.framework" />
 		<framework src="CoreAudio.framework" />
 		<framework src="AVFoundation.framework" />
-		<framework src="QuartzCore.framework" />		
+		<framework src="QuartzCore.framework" />
 		<framework src="AssetsLibrary.framework" />
-		<framework src="CoreGraphics.framework" />			
+		<framework src="CoreGraphics.framework" />
 		<framework src="MobileCoreServices.framework" />
 		<framework src="CoreLocation.framework" />
+		<framework src="VideoToolbox.framework" />
 		<framework src="AudioToolbox.framework" />
 		<framework src="GLKit.framework" />
 
-		<source-file src="libs/ios/libPhoneRTC.a" framework="true" />
+		<source-file src="libs/ios/libWebRTC-12671-arm-intel-Release.a" framework="true" />
     </platform>
 
     <platform name="android">
