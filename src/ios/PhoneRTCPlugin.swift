@@ -11,6 +11,7 @@ class PhoneRTCPlugin : CDVPlugin {
     var videoSource: RTCVideoSource?
     var localVideoView: RTCEAGLVideoView?
     var remoteVideoViews: [VideoTrackViewPair]!
+    var camera: String?
 
     var localVideoTrack: RTCVideoTrack?
     var localAudioTrack: RTCAudioTrack?
@@ -108,11 +109,18 @@ class PhoneRTCPlugin : CDVPlugin {
             }
             
             self.videoConfig = videoConfig
+
+            // get cameraParams from the JS params
+            self.camera = config.objectForKey("camera") as? String
             
             // add local video view
             if self.videoConfig!.local != nil {
                 if self.localVideoTrack == nil {
-                    self.initLocalVideoTrack()
+                    if(self.camera == "Front" || self.camera == "Back") {
+                        self.initLocalVideoTrack(self.camera!)
+                    }else {
+                        self.initLocalVideoTrack()
+                    }
                 }
                 
                 if self.videoConfig!.local == nil {
@@ -212,6 +220,33 @@ class PhoneRTCPlugin : CDVPlugin {
             constraints: RTCMediaConstraints()
         )
     
+        self.localVideoTrack = self.peerConnectionFactory
+            .videoTrackWithID("ARDAMSv0", source: self.videoSource)
+    }
+    
+    func initLocalVideoTrack(camera: String) {
+        NSLog("PhoneRTC: initLocalVideoTrack(camera: String) invoked")
+        var cameraID: String?
+        for captureDevice in AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo) {
+            // TODO: Make this camera option configurable
+            if captureDevice.position == AVCaptureDevicePosition.Front {
+                if camera == "Front"{
+                    cameraID = captureDevice.localizedName
+                }
+            }
+            if captureDevice.position == AVCaptureDevicePosition.Back {
+                if camera == "Back"{
+                    cameraID = captureDevice.localizedName
+                }
+            }
+        }
+        
+        self.videoCapturer = RTCVideoCapturer(deviceName: cameraID)
+        self.videoSource = self.peerConnectionFactory.videoSourceWithCapturer(
+            self.videoCapturer,
+            constraints: RTCMediaConstraints()
+        )
+        
         self.localVideoTrack = self.peerConnectionFactory
             .videoTrackWithID("ARDAMSv0", source: self.videoSource)
     }
