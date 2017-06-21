@@ -296,10 +296,9 @@ class PhoneRTCPlugin : CDVPlugin {
         let videosInRow = n == 2 ? 2 : Int(ceil(Float(n) / Float(rows)))
 
 				let containerWidth = self.videoConfig!.container.width
-				let containerHeight = self.videoConfig!.container.height;
-				let smallerSize = containerWidth < containerHeight ? containerWidth : containerHeight
-
-				let videoSize = Int(Float(smallerSize) / Float(videosInRow))
+        let containerHeight = self.videoConfig!.container.height;
+        let smallerSize = containerWidth < containerHeight ? containerWidth : containerHeight
+        let videoSize = Int(Float(smallerSize) / Float(videosInRow))
         let actualRows = Int(ceil(Float(n) / Float(videosInRow)))
 
         var y = getCenter(actualRows,
