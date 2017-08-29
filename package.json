@@ -1,5 +1,5 @@
 {
-  "_from": "git+https://github.com/De-Lac/phonertc.git",
+  "_from": "https://github.com/De-Lac/phonertc.git",
   "_id": "com.dooble.phonertc@2.1.0",
   "_inBundle": false,
   "_location": "/com.dooble.phonertc",
@@ -8,7 +8,7 @@
     "type": "git",
     "raw": "https://github.com/De-Lac/phonertc.git",
     "rawSpec": "https://github.com/De-Lac/phonertc.git",
-    "saveSpec": "git+https://github.com/De-Lac/phonertc.git",
+    "saveSpec": "https://github.com/De-Lac/phonertc.git",
     "fetchSpec": "https://github.com/De-Lac/phonertc.git",
     "gitCommittish": "master"
   },    
@@ -17,7 +17,7 @@
     "#USER",
     "/"
   ],
-  "_resolved": "git+https://github.com/De-Lac/phonertc.git",
+  "_resolved": "https://github.com/De-Lac/phonertc.git",
   "_spec": "https://github.com/De-Lac/phonertc.git",
   "author": {
     "name": "alongubkin"
@@ -36,18 +36,14 @@
   "engines": [
     {
       "name": "cordova",
-      "version": ">=3.0.0"
-    },
-    {
-      "name": "cordova-ios",
-      "version": ">=4.0.0"
+      "version": ">=5.0.0"
     }
   ],
   "homepage": "https://github.com/alongubkin/phonertc",
   "name": "cordova-plugins-phonertc",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/De-Lac/phonertc.git"
+    "url": "https://github.com/De-Lac/phonertc.git"
   },
   "version": "2.1.0"
 }
