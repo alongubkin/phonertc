@@ -1,13 +1,11 @@
 {
-  "_from": "com.dooble.phonertc@^2.1.0",
+  "_from": "com.dooble.phonertc@2.1.0",
   "_id": "com.dooble.phonertc@2.1.0",
   "_inBundle": false,
   "_location": "/com.dooble.phonertc",
-  "_phantomChildren": {},
   "_requested": {
-    "type": "range",
     "registry": true,
-    "raw": "com.dooble.phonertc@^2.1.0",
+    "raw": "com.dooble.phonertc",
     "name": "com.dooble.phonertc",
     "escapedName": "com.dooble.phonertc",
     "rawSpec": "2.1.0",
@@ -19,15 +17,14 @@
     "/"
   ],
   "_resolved": "https://github.com/De-Lac/phonertc/archive/master.zip",
-  "_spec": "com.dooble.phonertc@^2.1.0",
+  "_spec": "com.dooble.phonertc",
   "author": {
     "name": "alongubkin"
   },
-  "bundleDependencies": false,
   "cordova": {
     "id": "com.dooble.phonertc",
     "platforms": [
-      "android"
+      "android","ios"
     ]
   },
   "deprecated": false,
@@ -44,11 +41,10 @@
     "ecosystem:phonegap",
     "cordova-android"
   ],
-  "license": "Apache-2.0",
-  "name": "cordova-plugins-phonertc",
+  "name": "com.dooble.phonertc",
   "repository": {
     "type": "git",
     "url": "git://github.com/De-Lac/phonertc.git"
   },
-  "version": "1.1.0"
+  "version": "2.1.0"
 }
