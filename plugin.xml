@@ -1,55 +1,142 @@
-{
-  "_from": "com.dooble.phonertc@^2.1.0",
-  "_id": "com.dooble.phonertc@2.1.0",
-  "_inBundle": false,
-  "_location": "/com.dooble.phonertc",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "range",
-    "registry": true,
-    "raw": "com.dooble.phonertc@^2.1.0",
-    "name": "com.dooble.phonertc",
-    "escapedName": "com.dooble.phonertc",
-    "rawSpec": "2.1.0",
-    "saveSpec": null,
-    "fetchSpec": "^2.1.0"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-compat/-/cordova-plugin-compat-1.1.0.tgz",
-  "_spec": "com.dooble.phonertc@^2.1.0",
-  "_where": "/Volumes/HD Daniele/Sites/PennyCell/PennyCel/node_modules",
-  "author": {
-    "name": "alongubkin"
-  },
-  "bundleDependencies": false,
-  "cordova": {
-    "id": "com.dooble.phonertc",
-    "platforms": [
-      "android"
-    ]
-  },
-  "deprecated": false,
-  "description": "make peer-to-peer calls with WebRTC open source mobile implementation",
-  "engines": [
-    {
-      "name": "cordova",
-      "version": ">=5.0.0"
-    }
-  ],
-  "homepage": "https://github.com/alongubkin/phonertc",
-  "keywords": [
-    "ecosystem:cordova",
-    "ecosystem:phonegap",
-    "cordova-android"
-  ],
-  "license": "Apache-2.0",
-  "name": "cordova-plugins-phonertc",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/De-Lac/phonertc.git"
-  },
-  "version": "1.1.0"
-}
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.dooble.phonertc"
+    version="2.1.0">
+
+	<name>PhoneRTC</name>
+	<description></description>
+	<license></license>
+
+	<engines>
+		<engine name="cordova" version=">=3.0.0" />
+	</engines>
+
+	<dependency id="cordova-plugin-compat" version="^1.0.0" />
+
+	<js-module src="www/phonertc.js" name="PhoneRTC">
+        	<clobbers target="cordova.plugins.phonertc" />
+	</js-module>
+
+	<platform name="ios">
+		<info>---------------------
+PhoneRTC Installation
+---------------------
+
+In order to install PhoneRTC on iOS, please follow these steps:
+
+1) Go platforms/ios and click on [ProjectName].xcodeproj to open it with XCode
+2) Go to your project settings
+3) In `General`, change `Deployment Target` to 7.0 or above
+4) Go to `Build Settings` and change:
+      `Objective-C Bridging Header` => 
+           [ProjectName]/Plugins/com.dooble.phonertc/Bridging-Header.h
+      `Runpath Search Paths` => 
+           $(inherited) @executable_path/Frameworks
+5) Go to `Build Phases` and unfold `Link Binary With Libraries`
+      `Add libicucore.dylib`
+
+		</info>
+		
+		<config-file target="config.xml" parent="/*">
+			<feature name="PhoneRTCPlugin">
+				<param name="ios-package" value="PhoneRTCPlugin" />
+			</feature>
+		</config-file>
+
+		<header-file src="src/ios/RTCAudioSource.h" />
+		<header-file src="src/ios/RTCAudioTrack.h" />	
+		<header-file src="src/ios/RTCDataChannel.h" />
+		<header-file src="src/ios/RTCEAGLVideoView.h" />
+		<header-file src="src/ios/RTCI420Frame.h" />
+		<header-file src="src/ios/RTCICECandidate.h" />
+		<header-file src="src/ios/RTCICEServer.h" />
+		<header-file src="src/ios/RTCMediaConstraints.h" />
+		<header-file src="src/ios/RTCMediaSource.h" />
+		<header-file src="src/ios/RTCMediaStream.h" />
+		<header-file src="src/ios/RTCMediaStreamTrack.h" />
+		<header-file src="src/ios/RTCNSGLVideoView.h" />
+		<header-file src="src/ios/RTCOpenGLVideoRenderer.h" />
+		<header-file src="src/ios/RTCPair.h" />
+		<header-file src="src/ios/RTCPeerConnection.h" />
+		<header-file src="src/ios/RTCPeerConnectionDelegate.h" />
+		<header-file src="src/ios/RTCPeerConnectionFactory.h" />
+		<header-file src="src/ios/RTCSessionDescription.h" />
+		<header-file src="src/ios/RTCSessionDescriptionDelegate.h" />
+		<header-file src="src/ios/RTCStatsDelegate.h" />
+		<header-file src="src/ios/RTCStatsReport.h" />
+		<header-file src="src/ios/RTCTypes.h" />
+		<header-file src="src/ios/RTCVideoCapturer.h" />
+		<header-file src="src/ios/RTCVideoRenderer.h" />
+		<header-file src="src/ios/RTCVideoSource.h" />
+		<header-file src="src/ios/RTCVideoTrack.h" />
+
+		<header-file src="src/ios/Bridging-Header.h" />
+			
+		<source-file src="src/ios/PhoneRTCPlugin.swift" />
+		<source-file src="src/ios/PCObserver.swift" />
+		<source-file src="src/ios/Session.swift" />
+		<source-file src="src/ios/Config.swift" />
+		<source-file src="src/ios/SessionDescriptionDelegate.swift" />
+
+		<framework src="libc++.dylib" />
+		<framework src="libstdc++.dylib" />
+		<framework src="libsqlite3.0.dylib" />
+		<framework src="OpenGLES.framework" />
+		<framework src="CoreVideo.framework" />
+		<framework src="CoreMedia.framework" />
+		<framework src="CoreAudio.framework" />
+		<framework src="AVFoundation.framework" />
+		<framework src="QuartzCore.framework" />
+		<framework src="AssetsLibrary.framework" />
+		<framework src="CoreGraphics.framework" />
+		<framework src="MobileCoreServices.framework" />
+		<framework src="CoreLocation.framework" />
+		<framework src="VideoToolbox.framework" />
+		<framework src="AudioToolbox.framework" />
+		<framework src="GLKit.framework" />
+
+		<source-file src="libs/ios/libWebRTC-12671-arm-intel-Release.a" framework="true" />
+    </platform>
+
+    <platform name="android">
+        <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/Session.java" target-dir="src/com/dooble/phonertc" />
+		<source-file src="src/android/com/dooble/phonertc/SessionConfig.java" target-dir="src/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/VideoGLView.java" target-dir="src/com/dooble/phonertc" />
+    	<source-file src="src/android/com/dooble/phonertc/VideoConfig.java" target-dir="src/com/dooble/phonertc" />
+    	<source-file src="src/android/com/dooble/phonertc/VideoTrackRendererPair.java" target-dir="src/com/dooble/phonertc" />
+    	
+        <config-file target="res/xml/config.xml" parent="/*">
+			<feature name="PhoneRTCPlugin">
+				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
+			</feature>	
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+			<uses-feature android:name="android.hardware.camera" />
+			<uses-feature android:name="android.hardware.camera.autofocus" />
+			<uses-feature android:glEsVersion="0x00020000" android:required="true"></uses-feature>		
+			<uses-permission android:name="android.permission.INTERNET" />
+			<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+			<uses-permission android:name="android.permission.RECORD_AUDIO" />
+			<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+			<uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+
+        <source-file src="libs/android/libjingle_peerconnection.jar" target-dir="libs"/>
+		<source-file src="libs/android/armeabi-v7a/libjingle_peerconnection_so.so" target-dir="libs/armeabi-v7a"/>
+    </platform>
+
+    <platform name="browser">
+        <config-file target="config.xml" parent="/*">
+            <feature name="PhoneRTCPlugin">
+                <param name="browser-package" value="PhoneRTCPlugin" />
+            </feature>
+        </config-file>
+
+        <js-module src="src/browser/PhoneRTCProxy.js" name="PhoneRTCProxy">
+            <runs />
+        </js-module>    
+    </platform>
+</plugin>
