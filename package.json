@@ -1,34 +1,35 @@
 {
-  "_from": "https://github.com/De-Lac/phonertc.git",
+  "_from": "com.dooble.phonertc@^2.1.0",
   "_id": "com.dooble.phonertc@2.1.0",
   "_inBundle": false,
   "_location": "/com.dooble.phonertc",
-
+  "_phantomChildren": {},
   "_requested": {
-    "type": "git",
-    "raw": "https://github.com/De-Lac/phonertc.git",
-    "rawSpec": "https://github.com/De-Lac/phonertc.git",
-    "saveSpec": "https://github.com/De-Lac/phonertc.git",
-    "fetchSpec": "https://github.com/De-Lac/phonertc.git",
-    "gitCommittish": "master"
-  },    
-
+    "type": "range",
+    "registry": true,
+    "raw": "com.dooble.phonertc@^2.1.0",
+    "name": "com.dooble.phonertc",
+    "escapedName": "com.dooble.phonertc",
+    "rawSpec": "2.1.0",
+    "saveSpec": null,
+    "fetchSpec": "^2.1.0"
+  },
   "_requiredBy": [
     "#USER",
     "/"
   ],
-  "_resolved": "https://github.com/De-Lac/phonertc.git",
-  "_spec": "https://github.com/De-Lac/phonertc.git",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-compat/-/cordova-plugin-compat-1.1.0.tgz",
+  "_spec": "com.dooble.phonertc@^2.1.0",
+  "_where": "/Volumes/HD Daniele/Sites/PennyCell/PennyCel/node_modules",
   "author": {
     "name": "alongubkin"
   },
 
   "bundleDependencies": false,
   "cordova": {
-    "id": "com.dooble.phonertc",
+    "id": "cordova-plugin-compat",
     "platforms": [
-      "android",
-      "ios"
+      "android"
     ]
   },
   "deprecated": false,
@@ -40,49 +41,16 @@
     }
   ],
   "homepage": "https://github.com/alongubkin/phonertc",
-  "name": "cordova-plugins-phonertc",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/De-Lac/phonertc.git"
-  },
-  "version": "2.1.0"
-}
-
-
-
-
-{
-  "name": "cordova-plugins-phonertc",
-  "version": "2.1.0",
-  "description": "monitor phone calls",
-
-  "cordova": {
-    "id": "com.dooble.phonertc",
-    "platforms": [
-      "android",
-      "ios",
-      "browser"
-    ]
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/De-Lac/phonertc"
-  },
-  "bugs": {
-    "url": "https://issues.apache.org/jira/browse/CB"
-  },
   "keywords": [
-    "cordova",
-    "device"
+    "ecosystem:cordova",
+    "ecosystem:phonegap",
+    "cordova-android"
   ],
-
-  "author": "Daniele Fanì",
   "license": "Apache-2.0",
-  "engines": {
-    "cordovaDependencies": {
-      "2.0.0": {
-        "cordova": ">100"
-      }
-    }
-  }
+  "name": "cordova-plugins-phonertc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/De-Lac/phonertc.git"
+  },
+  "version": "1.1.0"
 }
