@@ -1,0 +1,56 @@
+{
+  "_from": "com.dooble.phonertc@^2.1.0",
+  "_id": "com.dooble.phonertc@2.1.0",
+  "_inBundle": false,
+  "_location": "/com.dooble.phonertc",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "com.dooble.phonertc@^2.1.0",
+    "name": "com.dooble.phonertc",
+    "escapedName": "com.dooble.phonertc",
+    "rawSpec": "2.1.0",
+    "saveSpec": null,
+    "fetchSpec": "^2.1.0"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-compat/-/cordova-plugin-compat-1.1.0.tgz",
+  "_spec": "com.dooble.phonertc@^2.1.0",
+  "_where": "/Volumes/HD Daniele/Sites/PennyCell/PennyCel/node_modules",
+  "author": {
+    "name": "alongubkin"
+  },
+
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "com.dooble.phonertc",
+    "platforms": [
+      "android"
+    ]
+  },
+  "deprecated": false,
+  "description": "make peer-to-peer calls with WebRTC open source mobile implementation",
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=5.0.0"
+    }
+  ],
+  "homepage": "https://github.com/alongubkin/phonertc",
+  "keywords": [
+    "ecosystem:cordova",
+    "ecosystem:phonegap",
+    "cordova-android"
+  ],
+  "license": "Apache-2.0",
+  "name": "cordova-plugins-phonertc",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/De-Lac/phonertc.git"
+  },
+  "version": "2.1.0"
+}
