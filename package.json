@@ -18,13 +18,11 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-compat/-/cordova-plugin-compat-1.1.0.tgz",
+  "_resolved": "https://github.com/De-Lac/phonertc/archive/master.zip",
   "_spec": "com.dooble.phonertc@^2.1.0",
-  "_where": "/Volumes/HD Daniele/Sites/PennyCell/PennyCel/node_modules",
   "author": {
     "name": "alongubkin"
   },
-
   "bundleDependencies": false,
   "cordova": {
     "id": "com.dooble.phonertc",
@@ -52,5 +50,5 @@
     "type": "git",
     "url": "git://github.com/De-Lac/phonertc.git"
   },
-  "version": "2.1.0"
+  "version": "1.1.0"
 }
