@@ -47,3 +47,42 @@
   },
   "version": "2.1.0"
 }
+
+
+
+
+{
+  "name": "cordova-plugins-phonertc",
+  "version": "2.1.0",
+  "description": "monitor phone calls",
+
+  "cordova": {
+    "id": "com.dooble.phonertc",
+    "platforms": [
+      "android",
+      "ios",
+      "browser"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/De-Lac/phonertc"
+  },
+  "bugs": {
+    "url": "https://issues.apache.org/jira/browse/CB"
+  },
+  "keywords": [
+    "cordova",
+    "device"
+  ],
+
+  "author": "Daniele Fanì",
+  "license": "Apache-2.0",
+  "engines": {
+    "cordovaDependencies": {
+      "2.0.0": {
+        "cordova": ">100"
+      }
+    }
+  }
+}
