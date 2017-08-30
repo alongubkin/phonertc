@@ -307,7 +307,7 @@ path.addArc(withCenter: CGPoint(x: 20, y: 20), radius: 19, startAngle: 0, endAng
         let tmpPath = UIBezierPath()
         tmpPath.move(to: CGPoint(x: 20, y: 30))
 // tmpPath.addArc(withCenter: CGPoint(x: 20, y: 30), radius: 1, startAngle: 0, endAngle: CGFloat(M_PI2), clockwise: true)
-tmpPath.addArc(withCenter: CGPoint(x: 20, y: 30), radius: 1, startAngle: 0, endAngle: CGFloat( Double.pi2), clockwise: true)
+tmpPath.addArc(withCenter: CGPoint(x: 20, y: 30), radius: 1, startAngle: 0, endAngle: CGFloat( Double.pi/2), clockwise: true)
 
         tmpPath.close()
         UIColor.white.setFill()
