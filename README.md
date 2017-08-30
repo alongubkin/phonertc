@@ -1,8 +1,9 @@
 this is a fork of the project [https://github.com/alongubkin/phonertc](https://github.com/alongubkin/phonertc).
 I've just added a package.json to be compliant with cordova 7, and replaced the \*.swift files to be compliant with Swift 3, according to suggestions proposed by the user [@wolfmanwoking](https://github.com/alongubkin/phonertc/issues/235)
 
-### Problems
-probably, when compiling, you could have the SJProgressHUD object not recognized. Check if the file it's present in the folder of the installed plugin, otherwise manually add it. You can find this file on this repo, under /src/ios/SJProgressHUD.swift
+#### Problems
+ * probably, when compiling, you could have the SJProgressHUD object not recognized. Check if the file it's present in the folder of the installed plugin, otherwise manually add it. You can find this file on this repo, under `/src/ios/SJProgressHUD.swift`
+  * if ionic cordova build ios gives other errors, be sure to have updated your build ios version to be compiled with Swift 3. You can do it by `cordova platform update ios`
 
 ### PhoneRTC
 
