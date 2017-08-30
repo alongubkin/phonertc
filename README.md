@@ -1,3 +1,7 @@
+this is a fork of the project [https://github.com/alongubkin/phonertc](https://github.com/alongubkin/phonertc).
+I've just added a package.json to be compliant with cordova 7, and replaced the \*.swift files to be compliant with Swift 3, according to suggestions proposed by the user @wolfmanwoking
+
+
 <img src="http://phonertc.io/images/logo_black.png" width="400">
 
 WebRTC for Cordova apps!
