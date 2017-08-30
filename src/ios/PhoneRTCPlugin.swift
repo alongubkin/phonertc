@@ -367,7 +367,7 @@ func refreshVideoContainer() {
     let videoSize = Int(Float(self.videoConfig!.container.width) / Float(videosInRow))
     let actualRows = Int(ceil(Float(n) / Float(videosInRow)))
     
-    var y = getCenter(videoCount:actualRows, videoSize: videoSize, containerSize: self.videoConfig!.container.height)
+    var y = getCenter(actualRows, videoSize: videoSize, containerSize: self.videoConfig!.container.height)
         + self.videoConfig!.container.y
     
     var videoViewIndex = 0
