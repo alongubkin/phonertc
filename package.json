@@ -2,7 +2,6 @@
   "_from": "cordova-plugin-phonertc",
   "_id": "cordova-plugin-phonertc@2.1.0",
   "_inBundle": false,
-  "_integrity": "sha1-143I23iwGYuud+RAuuJIYftWE9M=",
   "_location": "/cordova-plugin-phonertc",
   "_phantomChildren": {},
   "_requested": {
@@ -19,10 +18,7 @@
     "#USER",
     "/"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-phonertc/-/cordova-plugin-phonertc-2.1.0.tgz",
-  "_shasum": "d78dc8db78b0198bae77e440bae24861fb5613d3",
   "_spec": "cordova-plugin-phonertc",
-  "_where": "/Volumes/HD Daniele/Sites/PennyCell/PennyCell",
   "author": {
     "name": "alon.gubkin@gmail.com"
   },
