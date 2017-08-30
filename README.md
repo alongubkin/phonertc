@@ -10,7 +10,7 @@ I've just added a package.json to be compliant with cordova 7, and replaced the 
     3) In `General`, change `Deployment Target` to 7.0 or above
     4) Go to `Build Settings` and change:
       `Objective-C Bridging Header` => 
-           [ProjectName]/Plugins/com.dooble.phonertc/Bridging-Header.h
+           `$(PROJECT_NAME)/Plugins/com.dooble.phonertc/Bridging-Header.h`
       `Runpath Search Paths` => 
            $(inherited) @executable_path/Frameworks
     5) Go to `Build Phases` and unfold `Link Binary With Libraries`
