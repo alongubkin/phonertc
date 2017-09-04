@@ -20,7 +20,7 @@ I've just added a package.json to be compliant with cordova 7, and replaced the 
            $(inherited) @executable_path/Frameworks
     5) Go to `Build Phases` and unfold `Link Binary With Libraries`
       `Add libicucore.dylib`
-  * if ionic doesn't build, build it with Xcode    
+  * Actually, I have still problems in compiling it with Ionic. Anyway, it's enough to have it succesfully compiled in Xcode, so at the end it works.
 
 ### PhoneRTC
 
