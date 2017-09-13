@@ -8,6 +8,7 @@ I've just added a package.json to be compliant with cordova 7, and replaced the 
 
 #### Problems
  * probably, when compiling, you could have the SJProgressHUD object not recognized. Check if the file it's present in the folder of the installed plugin, otherwise manually add it. You can find this file on this repo, under `/src/ios/SJProgressHUD.swift`
+  If it's still missing, add manually by XCode: open Xcode, open the project, find where are the other files .swift, right-click, add-file and manually paste the code
   * if ionic cordova build ios gives other errors, be sure to have updated your build ios version to be compiled with Swift 3. You can do it by `cordova platform update ios`
   * fix the headers in xcode:
     1) Go platforms/ios and click on [ProjectName].xcodeproj to open it with XCode
