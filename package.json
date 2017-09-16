@@ -56,7 +56,7 @@
   "name": "cordova-plugin-phonertc",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/alongubkin/phonertc.git"
+    "url": "git+https://github.com/De-Lac/phonertc.git"
   },
   "version": "2.1.0"
 }
