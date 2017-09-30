@@ -1,0 +1,62 @@
+{
+  "_from": "cordova-plugin-phonertc",
+  "_id": "cordova-plugin-phonertc@2.1.0",
+  "_inBundle": false,
+  "_location": "/cordova-plugin-phonertc",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-phonertc",
+    "name": "cordova-plugin-phonertc",
+    "escapedName": "cordova-plugin-phonertc",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_spec": "cordova-plugin-phonertc",
+  "author": {
+    "name": "alon.gubkin@gmail.com"
+  },
+  "bugs": {
+    "url": "https://github.com/alongubkin/phonertc/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-device",
+    "platforms": [
+      "android",
+      "ios",
+      "browser"
+    ]
+  },
+  "dependencies": {},
+  "deprecated": false,
+  "description": "Cordova PhoneRTC Plugin",
+  "homepage": "https://github.com/alongubkin/phonertc#readme",
+  "keywords": [
+    "cordova",
+    "webrtc",
+    "mobile",
+    "video",
+    "video conferece",
+    "voice",
+    "voice over ip",
+    "voip",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "cordova-browser"
+  ],
+  "license": "Apache 2.0",
+  "name": "cordova-plugin-phonertc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/De-Lac/phonertc.git"
+  },
+  "version": "2.1.0"
+}
