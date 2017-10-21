@@ -1,8 +1,8 @@
-### PhoneRTC
-
 <img src="http://phonertc.io/images/logo_black.png" width="400">
 
 WebRTC for Cordova apps!
+
+**This project is no longer active. Check out [react-native-webrtc](https://github.com/oney/react-native-webrtc)**
 
 **Important Note**: Use GitHub issues only for bugs and feature requests! For any other questions, use the [StackOverflow forum](http://stackoverflow.com/questions/tagged/phonertc).
 
