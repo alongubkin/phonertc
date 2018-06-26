@@ -101,20 +101,20 @@ In order to install PhoneRTC on iOS, please follow these steps:
     </platform>
 
     <platform name="android">
-        <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="src/com/dooble/phonertc" />
-        <source-file src="src/android/com/dooble/phonertc/Session.java" target-dir="src/com/dooble/phonertc" />
-		<source-file src="src/android/com/dooble/phonertc/SessionConfig.java" target-dir="src/com/dooble/phonertc" />
-        <source-file src="src/android/com/dooble/phonertc/VideoGLView.java" target-dir="src/com/dooble/phonertc" />
-    	<source-file src="src/android/com/dooble/phonertc/VideoConfig.java" target-dir="src/com/dooble/phonertc" />
-    	<source-file src="src/android/com/dooble/phonertc/VideoTrackRendererPair.java" target-dir="src/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/PhoneRTCPlugin.java" target-dir="app/src/main/java/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/Session.java" target-dir="app/src/main/java/com/dooble/phonertc" />
+		<source-file src="src/android/com/dooble/phonertc/SessionConfig.java" target-dir="app/src/main/java/com/dooble/phonertc" />
+        <source-file src="src/android/com/dooble/phonertc/VideoGLView.java" target-dir="app/src/main/java/com/dooble/phonertc" />
+    	<source-file src="src/android/com/dooble/phonertc/VideoConfig.java" target-dir="app/src/main/java/com/dooble/phonertc" />
+    	<source-file src="src/android/com/dooble/phonertc/VideoTrackRendererPair.java" target-dir="app/src/main/java/com/dooble/phonertc" />
     	
-        <config-file target="res/xml/config.xml" parent="/*">
+        <config-file target="app/src/main/res/xml/config.xml" parent="/*">
 			<feature name="PhoneRTCPlugin">
 				<param name="android-package" value="com.dooble.phonertc.PhoneRTCPlugin" />
 			</feature>	
         </config-file>
 
-        <config-file target="AndroidManifest.xml" parent="/manifest">
+        <config-file target="app/src/main/AndroidManifest.xml" parent="/manifest">
 			<uses-feature android:name="android.hardware.camera" />
 			<uses-feature android:name="android.hardware.camera.autofocus" />
 			<uses-feature android:glEsVersion="0x00020000" android:required="true"></uses-feature>		
